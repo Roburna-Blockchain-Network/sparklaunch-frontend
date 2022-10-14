@@ -7,7 +7,7 @@ import Header from './Header'
 
 //displays on home page
 import Featuredboxes from './Middlediv/Featuredboxes'
-import Salecards from './Middlediv/salecards'
+import Salecards from './Home/salecards.js'
 
 //displays for launch sale
 import Title from './Middlediv/title'
@@ -128,7 +128,7 @@ const MiddleBottomdiv = () => {
                                 </div>
                             </div>
                         </div>
-                   </div>
+                    </div>
                 </>
             }
 

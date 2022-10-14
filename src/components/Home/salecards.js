@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef}  from 'react'
 
-import Salecard from './Salecard'
+import Salecard from '../Home/Salecard'
 import {fetchSaleInfor} from '../../connect/dataProccessing'
 
 

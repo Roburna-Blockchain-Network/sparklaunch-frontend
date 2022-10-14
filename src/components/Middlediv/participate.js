@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 
-import { selectedSale } from './salecards';
+import { selectedSale } from '../Home/salecards';
 import { participateInsale } from '../../connect/dataProccessing';
 
 const Participate = ({ setopenModal11, setopenModal10, setopenModal9, toggle1 }) => {

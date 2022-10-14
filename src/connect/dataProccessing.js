@@ -1,7 +1,7 @@
   import { ethers } from "ethers"
 
   import { factoryABI, saleABI , adminABI, testABI} from "./abi";
-  import { selectedSale } from "../components/Middlediv/salecards";
+  import { selectedSale } from "../components/Home/salecards";
   import { formatDistanceToNow } from "date-fns";
 import { formatEther } from "ethers/lib/utils";
  
