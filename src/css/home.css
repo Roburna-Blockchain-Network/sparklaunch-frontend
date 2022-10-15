@@ -172,8 +172,9 @@
 }
 
 .ask-btn{
-  position: relative;
+  position: absolute;
   left: 85%;
+  top: 4560px;
 
   /* Topology */
   font-family: 'Konnect';
@@ -188,7 +189,20 @@
   height: 5.6rem;
   background: hsl(106, 95%, 65%);
   border-radius: 1.5rem;
+ 
   
 }
 
+.loading-animation{
+  height: auto;
+  width: 259px;
+  align-self: center;
+  animation: pulse;
+  animation-duration: 0s;
+  animation-iteration-count: 1;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+    margin: auto;
+    margin-top: 20%;
+}
 

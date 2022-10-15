@@ -10,7 +10,8 @@ html, body {
     color: #fff;
     object-fit: cover;
     flex-direction: column;
-    /* height: 4096px; */
+    height: 4500px;
+    border-radius: 0px;
 
 }
 

@@ -121,11 +121,7 @@ const MiddleBottomdiv = () => {
                                 <div className='row cards-row'  ref={salecardsRef} >  
                                     <Salecards setopenModal9={setopenModal9} setopenModal5={setopenModal5} />
                                 </div>
-                                <div className='row'>
-                                    <div className='container ask-btn-div'>
-                                        <button className='ask-btn'>Ask Us</button>
-                                    </div>
-                                </div>
+                                <button className='ask-btn'>Ask Us</button>
                             </div>
                         </div>
                     </div>

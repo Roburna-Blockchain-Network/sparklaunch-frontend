@@ -45,9 +45,9 @@ function Salecards ({setopenModal9,setopenModal5}){
 
         setSaleList(saleList =
 
-            <div className="loading-div">
-            <img className="loading" src='images/smlogo.png'/>
-            </div>  
+            
+            <img className="loading-animation" src='images/smlogo.png'/>
+           
         )
  
         let timerId = setInterval(function() {
