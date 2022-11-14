@@ -115,7 +115,7 @@ const Header = props => {
                 </Link>
 
                 <Link
-                  to="#"
+                  to="/token-locker"
                   className={classnames("nav-link me-3 px-0", {
                     active: window.location.pathname === "/token-locker",
                   })}

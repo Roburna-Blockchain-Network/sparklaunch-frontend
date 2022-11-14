@@ -16,6 +16,7 @@ import HorizontalLayout from "components/HorizontalLayout/"
 
 // Import scss
 import "assets/scss/theme.scss"
+import "assets/scss/extra.scss"
 
 const App = props => {
   function getLayout() {
