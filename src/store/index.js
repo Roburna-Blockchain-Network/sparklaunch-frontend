@@ -1,5 +1,9 @@
 import { applyMiddleware, compose } from "redux"
-import { configureStore, createSlice, getDefaultMiddleware } from '@reduxjs/toolkit'
+import {
+  configureStore,
+  createSlice,
+  getDefaultMiddleware,
+} from "@reduxjs/toolkit"
 
 import createSagaMiddleware from "redux-saga"
 
@@ -16,31 +20,30 @@ import rootSaga from "./sagas"
 //   )
 // })
 
-
 const sparklaunchSlice = createSlice({
   name: "sparklaunch",
   initialState: {
-    todos: []
+    todos: [],
   },
   reducers: {
     fetchData: (state, action) => {
       return {
-        todos: action.payload
-      };
-    }
-  }
-});
+        todos: action.payload,
+      }
+    },
+  },
+})
 
-export const { fetchData } = sparklaunchSlice.actions;
+export const { fetchData } = sparklaunchSlice.actions
 
-const sagaMiddleware = createSagaMiddleware();
-const middleware = [...getDefaultMiddleware({ thunk: false }), sagaMiddleware];
+const sagaMiddleware = createSagaMiddleware()
+const middleware = [...getDefaultMiddleware({ thunk: false }), sagaMiddleware]
 
 const store = configureStore({
   reducer: rootReducer,
-  middleware
-});
+  middleware,
+})
 
-sagaMiddleware.run(rootSaga);
+sagaMiddleware.run(rootSaga)
 
-export default store;
+export default store

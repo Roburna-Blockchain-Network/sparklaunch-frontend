@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react"
 import { withRouter } from "react-router-dom"
 import PropTypes from "prop-types"
 
@@ -17,9 +17,7 @@ import Navbar from "./Navbar"
 import Header from "./Header"
 import Footer from "./Footer"
 
-
-const Layout = (props) => {
-
+const Layout = props => {
   const dispatch = useDispatch()
   const [isMenuOpened, setIsMenuOpened] = useState(false)
 
@@ -37,9 +35,8 @@ const Layout = (props) => {
     const title = props.location.pathname
     let currentage = title.charAt(1).toUpperCase() + title.slice(2)
 
-    document.title =
-      currentage ? currentage + " | Sparklaunch" : "Sparklaunch"
-  }, [props.location.pathname]);
+    document.title = currentage ? currentage + " | Sparklaunch" : "Sparklaunch"
+  }, [props.location.pathname])
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -50,7 +47,7 @@ const Layout = (props) => {
   */
   useEffect(() => {
     dispatch(changeLayout("horizontal"))
-  }, [dispatch]);
+  }, [dispatch])
 
   useEffect(() => {
     if (isPreloader === true) {
@@ -58,7 +55,10 @@ const Layout = (props) => {
       document.getElementById("status").style.display = "block"
 
       setTimeout(() => {
-        if ((document.getElementById("preloader") !== null) && (document.getElementById("status") !== null)) {
+        if (
+          document.getElementById("preloader") !== null &&
+          document.getElementById("status") !== null
+        ) {
           document.getElementById("preloader").style.display = "none"
           document.getElementById("status").style.display = "none"
         }
@@ -71,18 +71,18 @@ const Layout = (props) => {
 
   useEffect(() => {
     if (topbarTheme) {
-      dispatch(changeTopbarTheme(topbarTheme));
+      dispatch(changeTopbarTheme(topbarTheme))
     }
-  }, [dispatch, topbarTheme]);
+  }, [dispatch, topbarTheme])
 
   useEffect(() => {
     if (layoutWidth) {
-      dispatch(changeLayoutWidth(layoutWidth));
+      dispatch(changeLayoutWidth(layoutWidth))
     }
-  }, [dispatch, layoutWidth]);
+  }, [dispatch, layoutWidth])
 
   const openMenu = () => {
-    setIsMenuOpened(!isMenuOpened);
+    setIsMenuOpened(!isMenuOpened)
   }
 
   return (
@@ -111,7 +111,6 @@ const Layout = (props) => {
         <div className="main-content">{props.children}</div>
         <Footer pathname={props.location.pathname} />
       </div>
-
     </React.Fragment>
   )
 }
@@ -125,7 +124,7 @@ Layout.propTypes = {
   layoutWidth: PropTypes.any,
   location: PropTypes.object,
   showRightSidebar: PropTypes.any,
-  topbarTheme: PropTypes.any
+  topbarTheme: PropTypes.any,
 }
 
-export default withRouter(Layout);
+export default withRouter(Layout)

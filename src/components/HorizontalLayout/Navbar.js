@@ -11,9 +11,7 @@ import { toggleLeftmenu } from "store/actions"
 
 import { connect } from "react-redux"
 
-
 const Navbar = props => {
-
   useEffect(() => {
     var matchingMenuItem = null
     var ul = document.getElementById("navigation")
@@ -71,7 +69,6 @@ const Navbar = props => {
               id="topnav-menu-content"
             >
               <ul className="navbar-nav align-items-start">
-
                 <li className="nav-item">
                   <Link
                     to="/"
@@ -113,7 +110,6 @@ const Navbar = props => {
                     {props.t("Token Locker")} {props.menuOpen}
                   </Link>
                 </li>
-
               </ul>
             </Collapse>
           </nav>

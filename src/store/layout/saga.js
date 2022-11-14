@@ -97,7 +97,7 @@ function* changeLeftSidebarTheme({ payload: theme }) {
  * Changes the left sidebar theme Image
  * @param {*} param0
  */
- function* changeLeftSidebarThemeImage({ payload: theme }) {
+function* changeLeftSidebarThemeImage({ payload: theme }) {
   try {
     yield call(changeBodyAttribute, "data-sidebar-image", theme)
   } catch (error) {}

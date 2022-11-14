@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import PropTypes from 'prop-types'
+import PropTypes from "prop-types"
 
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
@@ -8,44 +8,43 @@ import classnames from "classnames"
 // Redux Store
 import { showRightSidebarAction, toggleLeftmenu } from "store/actions"
 
-import {
-  Dropdown,
-  Nav,
-  Navbar,
-} from 'react-bootstrap'
+import { Dropdown, Nav, Navbar } from "react-bootstrap"
 
 // import images
-import logoSM from 'assets/images/logos/smlogo.png'
-import logoLG from 'assets/images/logos/lglogo.png'
+import logoSM from "assets/images/logos/smlogo.png"
+import logoLG from "assets/images/logos/lglogo.png"
 
-import bscLogo from 'assets/images/logos/bsc.png'
-import roburnaLogo from 'assets/images/logos/roburna.png'
-
+import bscLogo from "assets/images/logos/bsc.png"
+import roburnaLogo from "assets/images/logos/roburna.png"
 
 //ethers imports
 import { ethers } from "ethers"
 import { formatEther } from "ethers/lib/utils"
 
 //import Methods
-import { checkMetamaskAvailability, connectWallet, handleChange } from "connect/dataProccessing"
+import {
+  checkMetamaskAvailability,
+  connectWallet,
+  handleChange,
+} from "connect/dataProccessing"
 
 const Header = props => {
-
   const options = [
-    { value: '0x61', text: 'Binance Smart', logo: bscLogo },
-    { value: '0x9f', text: 'Roburna Chain', logo: roburnaLogo },
+    { value: "0x61", text: "Binance Smart", logo: bscLogo },
+    { value: "0x9f", text: "Roburna Chain", logo: roburnaLogo },
   ]
-  const [haveMetamask, sethaveMetamask] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
-  const [accountAddress, setAccountAddress] = useState('');
-  const [selected, setSelected] = useState(options[1]);
+  const [haveMetamask, sethaveMetamask] = useState(false)
+  const [isConnected, setIsConnected] = useState(false)
+  const [accountAddress, setAccountAddress] = useState("")
+  const [selected, setSelected] = useState(options[1])
 
   useEffect(async () => {
-    checkMetamaskAvailability(sethaveMetamask, setIsConnected, setAccountAddress);
-
-  }, []);
-
-
+    checkMetamaskAvailability(
+      sethaveMetamask,
+      setIsConnected,
+      setAccountAddress
+    )
+  }, [])
 
   return (
     <React.Fragment>
@@ -53,7 +52,6 @@ const Header = props => {
         <div className="navbar-header">
           {/* left section */}
           <div className="d-flex align-items-center">
-
             {/* open menu for small screens */}
             <button
               type="button"
@@ -68,35 +66,19 @@ const Header = props => {
             <div className="navbar-brand-box ms-md-2 me-md-3">
               <Link to="/" className="logo logo-dark">
                 <span className="logo-sm">
-                  <img
-                    src={logoSM}
-                    alt=""
-                    height="25px"
-                  />
+                  <img src={logoSM} alt="" height="25px" />
                 </span>
                 <span className="logo-lg">
-                  <img
-                    src={logoLG}
-                    alt=""
-                    height="80px"
-                  />
+                  <img src={logoLG} alt="" height="80px" />
                 </span>
               </Link>
 
               <Link to="/" className="logo logo-light">
                 <span className="logo-sm">
-                  <img
-                    src={logoSM}
-                    alt=""
-                    height="25px"
-                  />
+                  <img src={logoSM} alt="" height="25px" />
                 </span>
                 <span className="logo-lg">
-                  <img
-                    src={logoLG}
-                    alt=""
-                    height="80px"
-                  />
+                  <img src={logoLG} alt="" height="80px" />
                 </span>
               </Link>
             </div>
@@ -105,9 +87,10 @@ const Header = props => {
               <Nav className="me-auto px-4 d-flex align-items-center">
                 <Link
                   to="/home"
-                  className={classnames('nav-link me-3 px-0', {
-                    active: window.location.pathname === '/' ||
-                      window.location.pathname === '/home'
+                  className={classnames("nav-link me-3 px-0", {
+                    active:
+                      window.location.pathname === "/" ||
+                      window.location.pathname === "/home",
                   })}
                 >
                   HOME
@@ -115,8 +98,8 @@ const Header = props => {
 
                 <a
                   href="/#pools"
-                  className={classnames('nav-link me-3 px-0', {
-                    active: window.location.pathname === '/#pools'
+                  className={classnames("nav-link me-3 px-0", {
+                    active: window.location.pathname === "/#pools",
                   })}
                 >
                   POOLS
@@ -124,8 +107,8 @@ const Header = props => {
 
                 <Link
                   to="#"
-                  className={classnames('nav-link me-3 px-0', {
-                    active: window.location.pathname === '/about'
+                  className={classnames("nav-link me-3 px-0", {
+                    active: window.location.pathname === "/about",
                   })}
                 >
                   ABOUT
@@ -133,23 +116,19 @@ const Header = props => {
 
                 <Link
                   to="#"
-                  className={classnames('nav-link me-3 px-0', {
-                    active: window.location.pathname === '/token-locker'
+                  className={classnames("nav-link me-3 px-0", {
+                    active: window.location.pathname === "/token-locker",
                   })}
                 >
                   TOKEN LOCKER
                 </Link>
               </Nav>
             </Navbar>
-
           </div>
 
           {/* right section */}
           <div className="d-flex flex-fill  ms-2  justify-content-end">
-
-            <button
-              className="btn btn-gradient-blue rounded-2 py-0 w-md me-3 d-none d-md-inline"
-            >
+            <button className="btn btn-gradient-blue rounded-2 py-0 w-md me-3 d-none d-md-inline">
               PYRE GAMES
             </button>
 
@@ -158,50 +137,45 @@ const Header = props => {
                 <img
                   src={selected.logo}
                   height={28}
-                  className='me-1 bg-dark rounded p-1'
+                  className="me-1 bg-dark rounded p-1"
                 />
                 {selected.text}
               </Dropdown.Toggle>
 
               <Dropdown.Menu variant="dark">
-                {options.map((item, key) =>
+                {options.map((item, key) => (
                   <Dropdown.Item
                     key={key}
-                    onClick={() => handleChange(haveMetamask, item, setSelected)}
+                    onClick={() =>
+                      handleChange(haveMetamask, item, setSelected)
+                    }
                   >
-                    <img
-                      src={item.logo}
-                      height={18}
-                      className='me-2'
-                    />
+                    <img src={item.logo} height={18} className="me-2" />
                     {item.text}
                   </Dropdown.Item>
-                )}
+                ))}
               </Dropdown.Menu>
-
             </Dropdown>
 
-            {isConnected ?
-              <button
-                className="btn btn-sm btn-outline-primary text-primary rounded-3 me-3 ps-0 py-0 text-nowrap"
-              >
+            {isConnected ? (
+              <button className="btn btn-sm btn-outline-primary text-primary rounded-3 me-3 ps-0 py-0 text-nowrap">
                 <i className="fa-solid fa-wallet text-primary border border-primary rounded p-1 me-1 fs-5" />
                 {accountAddress.slice(0, 2)}...{accountAddress.slice(38, 42)}
-
               </button>
-              :
+            ) : (
               <button
                 className="btn btn-sm btn-primary text-white rounded-3 me-3 fw-bold"
-                onClick={() => { connectWallet(haveMetamask, setIsConnected, setAccountAddress) }}
+                onClick={() => {
+                  connectWallet(haveMetamask, setIsConnected, setAccountAddress)
+                }}
               >
                 CONNECT WALLET
               </button>
-            }
+            )}
           </div>
-
         </div>
       </header>
-    </React.Fragment >
+    </React.Fragment>
   )
 }
 
@@ -210,7 +184,7 @@ Header.propTypes = {
   showRightSidebar: PropTypes.any,
   showRightSidebarAction: PropTypes.func,
   t: PropTypes.any,
-  toggleLeftmenu: PropTypes.func
+  toggleLeftmenu: PropTypes.func,
 }
 
 const mapStatetoProps = state => {

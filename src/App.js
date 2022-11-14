@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types'
+import PropTypes from "prop-types"
 import React from "react"
 
 import { Switch, BrowserRouter as Router } from "react-router-dom"
@@ -17,9 +17,7 @@ import HorizontalLayout from "components/HorizontalLayout/"
 // Import scss
 import "assets/scss/theme.scss"
 
-
 const App = props => {
-
   function getLayout() {
     let layoutCls = VerticalLayout
     switch (props.layout.layoutType) {
@@ -35,9 +33,8 @@ const App = props => {
 
   const Layout = getLayout()
 
-
   return (
-    <React.Fragment >
+    <React.Fragment>
       <Router>
         <Switch>
           {connectedRoutes.map((route, idx) => (
@@ -68,7 +65,7 @@ const App = props => {
 }
 
 App.propTypes = {
-  layout: PropTypes.any
+  layout: PropTypes.any,
 }
 
 const mapStateToProps = state => {

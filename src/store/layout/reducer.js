@@ -22,7 +22,6 @@ import {
   leftSideBarThemeTypes,
 } from "constants/layout"
 
-
 const INIT_STATE = {
   layoutType: layoutTypes.HORIZONTAL,
   layoutWidth: layoutWidthTypes.FLUID,
