@@ -21,3 +21,5 @@ const networks = [
     },
   },
 ]
+
+export { networks }

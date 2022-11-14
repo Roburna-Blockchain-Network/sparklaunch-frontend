@@ -30,8 +30,9 @@ const ProjectSetup = () => {
 
     setStep1({
       title: form.title.value,
-      symbol: form.symbol.value,
+      // symbol: form.symbol.value,
       address: form.address.value,
+      price: form.price.value,
     })
 
     setActiveTab(activeTab + 1)
@@ -50,7 +51,7 @@ const ProjectSetup = () => {
       maxbuy: form.maxbuy.value,
       startdt: form.startdt.value,
       enddt: form.enddt.value,
-      price: form.price.value,
+      // price: form.price.value,
       saleOwner: form.saleowner.value
         ? form.saleowner.value
         : ethereum.selectedAddress,
@@ -94,7 +95,7 @@ const ProjectSetup = () => {
 
     const values = {
       title: step1?.title,
-      symbol: step1?.symbol,
+      price: step1?.price,
       address: step1?.address,
 
       softcap: step2?.softcap,
@@ -103,7 +104,7 @@ const ProjectSetup = () => {
       maxbuy: step2?.maxbuy,
       startdt: step2?.startdt,
       enddt: step2?.enddt,
-      price: step2?.price,
+      // price: step2?.price,
       saleOwner: step2?.saleOwner,
       round1: step2?.round1,
       round2: step2?.round2,
@@ -140,8 +141,7 @@ const ProjectSetup = () => {
     {
       step: 2,
       title: "Private Sale",
-      desc:
-        "Enter the launchpad information that you want to raise, that should be enter all details about your presale",
+      desc: "Enter the launchpad information that you want to raise, that should be enter all details about your presale",
     },
     {
       step: 3,
@@ -185,7 +185,8 @@ const ProjectSetup = () => {
   }
 
   useEffect(async () => {
-    setDeploymentFee(await getDeploymentFee())
+    const devFee = await getDeploymentFee()
+    setDeploymentFee(devFee)
   }, [])
 
   return (
@@ -229,27 +230,27 @@ const ProjectSetup = () => {
                     placeholder="Ex. This is my private sale..."
                     required
                   />
-                  <Form.Text className="text-primary">
-                    Pool creation fee: {deploymentFee} BNB
-                  </Form.Text>
-                </Form.Group>
-
-                <Form.Group className="mb-3" controlId="symbol">
-                  <Form.Label>Symbol</Form.Label>
-                  <Form.Control
-                    defaultValue={step1?.symbol}
-                    placeholder="Ex. ZBT"
-                  />
                 </Form.Group>
 
                 <Form.Group className="mb-3" controlId="address">
-                  <Form.Label>Address *</Form.Label>
+                  <Form.Label>Token Address *</Form.Label>
                   <Form.Control
                     defaultValue={step1?.address}
                     placeholder="Ex. 0x...q34f"
                     required
                   />
+                  <Form.Text className="text-primary">
+                    Pool creation fee: {deploymentFee} BNB
+                  </Form.Text>
                 </Form.Group>
+
+                {/* <Form.Group className="mb-3" controlId="symbol">
+                  <Form.Label>Symbol</Form.Label>
+                  <Form.Control
+                    defaultValue={step1?.symbol}
+                    placeholder="Ex. ZBT"
+                  />
+                </Form.Group> */}
 
                 <Form.Group className="mb-2">
                   <Form.Label>Currency</Form.Label>
@@ -263,6 +264,17 @@ const ProjectSetup = () => {
                   <Form.Text className="text-primary">
                     Users will pay with BNB for your token
                   </Form.Text>
+                </Form.Group>
+                <Form.Group className="mb-2" as={Col} controlId="price">
+                  <Form.Label>Token Price (BNB) *</Form.Label>
+                  <Form.Control
+                    defaultValue={step1?.price}
+                    type="number"
+                    placeholder="0"
+                    step=".0000001"
+                    min="0"
+                    required
+                  />
                 </Form.Group>
 
                 <div className="text-end">
@@ -361,7 +373,7 @@ const ProjectSetup = () => {
                     <Form.Label>Start time (UTC) *</Form.Label>
                     <Form.Control
                       defaultValue={step2?.startdt}
-                      type="date"
+                      type="datetime-local"
                       placeholder="0"
                       required
                     />
@@ -376,7 +388,7 @@ const ProjectSetup = () => {
                     <Form.Label>End time (UTC) *</Form.Label>
                     <Form.Control
                       defaultValue={step2?.enddt}
-                      type="date"
+                      type="datetime-local"
                       placeholder="0"
                       required
                     />
