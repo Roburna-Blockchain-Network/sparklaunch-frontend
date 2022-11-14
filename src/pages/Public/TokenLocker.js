@@ -68,11 +68,27 @@ const TokenLocker = () => {
                 <h1 className="text-center">Unlock In</h1>
               </Col>
             </Row>
+            <Row>
+              <Col className="text-center">
+                <button className="btn btn-primary px-3 btn-time fw-bolder text-center">
+                  111
+                </button>
+                <button className="btn btn-primary px-3 btn-time fw-bolder text-center">
+                  05
+                </button>
+                <button className="btn btn-primary px-3 btn-time fw-bolder text-center">
+                  08
+                </button>
+                <button className="btn btn-primary px-3 btn-time fw-bolder text-center">
+                  05
+                </button>
+              </Col>
+            </Row>
             <Row className="mt-5">
               <Col md="6">
                 <h3>Pair Info</h3>
                 {PairInfo.map((pair, i) => (
-                  <Row className="list-container">
+                  <Row className="list-container" key={i}>
                     <Col>{pair.label}</Col>
                     <Col className="text-end">
                       {pair.image && (
@@ -90,11 +106,31 @@ const TokenLocker = () => {
               <Col md="6">
                 <h3>Lock Info</h3>
                 {LockInfo.map((lock, i) => (
-                  <Row className="list-container">
+                  <Row className="list-container" key={i}>
                     <Col>{lock.label}</Col>
                     <Col className="text-end">{lock.value}</Col>
                   </Row>
                 ))}
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <Row className="list-container">
+                  <Col>Unlock Date</Col>
+                  <Col className="text-end">
+                    2023.02.26 20:07 UTC (in 4 months)
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+            <Row>
+              <Col className="text-center">
+                <button
+                  className="btn btn-primary px-3 fw-bolder text-center"
+                  type="submit"
+                >
+                  Unlock
+                </button>
               </Col>
             </Row>
           </div>
