@@ -6,6 +6,7 @@ import { Link } from "react-router-dom"
 
 //import methods to handle data
 import { getDeploymentFee, deploySale } from "connect/dataProccessing"
+import { ethers } from "ethers"
 
 const ProjectSetup = () => {
   const [activeTab, setActiveTab] = useState(1)
@@ -28,14 +29,18 @@ const ProjectSetup = () => {
     event.preventDefault()
     event.stopPropagation()
 
-    setStep1({
-      title: form.title.value,
-      // symbol: form.symbol.value,
-      address: form.address.value,
-      price: form.price.value,
-    })
+    if (ethers.utils.isAddress(form.address.value)) {
+      setStep1({
+        title: form.title.value,
+        // symbol: form.symbol.value,
+        address: form.address.value,
+        price: form.price.value,
+      })
 
-    setActiveTab(activeTab + 1)
+      setActiveTab(activeTab + 1)
+    } else {
+      alert("error")
+    }
   }
 
   const handleSubmit2 = event => {
@@ -51,17 +56,17 @@ const ProjectSetup = () => {
       maxbuy: form.maxbuy.value,
       startdt: form.startdt.value,
       enddt: form.enddt.value,
-      // price: form.price.value,
-      saleOwner: form.saleowner.value
-        ? form.saleowner.value
-        : ethereum.selectedAddress,
+      publicDate: form.publicDate.value,
+      listingPrice: form.listingPrice.value,
+      liquidityPercent: form.liquidityPercent.value,
+      liquidityLock: form.liquidityLock.value,
       round1: form.round1.value,
       round2: form.round2.value,
       round3: form.round3.value,
       round4: form.round4.value,
       round5: form.round5.value,
-      publicroundDelta: form.publicRound.value - form.round5.value,
-      csvlink: form.csvlink.value,
+      // publicroundDelta: form.publicRound.value - form.round5.value,
+      // csvlink: form.csvlink.value,
     })
 
     setActiveTab(activeTab + 1)
@@ -243,15 +248,6 @@ const ProjectSetup = () => {
                     Pool creation fee: {deploymentFee} BNB
                   </Form.Text>
                 </Form.Group>
-
-                {/* <Form.Group className="mb-3" controlId="symbol">
-                  <Form.Label>Symbol</Form.Label>
-                  <Form.Control
-                    defaultValue={step1?.symbol}
-                    placeholder="Ex. ZBT"
-                  />
-                </Form.Group> */}
-
                 <Form.Group className="mb-2">
                   <Form.Label>Currency</Form.Label>
                   <Form.Check
@@ -275,6 +271,9 @@ const ProjectSetup = () => {
                     min="0"
                     required
                   />
+                  <p className="form-text text-info">
+                    If I want to buy 1 Token how many BNB Should I spend?
+                  </p>
                 </Form.Group>
 
                 <div className="text-end">
@@ -307,6 +306,9 @@ const ProjectSetup = () => {
                       step=".0000001"
                       min="0"
                     />
+                    {/* <p className="form-text text-info">
+                      Softcap must be >= 50% of Hardcap!
+                    </p> */}
                   </Form.Group>
 
                   <Form.Group
@@ -398,15 +400,13 @@ const ProjectSetup = () => {
                     className="mb-2"
                     as={Col}
                     md={6}
-                    controlId="price"
+                    controlId="publicDate"
                   >
-                    <Form.Label>Price (BNB) *</Form.Label>
+                    <Form.Label>Public Round Start Date *</Form.Label>
                     <Form.Control
-                      defaultValue={step2?.price}
-                      type="number"
+                      defaultValue={step2?.publicDate}
+                      type="datetime-local"
                       placeholder="0"
-                      step=".0000001"
-                      min="0"
                       required
                     />
                   </Form.Group>
@@ -415,16 +415,55 @@ const ProjectSetup = () => {
                     className="mb-2"
                     as={Col}
                     md={6}
-                    controlId="saleowner"
+                    controlId="listingPrice"
                   >
-                    <Form.Label>Sale Owner</Form.Label>
+                    <Form.Label>Listing Price *</Form.Label>
                     <Form.Control
-                      defaultValue={step2?.saleOwner}
-                      placeholder="0x...e4r7"
+                      defaultValue={step2?.listingPrice}
+                      type="number"
+                      required
+                      // min="60"
+                      // max="100"
+                      // placeholder="51"
+                      step="0.1"
                     />
-                    <p className="form-text text-primary">
+                    {/* <p className="form-text text-primary">
                       Leave blank if you are the sale owner
-                    </p>
+                    </p> */}
+                  </Form.Group>
+                  <Form.Group
+                    className="mb-2"
+                    as={Col}
+                    md={6}
+                    controlId="liquidityPercent"
+                  >
+                    <Form.Label>Liquidity (%)</Form.Label>
+                    <Form.Control
+                      defaultValue={step2?.liquidityPercent}
+                      type="number"
+                      min="51"
+                      max="100"
+                      placeholder="51"
+                      step="1"
+                      required
+                    />
+                  </Form.Group>
+
+                  <Form.Group
+                    className="mb-2"
+                    as={Col}
+                    md={6}
+                    controlId="liquidityLock"
+                  >
+                    <Form.Label>Liquidity Lock (minutes)</Form.Label>
+                    <Form.Control
+                      defaultValue={step2?.liquidityLock}
+                      type="number"
+                      min="5"
+                      placeholder="5"
+                      step="1"
+                      required
+                    />
                   </Form.Group>
                 </Row>
                 <p className="mb-3 fs-5">Set Sale Rounds</p>
@@ -439,12 +478,11 @@ const ProjectSetup = () => {
                     lg={4}
                     controlId="round1"
                   >
-                    <Form.Label>Rounds 1 (Hrs) *</Form.Label>
+                    <Form.Label>Rounds 1 </Form.Label>
                     <Form.Control
                       defaultValue={step2?.round1}
-                      type="number"
-                      placeholder="0.5"
-                      step=".1"
+                      type="datetime-local"
+                      required
                     />
                   </Form.Group>
 
@@ -458,9 +496,7 @@ const ProjectSetup = () => {
                     <Form.Label>Round 2 (Hrs) *</Form.Label>
                     <Form.Control
                       defaultValue={step2?.round2}
-                      type="number"
-                      placeholder="0.5"
-                      step=".1"
+                      type="datetime-local"
                       required
                     />
                   </Form.Group>
@@ -475,9 +511,7 @@ const ProjectSetup = () => {
                     <Form.Label>Round 3 (Hrs) *</Form.Label>
                     <Form.Control
                       defaultValue={step2?.round3}
-                      type="number"
-                      placeholder="0.5"
-                      step=".1"
+                      type="datetime-local"
                       required
                     />
                   </Form.Group>
@@ -492,9 +526,8 @@ const ProjectSetup = () => {
                     <Form.Label>Rounds 4 (Hrs) *</Form.Label>
                     <Form.Control
                       defaultValue={step2?.round4}
-                      type="number"
-                      placeholder="0.5"
-                      step=".1"
+                      type="datetime-local"
+                      required
                     />
                   </Form.Group>
 
@@ -508,14 +541,12 @@ const ProjectSetup = () => {
                     <Form.Label>Round 5 (Hrs) *</Form.Label>
                     <Form.Control
                       defaultValue={step2?.round5}
-                      type="number"
-                      placeholder="0.5"
-                      step=".1"
+                      type="datetime-local"
                       required
                     />
                   </Form.Group>
 
-                  <Form.Group
+                  {/* <Form.Group
                     className="mb-2"
                     as={Col}
                     md={6}
@@ -525,15 +556,13 @@ const ProjectSetup = () => {
                     <Form.Label>Public Round (Hrs) *</Form.Label>
                     <Form.Control
                       defaultValue={step2?.publicRound}
-                      type="number"
-                      placeholder="0.5"
-                      step=".1"
+                      type="datetime-local"
                       required
                     />
-                  </Form.Group>
+                  </Form.Group> */}
                 </Row>
-                <p className="form-text mb-3 fs-5">Set Sale Whitelist</p>
-                <Row>
+                {/* <p className="form-text mb-3 fs-5">Set Sale Whitelist</p> */}
+                {/* <Row>
                   <Form.Group className="" as={Col} md={6} controlId="csvlink">
                     <Form.Label>CSV File Link </Form.Label>
                     <Form.Control
@@ -552,7 +581,7 @@ const ProjectSetup = () => {
                       </a>
                     </Form.Text>
                   </Form.Group>
-                </Row>
+                </Row> */}
 
                 <div className="d-flex justify-content-between mt-5">
                   <button
