@@ -19,7 +19,7 @@ const config = {
   readOnlyChainId: RbaChain.chainId,
   readOnlyUrls: {
     [RbaChain.chainId]: "https://preseed-testnet-1.roburna.com/",
-    [BSCTestnet.chainId]: "https://preseed-testnet-1.roburna.com/",
+    [BSCTestnet.chainId]: BSCTestnet.rpcUrl,
   },
   networks: [BSCTestnet, RbaChain],
 }

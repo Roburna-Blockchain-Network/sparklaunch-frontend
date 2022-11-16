@@ -1,0 +1,19 @@
+const { ChainId } = require("@usedapp/core")
+
+const FACTORY_ADDRESS = {
+  [ChainId.BSCTestnet]: "0x0Ce8fF4ff0fa1C37deC51c46FbC06F9C9e2079e2",
+  159: "0x2b211Ec39ED1211538641Cbe89d5A39c58EBB86f",
+}
+
+const ADMIN_ADDRESS = {
+  [ChainId.BSCTestnet]: "0xA78AeFa96c0AA49CE2aD1c9a6cB88aC0eaE49363",
+  159: "0xf2FD1Cd32819bE7c88E2DC9Dfb063E8333146605",
+}
+const ROUTER_ADDRESS = {
+  [ChainId.BSCTestnet]: "0x4e1845Ab1d9D464150777a931Ce8FDaaD1cf8229",
+  159: "0x2fAe743821Bbc2CfD025C7E6B3Ee01ae202dd48B",
+}
+
+const API_URL = "http://localhost:3005/"
+
+export { FACTORY_ADDRESS, ADMIN_ADDRESS, API_URL, ROUTER_ADDRESS }
