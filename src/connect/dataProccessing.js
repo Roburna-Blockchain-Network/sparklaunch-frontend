@@ -308,7 +308,8 @@ export const getSaleById = async (id, setIsLoading) => {
     //sale State (true or false, 7 fields)
     const isFinished = await saleContract.saleFinished()
     const isSaleSuccessful = await saleContract.isSaleSuccessful()
-    const issaleCancelledTokensWithdrawn = await saleContract.saleCancelledTokensWithdrawn()
+    const issaleCancelledTokensWithdrawn =
+      await saleContract.saleCancelledTokensWithdrawn()
     const isCreated = chainData.isCreated
     const isEarningsWithdrawn = chainData.earningsWithdrawn
     const isLeftoverWithdrawn = chainData.leftoverWithdrawn
@@ -632,7 +633,7 @@ export const deploySale = async values => {
             // console.log('Account:', ethereum.selectedAddress)
             // console.log("Bal4:", bal)
             // console.log('fee:', fee)
-            const BalAFT = await provider.getBalance(ethereum.selectedAddress)
+            // const BalAFT = await provider.getBalance(ethereum.selectedAddress)
             // console.log('BalAFT:', formatEther(BalAFT))
 
             window.location.pathname = "/"

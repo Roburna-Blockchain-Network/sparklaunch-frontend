@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { MetaTags } from "react-meta-tags"
+import moment from "moment"
+import { useEthers } from "@usedapp/core"
 
 import { Col, Container, Form, Row, Spinner } from "react-bootstrap"
 import { Link } from "react-router-dom"
@@ -9,6 +11,7 @@ import { getDeploymentFee, deploySale } from "connect/dataProccessing"
 import { ethers } from "ethers"
 
 const ProjectSetup = () => {
+  const { account } = useEthers()
   const [activeTab, setActiveTab] = useState(1)
 
   const [step1, setStep1] = useState(null)
@@ -22,7 +25,10 @@ const ProjectSetup = () => {
   const [deploymentFee, setDeploymentFee] = useState(0.0)
 
   const [isLoading, setIsLoading] = useState(false)
+  const [isPrivateSale, setIsPrivateSale] = useState(false)
+  const [saleType, setSaleType] = useState("public")
 
+  console.log(`account`, account)
   const handleSubmit1 = event => {
     const form = event.currentTarget
 
@@ -49,26 +55,48 @@ const ProjectSetup = () => {
     event.preventDefault()
     event.stopPropagation()
 
-    setStep2({
-      softcap: form.softcap.value,
-      hardcap: form.hardcap.value,
-      minbuy: form.minbuy.value,
-      maxbuy: form.maxbuy.value,
-      startdt: form.startdt.value,
-      enddt: form.enddt.value,
-      publicDate: form.publicDate.value,
-      listingPrice: form.listingPrice.value,
-      liquidityPercent: form.liquidityPercent.value,
-      liquidityLock: form.liquidityLock.value,
-      round1: form.round1.value,
-      round2: form.round2.value,
-      round3: form.round3.value,
-      round4: form.round4.value,
-      round5: form.round5.value,
-      // publicroundDelta: form.publicRound.value - form.round5.value,
-      // csvlink: form.csvlink.value,
-    })
+    if (saleType === "public") {
+      setStep2({
+        softcap: form.softcap.value,
+        hardcap: form.hardcap.value,
+        minbuy: form.minbuy.value,
+        maxbuy: form.maxbuy.value,
+        startdt: form.startdt.value,
+        enddt: form.enddt.value,
+        publicDate: form.publicDate.value,
+        listingPrice: form.listingPrice.value,
+        liquidityPercent: form.liquidityPercent.value,
+        liquidityLock: form.liquidityLock.value,
+        // round1: form.round1.value,
+        // round2: form.round2.value,
+        // round3: form.round3.value,
+        // round4: form.round4.value,
+        // round5: form.round5.value,
+      })
+    } else {
+      setStep2({
+        selectedSaleType: saleType,
+        softcap: form.softcap.value,
+        hardcap: form.hardcap.value,
+        minbuy: form.minbuy.value,
+        maxbuy: form.maxbuy.value,
+        startdt: form.startdt.value,
+        enddt: form.enddt.value,
+        publicDate: form.publicDate.value,
+        listingPrice: form.listingPrice.value,
+        liquidityPercent: form.liquidityPercent.value,
+        liquidityLock: form.liquidityLock.value,
+        round1: form.round1.value,
+        round2: form.round2.value,
+        round3: form.round3.value,
+        round4: form.round4.value,
+        round5: form.round5.value,
+      })
+    }
 
+    console.log(step2)
+    console.log(moment(step2.enddt).unix())
+    console.log(moment(step2.startdt).unix())
     setActiveTab(activeTab + 1)
   }
 
@@ -94,10 +122,15 @@ const ProjectSetup = () => {
     setActiveTab(activeTab + 1)
   }
 
+  const handleBackButton = () => {
+    setActiveTab(activeTab - 1)
+    setIsLoading(false)
+  }
+
   const handleSubmitFinal = async event => {
     event.preventDefault()
     event.stopPropagation()
-
+    setIsLoading(true)
     const values = {
       title: step1?.title,
       price: step1?.price,
@@ -109,7 +142,6 @@ const ProjectSetup = () => {
       maxbuy: step2?.maxbuy,
       startdt: step2?.startdt,
       enddt: step2?.enddt,
-      // price: step2?.price,
       saleOwner: step2?.saleOwner,
       round1: step2?.round1,
       round2: step2?.round2,
@@ -132,9 +164,20 @@ const ProjectSetup = () => {
       description: description,
     }
 
-    setIsLoading(true)
+    console.log(values)
+    // await deploySale(values)
+  }
 
-    await deploySale(values)
+  const addressValidation = e => {
+    const inputtedAddress = e.target.value
+    if (!ethers.utils.isAddress(inputtedAddress)) {
+      e.target.focus()
+    }
+  }
+
+  const handleSaletype = e => {
+    const selectedType = e.target.value
+    setSaleType(selectedType)
   }
 
   const steps = [
@@ -243,6 +286,7 @@ const ProjectSetup = () => {
                     defaultValue={step1?.address}
                     placeholder="Ex. 0x...q34f"
                     required
+                    onBlur={addressValidation}
                   />
                   <Form.Text className="text-primary">
                     Pool creation fee: {deploymentFee} BNB
@@ -466,87 +510,122 @@ const ProjectSetup = () => {
                     />
                   </Form.Group>
                 </Row>
-                <p className="mb-3 fs-5">Set Sale Rounds</p>
                 <Row>
-                  <Form.Text className="text-primary mb-2">
-                    Enter Hrs after sale start that a round should begin
-                  </Form.Text>
-                  <Form.Group
-                    className="mb-2"
-                    as={Col}
-                    md={6}
-                    lg={4}
-                    controlId="round1"
-                  >
-                    <Form.Label>Rounds 1 </Form.Label>
-                    <Form.Control
-                      defaultValue={step2?.round1}
-                      type="datetime-local"
-                      required
-                    />
-                  </Form.Group>
+                  <div className="form-group">
+                    <label>Sale Type</label>
+                    <div className="form-check">
+                      <input
+                        className="form-check-input"
+                        type="radio"
+                        value="public"
+                        name="saleType"
+                        id="saleType1"
+                        onChange={handleSaletype}
+                        checked={saleType === "public"}
+                      />
+                      <label className="form-check-label" for="saleType1">
+                        Public
+                      </label>
+                    </div>
+                    <div className="form-check">
+                      <input
+                        className="form-check-input"
+                        type="radio"
+                        value="private"
+                        name="saleType"
+                        id="saleType2"
+                        onChange={handleSaletype}
+                        checked={saleType == "private"}
+                      />
+                      <label className="form-check-label" for="saleType2">
+                        Private
+                      </label>
+                    </div>
+                  </div>
+                </Row>
+                {saleType == "private" && (
+                  <>
+                    <p className="mb-3 mt-3 fs-5">Set Sale Rounds</p>
+                    <Row>
+                      <Form.Text className="text-primary mb-2">
+                        Enter Hrs after sale start that a round should begin
+                      </Form.Text>
+                      <Form.Group
+                        className="mb-2"
+                        as={Col}
+                        md={6}
+                        lg={4}
+                        controlId="round1"
+                      >
+                        <Form.Label>Rounds 1 </Form.Label>
+                        <Form.Control
+                          defaultValue={step2?.round1}
+                          type="datetime-local"
+                          required
+                        />
+                      </Form.Group>
 
-                  <Form.Group
-                    className="mb-2"
-                    as={Col}
-                    md={6}
-                    lg={4}
-                    controlId="round2"
-                  >
-                    <Form.Label>Round 2 (Hrs) *</Form.Label>
-                    <Form.Control
-                      defaultValue={step2?.round2}
-                      type="datetime-local"
-                      required
-                    />
-                  </Form.Group>
+                      <Form.Group
+                        className="mb-2"
+                        as={Col}
+                        md={6}
+                        lg={4}
+                        controlId="round2"
+                      >
+                        <Form.Label>Round 2 (Hrs) *</Form.Label>
+                        <Form.Control
+                          defaultValue={step2?.round2}
+                          type="datetime-local"
+                          required
+                        />
+                      </Form.Group>
 
-                  <Form.Group
-                    className="mb-2"
-                    as={Col}
-                    md={6}
-                    lg={4}
-                    controlId="round3"
-                  >
-                    <Form.Label>Round 3 (Hrs) *</Form.Label>
-                    <Form.Control
-                      defaultValue={step2?.round3}
-                      type="datetime-local"
-                      required
-                    />
-                  </Form.Group>
+                      <Form.Group
+                        className="mb-2"
+                        as={Col}
+                        md={6}
+                        lg={4}
+                        controlId="round3"
+                      >
+                        <Form.Label>Round 3 (Hrs) *</Form.Label>
+                        <Form.Control
+                          defaultValue={step2?.round3}
+                          type="datetime-local"
+                          required
+                        />
+                      </Form.Group>
 
-                  <Form.Group
-                    className="mb-2"
-                    as={Col}
-                    md={6}
-                    lg={4}
-                    controlId="round4"
-                  >
-                    <Form.Label>Rounds 4 (Hrs) *</Form.Label>
-                    <Form.Control
-                      defaultValue={step2?.round4}
-                      type="datetime-local"
-                      required
-                    />
-                  </Form.Group>
+                      <Form.Group
+                        className="mb-2"
+                        as={Col}
+                        md={6}
+                        lg={4}
+                        controlId="round4"
+                      >
+                        <Form.Label>Rounds 4 (Hrs) *</Form.Label>
+                        <Form.Control
+                          defaultValue={step2?.round4}
+                          type="datetime-local"
+                          required
+                        />
+                      </Form.Group>
 
-                  <Form.Group
-                    className="mb-2"
-                    as={Col}
-                    md={6}
-                    lg={4}
-                    controlId="round5"
-                  >
-                    <Form.Label>Round 5 (Hrs) *</Form.Label>
-                    <Form.Control
-                      defaultValue={step2?.round5}
-                      type="datetime-local"
-                      required
-                    />
-                  </Form.Group>
+                      <Form.Group
+                        className="mb-2"
+                        as={Col}
+                        md={6}
+                        lg={4}
+                        controlId="round5"
+                      >
+                        <Form.Label>Round 5 (Hrs) *</Form.Label>
+                        <Form.Control
+                          defaultValue={step2?.round5}
+                          type="datetime-local"
+                          required
+                        />
+                      </Form.Group>
 
-                  {/* <Form.Group
+                      {/* <Form.Group
                     className="mb-2"
                     as={Col}
                     md={6}
@@ -560,7 +639,9 @@ const ProjectSetup = () => {
                       required
                     />
                   </Form.Group> */}
-                </Row>
+                    </Row>
+                  </>
+                )}
                 {/* <p className="form-text mb-3 fs-5">Set Sale Whitelist</p> */}
                 {/* <Row>
                   <Form.Group className="" as={Col} md={6} controlId="csvlink">
@@ -586,7 +667,7 @@ const ProjectSetup = () => {
                 <div className="d-flex justify-content-between mt-5">
                   <button
                     className="btn btn-primary px-3 fw-bolder"
-                    onClick={() => setActiveTab(activeTab - 1)}
+                    onClick={handleBackButton}
                   >
                     {"<<"} Prev
                   </button>
@@ -767,7 +848,7 @@ const ProjectSetup = () => {
                 <div className="d-flex justify-content-between mt-5">
                   <button
                     className="btn btn-primary px-3 fw-bolder"
-                    onClick={() => setActiveTab(activeTab - 1)}
+                    onClick={handleBackButton}
                   >
                     {"<<"} Prev
                   </button>

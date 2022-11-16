@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
 import PropTypes from "prop-types"
+import { useEthers, ChainId } from "@usedapp/core"
 
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
@@ -17,34 +18,30 @@ import logoLG from "assets/images/logos/lglogo.png"
 import bscLogo from "assets/images/logos/bsc.png"
 import roburnaLogo from "assets/images/logos/roburna.png"
 
-//ethers imports
-import { ethers } from "ethers"
-import { formatEther } from "ethers/lib/utils"
-
-//import Methods
-import {
-  checkMetamaskAvailability,
-  connectWallet,
-  handleChange,
-} from "connect/dataProccessing"
-
 const Header = props => {
+  const { account, activateBrowserWallet, deactivate, switchNetwork, chainId } =
+    useEthers()
   const options = [
-    { value: "0x61", text: "Binance Smart", logo: bscLogo },
-    { value: "0x9f", text: "Roburna Chain", logo: roburnaLogo },
+    { value: ChainId.BSCTestnet, text: "Binance Smart", logo: bscLogo },
+    { value: 159, text: "Roburna Chain", logo: roburnaLogo },
   ]
-  const [haveMetamask, sethaveMetamask] = useState(false)
-  const [isConnected, setIsConnected] = useState(false)
-  const [accountAddress, setAccountAddress] = useState("")
   const [selected, setSelected] = useState(options[1])
 
+  const handleSwitchNetwork = async e => {
+    if (chainId === e.value) {
+      return
+    } else {
+      await switchNetwork(e.value)
+    }
+  }
+
   useEffect(async () => {
-    checkMetamaskAvailability(
-      sethaveMetamask,
-      setIsConnected,
-      setAccountAddress
-    )
-  }, [])
+    if (chainId == 97) {
+      setSelected(options[0])
+    } else {
+      setSelected(options[1])
+    }
+  }, [chainId])
 
   return (
     <React.Fragment>
@@ -146,9 +143,7 @@ const Header = props => {
                 {options.map((item, key) => (
                   <Dropdown.Item
                     key={key}
-                    onClick={() =>
-                      handleChange(haveMetamask, item, setSelected)
-                    }
+                    onClick={() => handleSwitchNetwork(item)}
                   >
                     <img src={item.logo} height={18} className="me-2" />
                     {item.text}
@@ -157,17 +152,18 @@ const Header = props => {
               </Dropdown.Menu>
             </Dropdown>
 
-            {isConnected ? (
-              <button className="btn btn-sm btn-outline-primary text-primary rounded-3 me-3 ps-0 py-0 text-nowrap">
+            {account ? (
+              <button
+                onClick={deactivate}
+                className="btn btn-sm btn-outline-primary text-primary rounded-3 me-3 ps-0 py-0 text-nowrap"
+              >
                 <i className="fa-solid fa-wallet text-primary border border-primary rounded p-1 me-1 fs-5" />
-                {accountAddress.slice(0, 2)}...{accountAddress.slice(38, 42)}
+                {account.substring(0, 2)}...{account.substring(38, 42)}
               </button>
             ) : (
               <button
                 className="btn btn-sm btn-primary text-white rounded-3 me-3 fw-bold"
-                onClick={() => {
-                  connectWallet(haveMetamask, setIsConnected, setAccountAddress)
-                }}
+                onClick={() => activateBrowserWallet()}
               >
                 CONNECT WALLET
               </button>
