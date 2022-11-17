@@ -9,6 +9,7 @@ import { Link } from "react-router-dom"
 
 import { ethers, utils } from "ethers"
 import useDeploymentFee from "hooks/useDeploymentFee"
+
 import {
   FACTORY_ADDRESS,
   API_URL,
@@ -18,6 +19,7 @@ import {
 
 import FactoryAbi from "constants/abi/Factory.json"
 import ERCAbi from "constants/abi/ERC20.json"
+import { saveData } from "connect/dataProccessing"
 
 const ProjectSetup = () => {
   const { account, chainId, library } = useEthers()
@@ -148,6 +150,7 @@ const ProjectSetup = () => {
   }
 
   const handleDeploySale = async data => {
+    console.log(data)
     const factoryContractAddress = FACTORY_ADDRESS[chainId]
     const contract = new Contract(
       factoryContractAddress,
@@ -172,7 +175,7 @@ const ProjectSetup = () => {
       startTimes.push(START_SALE + 5)
       isPublic = "true"
     } else {
-      data.round1 = moment(data.enddt).unix()
+      // data.round1 = moment(data.enddt).unix()
       startTimes.push(moment(data.round1).unix())
       startTimes.push(moment(data.round2).unix())
       startTimes.push(moment(data.round3).unix())
@@ -180,7 +183,8 @@ const ProjectSetup = () => {
       startTimes.push(moment(data.round5).unix())
     }
     try {
-      await contract.deployNormalSale(
+      const saleId = await contract.getNumberOfSalesDeployed()
+      const tx = await contract.deployNormalSale(
         [routerAddress, adminAddress, data.address, account],
         [
           "1000",
@@ -202,6 +206,11 @@ const ProjectSetup = () => {
         isPublic,
         { value: utils.parseEther(deploymentFee) }
       )
+      await tx.wait()
+
+      const deployedAddress = await contract.saleIdToAddress(saleId.toNumber())
+
+      return [saleId.toNumber(), deployedAddress]
     } catch (error) {
       console.log(error)
     }
@@ -245,7 +254,7 @@ const ProjectSetup = () => {
       liquidityPercent: step2?.liquidityPercent,
       liquidityLock: step2?.liquidityLock,
       publicDate: step2?.publicDate,
-
+      saleOwner: account,
       whilelist: step2?.csvlink,
 
       logo: step3?.logo,
@@ -260,8 +269,17 @@ const ProjectSetup = () => {
       youtube: step3?.youtube,
       description: description,
     }
+    try {
+      // const [id, contractAddress] = await handleDeploySale(values)
+      values.id = 7
+      values.address = "0x08c65eB92d15Aafc5c0e07B60659BbDE59c26051"
+      // console.log(id)
+      const dbId = await saveData(values)
 
-    await handleDeploySale(values)
+      console.log(dbId)
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   const addressValidation = async e => {

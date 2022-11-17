@@ -7,7 +7,7 @@ import { formatEther } from "ethers/lib/utils"
 import api from "connect/BaseApi"
 
 // const backendURL = 'http://localhost:3005/sale'
-const backendURL = "https://sparklaunch-backend.herokuapp.com/sale"
+const backendURL = "http://34.236.143.36/sale"
 
 const ADMIN_ADDRESS = "0x45B1379Be4A4f389B67D7Ad41dB5222f7104D26C"
 const FACTORY_ADDRESS = "0x863B229F7d5e41D76C49bC9922983B0c3a096CDF"
@@ -494,71 +494,83 @@ export const getSaleById = async (id, setIsLoading) => {
 
 export const saveData = async values => {
   try {
-    if (values.maxbuy < values.minbuy) {
-      alert("maxBuy is less than minBuy")
+    const START_SALE = moment(values.startdt).unix()
+    const END_SALE = moment(values.enddt).unix()
+    const PUBLIC_SALE = moment(values.publicDate).unix()
+    const PUBLIC_DELTA = END_SALE - (PUBLIC_SALE + 10)
+
+    if (typeof values.round1 == "undefined") {
+      values.round1 = START_SALE + 1
+      values.round2 = START_SALE + 2
+      values.round3 = START_SALE + 3
+      values.round4 = START_SALE + 4
+      values.round5 = START_SALE + 5
+      isPublic = "true"
     } else {
-      const input = JSON.stringify({
-        saleToken: {
-          name: values.title,
-          symbol: values.symbol,
-          address: values.address,
-        },
-        saleParams: {
-          softCap: values.softcap,
-          hardCap: values.hardcap,
-          minBuy: values.minbuy,
-          maxBuy: values.maxbuy,
-          startDate: values.startdt,
-          endDate: values.enddt,
-          price: values.price,
-          saleOwner: values.saleOwner
-            ? values.saleOwner
-            : ethereum.selectedAddress,
-          round1: values.round1,
-          round2: values.round2,
-          round3: values.round3,
-          round4: values.round4,
-          round5: values.round5,
-          publicroundDelta: values.publicroundDelta,
-        },
-
-        saleLinks: {
-          logo: values.logo,
-          fb: values.facebook,
-          git: values.githube,
-          insta: values.instagram,
-          reddit: values.reddit,
-          web: values.website,
-          twitter: values.twitter,
-          telegram: values.telegram,
-          discord: values.discord,
-          youtube: values.youtube,
-        },
-        saleDetails: {
-          description: values.description,
-          whilelist: values.whilelist,
-        },
-      })
-
-      const requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: input,
-      }
-
-      const response = await fetch(`${backendURL}`, requestOptions)
-      const data = await response.json()
-      // console.log('Data:', data)
-      let id = await data._id
-      let softCap = data.saleParams.softCap
-      let hardCap = data.saleParams.hardCap
-      let minBuy = data.saleParams.minBuy
-      let maxBuy = data.saleParams.maxBuy
-
-      // console.log('SaveData:', 'ID:', id, 'softCap', softCap, 'hardcap', hardCap, 'Minbuy', minBuy, 'Maxbuy', maxBuy)
-
-      return { id, minBuy, maxBuy }
+      values.round1 = moment(values.round1).unix()
+      values.round2 = moment(values.round2).unix()
+      values.round3 = moment(values.round3).unix()
+      values.round4 = moment(values.round4).unix()
+      values.round5 = moment(values.round5).unix()
     }
+
+    const input = JSON.stringify({
+      id: values.id,
+      address: values.address,
+      saleToken: {
+        name: values.title,
+        symbol: values.symbol,
+        address: values.address,
+      },
+      saleParams: {
+        softCap: values.softcap,
+        hardCap: values.hardcap,
+        minBuy: values.minbuy,
+        maxBuy: values.maxbuy,
+        startDate: START_SALE,
+        endDate: END_SALE,
+        price: values.price,
+        saleOwner: values.saleOwner,
+        round1: values.round1,
+        round2: values.round2,
+        round3: values.round3,
+        round4: values.round4,
+        round5: values.round5,
+        publicroundDelta: PUBLIC_DELTA,
+      },
+
+      saleLinks: {
+        logo: values.logo,
+        fb: values.facebook,
+        git: values.githube,
+        insta: values.instagram,
+        reddit: values.reddit,
+        web: values.website,
+        twitter: values.twitter,
+        telegram: values.telegram,
+        discord: values.discord,
+        youtube: values.youtube,
+      },
+      saleDetails: {
+        description: values.description,
+        whilelist: values.whilelist,
+      },
+    })
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: input,
+    }
+
+    const response = await fetch(`${backendURL}`, requestOptions)
+    const data = await response.json()
+    // // console.log('Data:', data)
+    let id = await data._id
+
+    // console.log('SaveData:', 'ID:', id, 'softCap', softCap, 'hardcap', hardCap, 'Minbuy', minBuy, 'Maxbuy', maxBuy)
+
+    return { id }
   } catch (e) {
     console.log("Err: ", e.message)
   }
