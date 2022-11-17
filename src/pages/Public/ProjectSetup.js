@@ -270,13 +270,13 @@ const ProjectSetup = () => {
       description: description,
     }
     try {
-      // const [id, contractAddress] = await handleDeploySale(values)
-      values.id = 7
-      values.address = "0x08c65eB92d15Aafc5c0e07B60659BbDE59c26051"
+      const [id, contractAddress] = await handleDeploySale(values)
+      // values.id = 7
+      // values.address = "0x08c65eB92d15Aafc5c0e07B60659BbDE59c26051"
       // console.log(id)
       const dbId = await saveData(values)
 
-      console.log(dbId)
+      setIsLoading(false)
     } catch (error) {
       console.log(error)
     }

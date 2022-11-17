@@ -258,7 +258,7 @@ const Public = props => {
                 </Row>
 
                 <Row className="g-4 my-4" id="pools">
-                  {filteredSales.length > 0 ? (
+                  {filteredSales?.length > 0 ? (
                     filteredSales
                       ?.filter(item => {
                         return contains(item, searchTerm)
