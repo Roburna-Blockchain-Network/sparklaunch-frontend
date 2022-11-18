@@ -4,10 +4,7 @@ import { factoryABI, saleABI, adminABI, testABI } from "./abi"
 import moment from "moment"
 import { formatEther } from "ethers/lib/utils"
 
-import api from "connect/BaseApi"
-
-// const backendURL = 'http://localhost:3005/sale'
-const backendURL = "http://34.236.143.36/sale"
+const backendURL = `${process.env.REACT_APP_BACKEND_URL}sale`
 
 const ADMIN_ADDRESS = "0x45B1379Be4A4f389B67D7Ad41dB5222f7104D26C"
 const FACTORY_ADDRESS = "0x863B229F7d5e41D76C49bC9922983B0c3a096CDF"
@@ -53,75 +50,16 @@ export const checkMetamaskAvailability = async (
   }
 }
 
-export const connectWallet = async (
-  haveMetamask,
-  setIsConnected,
-  setAccountAddress
-) => {
-  try {
-    if (haveMetamask) {
-      const accounts = await ethereum.request({
-        method: "eth_requestAccounts",
-      })
-
-      provider = new ethers.providers.Web3Provider(window.ethereum)
-      let balance = formatEther(
-        await provider.getBalance(ethereum.selectedAddress)
-      )
-      setAccountAddress(ethereum.selectedAddress)
-      setIsConnected(true)
-    } else {
-      console.log("Metamask not installed")
-      alert("Please install Metamask")
-    }
-  } catch (error) {
-    setIsConnected(false)
-    console.log(error)
-    alert(error.message)
-  }
-}
-
-export const handleChange = async (haveMetamask, item, setSelected) => {
-  setSelected(item)
-
-  if (haveMetamask) {
-    const chainId = await ethereum.request({ method: "eth_chainId" })
-
-    if (chainId === item.value) {
-      alert("You are on the correct network")
-    } else {
-      try {
-        await ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: item.value }],
-        })
-        console.log("You have succefully switched to Binance Smart Chain")
-      } catch (switchError) {
-        // This error code indicates that the chain has not been added to MetaMask.
-        if (switchError.code === 4902) {
-          console.log(
-            "This network is not available in your metamask, please add it"
-          )
-        }
-        console.log(switchError.msg)
-      }
-    }
-  } else {
-    console.log("No wallet installed")
-    alert("Metamask not Installed")
-  }
-}
-
 export const fetchAllSales = async setIsLoading => {
   let salesData = []
 
   try {
     const salesNO = await FactoryContract.getNumberOfSalesDeployed()
 
-    if (salesNO.toNumber() === 0) {
+    if (salesNO.toNumber() <= 0) {
       console.log("No sale deployed")
     } else {
-      const response = await fetch(`${backendURL}/deployed/true`)
+      const response = await fetch(`${backendURL}`)
       const DBdata = await response.json()
       // console.log('DB Data:', DBdata)
 
@@ -565,10 +503,7 @@ export const saveData = async values => {
 
     const response = await fetch(`${backendURL}`, requestOptions)
     const data = await response.json()
-    // // console.log('Data:', data)
     let id = await data._id
-
-    // console.log('SaveData:', 'ID:', id, 'softCap', softCap, 'hardcap', hardCap, 'Minbuy', minBuy, 'Maxbuy', maxBuy)
 
     return { id }
   } catch (e) {

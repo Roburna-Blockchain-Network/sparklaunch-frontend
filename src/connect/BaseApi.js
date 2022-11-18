@@ -1,8 +1,7 @@
 import axios from "axios"
 
 const BaseApi = axios.create({
-  // baseURL: "https://sparklaunch-backend.herokuapp.com/sale/",
-  baseURL: "http://34.236.143.36/sale",
+  baseURL: `${process.env.REACT_APP_BACKEND_URL}sale`,
 })
 
 export default BaseApi
