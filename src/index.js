@@ -26,11 +26,11 @@ const config = {
 
 const app = (
   <DAppProvider config={config}>
-    {/* <Provider store={store}> */}
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-    {/* </Provider> */}
+    <Provider store={store}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </Provider>
   </DAppProvider>
 )
 
