@@ -18,24 +18,14 @@ import {
 import smLogo from "assets/images/logos/smlogo.png"
 import bscLogo from "assets/images/logos/bsc.png"
 import discordLogo from "assets/images/icons/discord.png"
+import { useSelector } from "react-redux"
+import { useParams } from "react-router-dom"
 
 const SaleDetails = props => {
-  const { ethereum } = window
+  const { sales } = useSelector(state => state.Sales)
+  const { id } = useParams()
 
-  const [isLoading, setIsLoading] = useState(true)
-  const [saleData, setSaleData] = useState(null)
-  const [isProcessing, setIsProcessing] = useState(false)
-
-  const [showParticipateModal, setShowParticipateModal] = useState(false)
-
-  ethereum.on("accountsChanged", () => {
-    window.location.reload(false)
-  })
-
-  const closeParticipation = () => {
-    setShowParticipateModal(false)
-    setIsProcessing(false)
-  }
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleParticipate = event => {
     const form = event.currentTarget
@@ -48,23 +38,15 @@ const SaleDetails = props => {
     participateInsale(params.id, form.amount.value, closeParticipation)
   }
 
+  const saleDatas = sales.filter(d => {
+    return d.id == id
+  })
+
+  const saleData = saleDatas[0]
+  // setIsLoading(false)
   const {
     match: { params },
   } = props
-
-  useEffect(async () => {
-    if (params && params.id) {
-      if (!ethereum) {
-        alert("Please install MetaMask")
-      } else {
-        const sale = await getSaleById(params.id, setIsLoading)
-
-        console.log(sale)
-
-        setSaleData(sale)
-      }
-    }
-  }, [])
 
   return (
     <React.Fragment>
@@ -396,7 +378,7 @@ const SaleDetails = props => {
             </Row>
           )}
 
-          <Modal
+          {/* <Modal
             backdrop="static"
             size="sm"
             show={showParticipateModal}
@@ -454,7 +436,7 @@ const SaleDetails = props => {
               </Form>
               <Modal.Body></Modal.Body>
             </div>
-          </Modal>
+          </Modal> */}
         </Container>
       </div>
     </React.Fragment>

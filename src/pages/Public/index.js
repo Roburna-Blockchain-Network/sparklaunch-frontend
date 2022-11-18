@@ -11,13 +11,14 @@ import Hero from "./home/Hero"
 import FeaturedCard from "./home/FeaturedCard"
 import useDeployedSales from "hooks/useDeployedSales"
 import { useDispatch, useSelector } from "react-redux"
-import { setSaleDeployed } from "store/actions"
+import { setInitialSales, setSaleDeployed } from "store/actions"
 import { BigNumber } from "ethers"
 import { useEthers } from "@usedapp/core"
 
 const Public = props => {
   const dispatch = useDispatch()
   const { isLogin, selectedChain } = useSelector(state => state.User)
+  const { sales } = useSelector(state => state.User)
 
   const [featuredSales, setFeaturedSales] = useState([])
   const [deployedSales, setDeployedSales] = useState([])
@@ -102,6 +103,7 @@ const Public = props => {
 
   useEffect(async () => {
     const sales = await fetchAllSales(selectedChain)
+    dispatch(setInitialSales(sales))
     setDeployedSales(sales)
     setFilteredSales(sales)
     setIsLoading(false)
