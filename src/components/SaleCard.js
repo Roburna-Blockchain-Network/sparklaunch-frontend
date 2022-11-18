@@ -4,13 +4,18 @@ import moment from "moment/moment"
 import { Col, ProgressBar, Row } from "react-bootstrap"
 
 import discordLogo from "assets/images/icons/discord.png"
+import { useHistory } from "react-router-dom"
+import { useSelector } from "react-redux"
 
 const SaleCard = ({ sale }) => {
+  const currentDate = moment().unix()
+  let history = useHistory()
+
   const handleClick = e => {
     if (e.target.id === "social") {
       void 0
     } else {
-      window.location.pathname = "sale/" + sale.id
+      history.push(`/sale/${sale.id}`)
     }
   }
 
@@ -24,7 +29,7 @@ const SaleCard = ({ sale }) => {
       <div className="d-flex flex-nowrap">
         <div className="flex-grow-1">
           <h4 className="text-primary mb-0">{sale.saleToken?.name}</h4>
-          <h5>{sale.saleToken?.symbol}</h5>
+          <h5>{sale.saleToken.symbol ? sale.saleToken.symbol : "SPL"}</h5>
         </div>
 
         <div>
@@ -85,10 +90,21 @@ const SaleCard = ({ sale }) => {
           </a>
         </li>
       </ul>
-
-      <span className="bg-primary text-dark fw-bold px-2 rounded-pill font-size-11">
-        {sale.saleDetails.status}
-      </span>
+      {sale.saleParams.startDate > currentDate && (
+        <span className="bg-primary text-dark fw-bold px-2 rounded-pill font-size-11 me-2">
+          UPCOMING
+        </span>
+      )}
+      {sale.saleParams.startDate < currentDate && (
+        <span className="bg-primary text-dark fw-bold px-2 rounded-pill font-size-11 me-2">
+          LIVE
+        </span>
+      )}
+      {sale.saleParams.endDate < currentDate && (
+        <span className="bg-primary text-dark fw-bold px-2 rounded-pill font-size-11 me-2">
+          ENDED
+        </span>
+      )}
 
       <p className="my-2 text-white font-size-12 line-truncate-2">
         {sale.saleDetails.description}
@@ -119,7 +135,7 @@ const SaleCard = ({ sale }) => {
         <Row>
           <Col xs={6}>End</Col>
           <Col xs={6} className="text-primary">
-            {moment(sale.saleParams.endDate).format("llll")}
+            {moment.unix(sale.saleParams.endDate).format("llll")}
           </Col>
         </Row>
       </div>
