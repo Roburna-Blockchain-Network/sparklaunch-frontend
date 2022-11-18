@@ -4,7 +4,7 @@ import { factoryABI, saleABI, adminABI, testABI } from "./abi"
 import moment from "moment"
 import { formatEther } from "ethers/lib/utils"
 
-const backendURL = `${process.env.REACT_APP_BACKEND_URL}sale`
+const backendURL = `${process.env.REACT_APP_BACKEND_URL}`
 
 const ADMIN_ADDRESS = "0x45B1379Be4A4f389B67D7Ad41dB5222f7104D26C"
 const FACTORY_ADDRESS = "0x863B229F7d5e41D76C49bC9922983B0c3a096CDF"
@@ -13,13 +13,6 @@ const { ethereum } = window
 export let provider = ethers.getDefaultProvider(
   "https://preseed-testnet-1.roburna.com/"
 )
-
-//ethereum event reload on chain change
-if (ethereum) {
-  ethereum.on("chainChanged", () => {
-    window.location.reload(false)
-  })
-}
 
 const FactoryContract = new ethers.Contract(
   FACTORY_ADDRESS,
@@ -50,147 +43,14 @@ export const checkMetamaskAvailability = async (
   }
 }
 
-export const fetchAllSales = async setIsLoading => {
+export const fetchAllSales = async chainId => {
   let salesData = []
 
   try {
-    const salesNO = await FactoryContract.getNumberOfSalesDeployed()
-
-    if (salesNO.toNumber() <= 0) {
-      console.log("No sale deployed")
-    } else {
-      const response = await fetch(`${backendURL}`)
-      const DBdata = await response.json()
-      // console.log('DB Data:', DBdata)
-
-      await DBdata.map(async sale => {
-        const saleID = await sale._id
-
-        //get sale address
-        const saleAddress = await FactoryContract.saleIdToAddress(saleID)
-
-        //console.log(saleAddress)
-
-        if (saleAddress === "0x0000000000000000000000000000000000000000") {
-          console.log("sale in DB but not deployed")
-        } else {
-          //get sale chainData
-          const saleContract = new ethers.Contract(
-            saleAddress,
-            saleABI,
-            provider
-          )
-          const chainData = await saleContract.sale()
-          //console.log('Data',chainData)
-
-          //get NO of participants
-          const noOfParticipants = await saleContract.numberOfParticipants()
-          const holders = noOfParticipants.toNumber()
-          //console.log('Holders', holders)
-
-          //format data for display
-          let dateObject = new Date(chainData.saleEnd.toString() * 1000)
-
-          //get max and min participation
-          const minBuy = await saleContract.minParticipation()
-          const maxBuy = await saleContract.maxParticipation()
-
-          //get sale start, isFinished
-          const isFinished = await saleContract.saleFinished()
-          const saleStartTime = await saleContract.saleStartTime()
-
-          const percentage = () => {
-            const raised = chainData.totalBNBRaised / 10 ** 18
-            const hardCap = chainData.hardCap / 10 ** 18
-            const price = chainData.tokenPriceInBNB / 10 ** 18
-
-            const value = (raised / (hardCap * price)) * 100
-            if (value > 0) {
-              return value
-            } else {
-              return 0
-            }
-          }
-
-          //const end = chainData.saleEnd.toString()*1000
-          const timeDiff = () => {
-            const diffEnd = moment(
-              chainData.saleEnd.toString() * 1000
-            ).fromNow()
-            const diffStart = moment(saleStartTime.toNumber() * 1000).fromNow()
-            if (isFinished) {
-              return "Sale Closed"
-            } else if (Date.now() / 1000 < saleStartTime.toNumber()) {
-              return "Sale starts " + diffStart
-            } else if (Date.now() / 1000 < chainData.saleEnd.toString()) {
-              return "Sale ends " + diffEnd
-            } else {
-              return "Sale ended " + diffEnd
-            }
-          }
-
-          const status = () => {
-            if (isFinished) {
-              return "CLOSED"
-            } else if (Date.now() / 1000 < saleStartTime.toNumber()) {
-              return "UPCOMMING"
-            } else if (Date.now() / 1000 < chainData.saleEnd.toString()) {
-              return "LIVE"
-            } else if (chainData.saleEnd.toNumber() === 0) {
-              return "NOT-SET"
-            } else return "ENDED"
-          }
-
-          let saleDBChain = {
-            id: sale._id,
-            saleToken: {
-              name: sale.saleToken.name,
-              symbol: sale.saleToken.symbol,
-              address: sale.saleToken.address,
-            },
-            saleParams: {
-              softCap: chainData.softCap.toString() / 10 ** 18,
-              hardCap: chainData.hardCap.toString() / 10 ** 18,
-              raised: chainData.totalBNBRaised.toString() / 10 ** 18,
-              price: chainData.tokenPriceInBNB.toString() / 10 ** 18,
-              startDate: sale.saleParams.startDate,
-              endDate: dateObject,
-              minBuy: minBuy.toString() / 10 ** 18,
-              maxBuy: maxBuy.toString() / 10 ** 18,
-              firstRelease: sale.saleParams.firstRelease,
-              eachRelease: sale.saleParams.eachRelease,
-              vestingDays: sale.saleParams.vestingDay,
-            },
-            saleLinks: {
-              logo: sale.saleLinks.logo,
-              fb: sale.saleLinks.fb,
-              git: sale.saleLinks.git,
-              insta: sale.saleLinks.insta,
-              reddit: sale.saleLinks.reddit,
-
-              web: sale.saleLinks.web,
-              twitter: sale.saleLinks.twitter,
-              telegram: sale.saleLinks.telegram,
-              discord: sale.saleLinks.discord,
-              youtube: sale.saleLinks.youtube,
-            },
-            saleDetails: {
-              saleID: sale.saleDetails.saleID,
-              saleAddress: saleAddress,
-              saleOwner: chainData.saleOwner.toString(),
-              description: sale.saleDetails.description,
-              holders: holders,
-              listingDate: sale.saleDetails.listingDate,
-              percentage: percentage(),
-              diff: timeDiff(),
-              status: status(),
-            },
-          }
-          salesData.push(saleDBChain)
-        }
-      })
-
-      return { salesNO, salesData }
+    const response = await fetch(`${backendURL}sale/chain/${chainId}`)
+    const res = await response.json()
+    if (res.success) {
+      return res.data
     }
   } catch (e) {
     console.log("Err: ", e.message)
@@ -443,7 +303,6 @@ export const saveData = async values => {
       values.round3 = START_SALE + 3
       values.round4 = START_SALE + 4
       values.round5 = START_SALE + 5
-      isPublic = "true"
     } else {
       values.round1 = moment(values.round1).unix()
       values.round2 = moment(values.round2).unix()
@@ -454,7 +313,8 @@ export const saveData = async values => {
 
     const input = JSON.stringify({
       id: values.id,
-      address: values.address,
+      address: values.contractAddress,
+      chainId: values.chainId,
       saleToken: {
         name: values.title,
         symbol: values.symbol,
@@ -492,6 +352,7 @@ export const saveData = async values => {
       saleDetails: {
         description: values.description,
         whilelist: values.whilelist,
+        saleAddress: values.contractAddress,
       },
     })
 
@@ -501,7 +362,7 @@ export const saveData = async values => {
       body: input,
     }
 
-    const response = await fetch(`${backendURL}`, requestOptions)
+    const response = await fetch(`${backendURL}sale`, requestOptions)
     const data = await response.json()
     let id = await data._id
 

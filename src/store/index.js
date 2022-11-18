@@ -20,21 +20,21 @@ import rootSaga from "./sagas"
 //   )
 // })
 
-const sparklaunchSlice = createSlice({
-  name: "sparklaunch",
-  initialState: {
-    todos: [],
-  },
-  reducers: {
-    fetchData: (state, action) => {
-      return {
-        todos: action.payload,
-      }
-    },
-  },
-})
+// const sparklaunchSlice = createSlice({
+//   name: "sparklaunch",
+//   initialState: {
+//     todos: [],
+//   },
+//   reducers: {
+//     fetchData: (state, action) => {
+//       return {
+//         todos: action.payload,
+//       }
+//     },
+//   },
+// })
 
-export const { fetchData } = sparklaunchSlice.actions
+// export const { fetchData } = sparklaunchSlice.actions
 
 const sagaMiddleware = createSagaMiddleware()
 const middleware = [...getDefaultMiddleware({ thunk: false }), sagaMiddleware]

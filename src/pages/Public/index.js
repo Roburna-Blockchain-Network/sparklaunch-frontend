@@ -3,17 +3,22 @@ import MetaTags from "react-meta-tags"
 import { Link } from "react-router-dom"
 
 import { Col, Container, Row } from "react-bootstrap"
-
 import { fetchAllSales } from "connect/dataProccessing"
-
 import SaleCard from "components/SaleCard"
-import verticaLogo from "assets/images/logos/biglogo.png"
 import smLogo from "assets/images/logos/smlogo.png"
 import api from "connect/BaseApi"
+import Hero from "./home/Hero"
+import FeaturedCard from "./home/FeaturedCard"
+import useDeployedSales from "hooks/useDeployedSales"
+import { useDispatch } from "react-redux"
+import { setSaleDeployed } from "store/actions"
+import { BigNumber } from "ethers"
+import { useEthers } from "@usedapp/core"
 
 const Public = props => {
-  const tempCard = <div className="featured-card-animation"></div>
-  const tempList = [tempCard, tempCard, tempCard, tempCard, tempCard]
+  const dispatch = useDispatch()
+
+  const { chainId } = useEthers()
 
   const [featuredSales, setFeaturedSales] = useState([])
   const [deployedSales, setDeployedSales] = useState([])
@@ -22,6 +27,14 @@ const Public = props => {
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedBtn, setSelectedBtn] = useState("ALL")
+
+  const allSales = useDeployedSales()
+
+  useEffect(() => {
+    if (allSales instanceof BigNumber) {
+      dispatch(setSaleDeployed(allSales.toNumber()))
+    }
+  }, [])
 
   const contains = (item, searchValue) => {
     if (searchValue === null || searchValue.trim() === "") {
@@ -52,6 +65,13 @@ const Public = props => {
       return
     }
 
+    if (typeof deployedSales == "undefined") {
+      return
+    }
+    if (deployedSales.length <= 0) {
+      return
+    }
+
     setFilteredSales(
       deployedSales.filter(item => {
         if (
@@ -74,27 +94,21 @@ const Public = props => {
       })
       .then(response => {
         const data = response.data
-        // console.log(data)
-
         setFeaturedSales(data)
       })
       .catch(error => {
-        // information not found
         console.log(error.response?.data?.message)
       })
   }
 
   useEffect(async () => {
-    fetchFeaturedSale()
-
-    const sales = await fetchAllSales()
-
-    setTimeout(() => {
-      setDeployedSales(sales?.salesData)
-      setFilteredSales(sales?.salesData)
-      setIsLoading(false)
-    }, 10000)
-  }, [])
+    console.log(chainId)
+    const sales = await fetchAllSales(chainId)
+    console.log(sales)
+    setDeployedSales(sales)
+    setFilteredSales(sales)
+    setIsLoading(false)
+  }, [chainId])
 
   return (
     <React.Fragment>
@@ -104,81 +118,8 @@ const Public = props => {
         </MetaTags>
 
         <Container fluid>
-          <Row className="mb-5">
-            <Col md={{ span: 6, offset: 3 }} className="d-flex">
-              <img className="img-fluid mx-auto mb-4" src={verticaLogo} />
-            </Col>
-          </Row>
-
-          <Row className="pt-5 mb-lg-5 mb-3">
-            <Col
-              xs={12}
-              md={6}
-              className="text-lg-end text-center mb-5 mb-lg-0"
-            >
-              <Link
-                to="/project-setup"
-                className="bg-primary text-black fw-bold p-3 rounded-pill"
-              >
-                <span className="fs-4 d-none d-lg-inline">
-                  LAUNCH YOUR PROJECT WITH US
-                </span>
-                <span className="fs-5 d-lg-none">
-                  LAUNCH YOUR PROJECT WITH US
-                </span>
-              </Link>
-            </Col>
-
-            <Col md={6} className="text-center">
-              <a
-                href="#sales"
-                className="border border-2 border-primary text-white fw-bold py-3 px-5 w-lg rounded-pill"
-              >
-                <span className="fs-4 d-none d-lg-inline">BUY $IGHT</span>
-                <span className="fs-5 d-lg-none">BUY $IGHT</span>
-              </a>
-            </Col>
-          </Row>
-
-          <div className="pt-4">
-            <p className="text-center display-4 text-primary fw-bolder">
-              Featured Projects
-            </p>
-
-            <div
-              className="bg-white py-1 rounded mx-auto"
-              style={{ maxWidth: 70 }}
-            ></div>
-
-            <Row className="my-4 justify-content-center flex-md-nowrap">
-              {featuredSales.length > 0
-                ? featuredSales.map((sale, key) => (
-                    <Col
-                      xs={6}
-                      sm={4}
-                      md="2"
-                      key={key}
-                      className="mb-3 flex-md-grow-1"
-                    >
-                      <Link to={"sale/" + sale._id}>
-                        <div
-                          className="featured-card"
-                          style={{
-                            backgroundImage: `url(${sale.saleDetails.saleImg})`,
-                          }}
-                        ></div>
-                        <h3 className="text-center mt-1 d-none d-lg-block">
-                          {sale.saleToken.name}
-                        </h3>
-                        <h5 className="text-center mt-1 d-lg-none">
-                          {sale.saleToken.name}
-                        </h5>
-                      </Link>
-                    </Col>
-                  ))
-                : tempList.map((item, key) => <Col key={key}>{item}</Col>)}{" "}
-            </Row>
-          </div>
+          <Hero />
+          <FeaturedCard featuredSales />
 
           <div className="my-4">
             {isLoading ? (

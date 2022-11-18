@@ -5,7 +5,7 @@ import { useContractFunction, useEthers, useToken } from "@usedapp/core"
 import { Contract } from "@ethersproject/contracts"
 
 import { Col, Container, Form, Row, Spinner } from "react-bootstrap"
-import { Link } from "react-router-dom"
+import { Link, Redirect, useHistory } from "react-router-dom"
 
 import { ethers, utils } from "ethers"
 import useDeploymentFee from "hooks/useDeploymentFee"
@@ -22,6 +22,7 @@ import ERCAbi from "constants/abi/ERC20.json"
 import { saveData } from "connect/dataProccessing"
 
 const ProjectSetup = () => {
+  let history = useHistory()
   const { account, chainId, library } = useEthers()
   const deployFee = useDeploymentFee()
   const [activeTab, setActiveTab] = useState(1)
@@ -209,6 +210,7 @@ const ProjectSetup = () => {
       await tx.wait()
 
       const deployedAddress = await contract.saleIdToAddress(saleId.toNumber())
+      console.log(deployedAddress)
 
       return [saleId.toNumber(), deployedAddress]
     } catch (error) {
@@ -271,12 +273,17 @@ const ProjectSetup = () => {
     }
     try {
       const [id, contractAddress] = await handleDeploySale(values)
-      // values.id = 7
-      // values.address = "0x08c65eB92d15Aafc5c0e07B60659BbDE59c26051"
-      // console.log(id)
+
+      console.log(id, contractAddress)
+      values.id = id
+      values.contractAddress = contractAddress
+      values.chainId = chainId
+
       const dbId = await saveData(values)
 
       setIsLoading(false)
+
+      history.push("/")
     } catch (error) {
       console.log(error)
     }
