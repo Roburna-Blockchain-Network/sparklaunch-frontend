@@ -38,3 +38,28 @@ export const Sales = (
       return state
   }
 }
+export const User = (
+  state = {
+    isLogin: false,
+    selectedChain: 97,
+  },
+  action
+) => {
+  switch (action.type) {
+    case ActionTypes.SET_LOGIN_STATUS:
+      return {
+        ...state,
+        isLogin: action.payload,
+        selectedChain: state.selectedChain,
+      }
+
+    case ActionTypes.SET_CHAIN:
+      return {
+        ...state,
+        isLogin: state.isLogin,
+        selectedChain: action.payload,
+      }
+    default:
+      return state
+  }
+}

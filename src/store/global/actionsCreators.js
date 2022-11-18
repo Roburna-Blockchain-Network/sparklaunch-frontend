@@ -14,3 +14,12 @@ export const setSaleDeployed = p => ({
   type: ActionTypes.SET_NUMBER_DEPLOYED,
   payload: p,
 })
+
+export const setLoginStatus = p => ({
+  type: ActionTypes.SET_LOGIN_STATUS,
+  payload: p,
+})
+export const setSelectedChain = p => ({
+  type: ActionTypes.SET_CHAIN,
+  payload: p,
+})

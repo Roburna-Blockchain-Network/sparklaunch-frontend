@@ -2,12 +2,17 @@ import React, { useState, useEffect } from "react"
 import PropTypes from "prop-types"
 import { useEthers, ChainId } from "@usedapp/core"
 
-import { connect } from "react-redux"
+import { connect, useDispatch, useSelector } from "react-redux"
 import { Link } from "react-router-dom"
 import classnames from "classnames"
 
 // Redux Store
-import { showRightSidebarAction, toggleLeftmenu } from "store/actions"
+import {
+  setLoginStatus,
+  setSelectedChain,
+  showRightSidebarAction,
+  toggleLeftmenu,
+} from "store/actions"
 
 import { Dropdown, Nav, Navbar } from "react-bootstrap"
 
@@ -17,31 +22,48 @@ import logoLG from "assets/images/logos/lglogo.png"
 
 import bscLogo from "assets/images/logos/bsc.png"
 import roburnaLogo from "assets/images/logos/roburna.png"
+import { SUPPORTED_CHAIN } from "constants/Address"
 
 const Header = props => {
   const { account, activateBrowserWallet, deactivate, switchNetwork, chainId } =
     useEthers()
+
+  const users = useSelector(state => state.User)
+  const dispatch = useDispatch()
+
   const options = [
-    { value: ChainId.BSCTestnet, text: "Binance Smart", logo: bscLogo },
-    { value: 159, text: "Roburna Chain", logo: roburnaLogo },
+    { id: 0, value: ChainId.BSCTestnet, text: "Binance Smart", logo: bscLogo },
+    { id: 1, value: 159, text: "Roburna Chain", logo: roburnaLogo },
   ]
-  const [selected, setSelected] = useState(options[1])
+  const [selected, setSelected] = useState(options[0])
 
   const handleSwitchNetwork = async e => {
-    if (chainId === e.value) {
-      return
+    if (account) {
+      if (chainId === e.value) {
+        return
+      } else {
+        await switchNetwork(e.value)
+      }
     } else {
-      await switchNetwork(e.value)
+      if (users.selectedChain === e.value) {
+        return
+      } else {
+        dispatch(setSelectedChain(e.value))
+        setSelected(e)
+      }
     }
   }
 
   useEffect(async () => {
-    if (chainId == 97) {
-      setSelected(options[0])
+    if (typeof account == "undefined") {
+      dispatch(setLoginStatus(false))
     } else {
-      setSelected(options[1])
+      dispatch(setLoginStatus(true))
+      if (SUPPORTED_CHAIN.includes(chainId)) {
+        dispatch(setSelectedChain(chainId))
+      }
     }
-  }, [chainId])
+  }, [account])
 
   return (
     <React.Fragment>

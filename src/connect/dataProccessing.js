@@ -44,8 +44,9 @@ export const checkMetamaskAvailability = async (
 }
 
 export const fetchAllSales = async chainId => {
-  let salesData = []
-
+  if (typeof chainId == "undefined") {
+    return []
+  }
   try {
     const response = await fetch(`${backendURL}sale/chain/${chainId}`)
     const res = await response.json()
@@ -53,7 +54,7 @@ export const fetchAllSales = async chainId => {
       return res.data
     }
   } catch (e) {
-    console.log("Err: ", e.message)
+    return []
   }
 }
 
