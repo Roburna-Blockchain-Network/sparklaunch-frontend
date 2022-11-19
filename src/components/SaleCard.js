@@ -1,10 +1,10 @@
-import React from "react"
+import React, { useEffect } from "react"
 import moment from "moment/moment"
 
 import { Button, Col, ProgressBar, Row } from "react-bootstrap"
 
 import discordLogo from "assets/images/icons/discord.png"
-import { Link, useHistory } from "react-router-dom"
+import { Link, useHistory, useParams } from "react-router-dom"
 import { useSelector } from "react-redux"
 import useTokenInfo from "hooks/useTokenInfo"
 import { useEtherBalance } from "@usedapp/core"
@@ -16,6 +16,7 @@ const SaleCard = ({ sale }) => {
   const currentDate = moment().unix()
   let history = useHistory()
   const users = useSelector(state => state.User)
+
   /**
    * info
    */

@@ -14,8 +14,25 @@ const ROUTER_ADDRESS = {
   159: "0x2fAe743821Bbc2CfD025C7E6B3Ee01ae202dd48B",
 }
 
+const RPC_ADDRESS = {
+  [ChainId.BSCTestnet]: "https://rpc.ankr.com/bsc_testnet_chapel",
+  159: "https://preseed-testnet-1.roburna.com/",
+}
+
+const MULTICALL_ADDRESS = {
+  [ChainId.BSCTestnet]: "0x8F3273Fb89B075b1645095ABaC6ed17B2d4Bc576",
+  159: "0x4e1845Ab1d9D464150777a931Ce8FDaaD1cf8229",
+}
+
 export const SUPPORTED_CHAIN = [159, 97]
 
 const API_URL = process.env.REACT_APP_BACKEND_URL
 
-export { FACTORY_ADDRESS, ADMIN_ADDRESS, API_URL, ROUTER_ADDRESS }
+export {
+  FACTORY_ADDRESS,
+  ADMIN_ADDRESS,
+  API_URL,
+  ROUTER_ADDRESS,
+  RPC_ADDRESS,
+  MULTICALL_ADDRESS,
+}

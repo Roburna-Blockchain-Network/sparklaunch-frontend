@@ -19,34 +19,65 @@ import smLogo from "assets/images/logos/smlogo.png"
 import bscLogo from "assets/images/logos/bsc.png"
 import discordLogo from "assets/images/icons/discord.png"
 import { useSelector } from "react-redux"
-import { useParams } from "react-router-dom"
+import { useHistory, useParams } from "react-router-dom"
+import { ChainId, useConfig, useEthers } from "@usedapp/core"
+import useTokenInfo from "hooks/useTokenInfo"
+import useSaleInfo from "hooks/useSaleInfo"
+import { formatEther, formatUnits } from "ethers/lib/utils"
+import SaleDetailCard from "components/SaleDetailCard"
+import { API_URL } from "constants/Address"
+import { getSaleInfo, getTokenInfo } from "utils/factoryHelper"
+import { formatBigNumber } from "utils/numbers"
+import BuyDetailCard from "components/BuyDetailCard"
 
 const SaleDetails = props => {
+  const [isLoading, setIsLoading] = useState(false)
+  const [ready, setReady] = useState(false)
+  const [init, setInit] = useState(true)
+  const [saleData, setSaleData] = useState()
+  const [tokenInfo, setTokenInfo] = useState()
+  const [saleInfo, setSaleInfo] = useState()
+
   const { sales } = useSelector(state => state.Sales)
+  const { selectedChain } = useSelector(state => state.User)
   const { id } = useParams()
 
-  const [isLoading, setIsLoading] = useState(false)
+  useEffect(async () => {
+    const abortController = new AbortController()
+    try {
+      const response = await fetch(
+        `${API_URL}sale/chain/${selectedChain}/id/${id}`,
+        { signal: abortController.signal }
+      )
+      const res = await response.json()
+      setSaleData(res.data[0])
 
-  const handleParticipate = event => {
-    const form = event.currentTarget
+      const token = await getTokenInfo(
+        selectedChain,
+        res.data[0].saleToken.address
+      )
 
-    event.preventDefault()
-    event.stopPropagation()
+      // console.log(res.data[0].address)
 
-    setIsProcessing(true)
+      const sales = await getSaleInfo(selectedChain, res.data[0].address)
+      // console.log(sales)
 
-    participateInsale(params.id, form.amount.value, closeParticipation)
-  }
+      if (token.success) {
+        setTokenInfo(token.data)
+      }
+      if (sales.success) {
+        setSaleInfo(sales.data)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+    // console.log(saleInfo)
+    setReady(true)
 
-  const saleDatas = sales.filter(d => {
-    return d.id == id
-  })
-
-  const saleData = saleDatas[0]
-  // setIsLoading(false)
-  const {
-    match: { params },
-  } = props
+    return () => {
+      abortController.abort()
+    }
+  }, [])
 
   return (
     <React.Fragment>
@@ -56,16 +87,14 @@ const SaleDetails = props => {
         </MetaTags>
 
         <Container fluid>
-          {isLoading ? (
+          {!ready ? (
             <div className="text-center">
               <img src={smLogo} className="blinking-item" />
             </div>
           ) : (
             <Row className="mx-0 justify-content-center">
               <Col
-                md={6}
-                lg={5}
-                xl={4}
+                md={8}
                 className="bg-dark bg-softer border border-primary rounded-4 p-3 mb-4 mb-lg-0"
               >
                 <div className="d-flex flex-nowrap align-items-center">
@@ -162,218 +191,96 @@ const SaleDetails = props => {
                   <Row>
                     <Col>
                       <p>
-                        <span className="fw-bold">Access Type: </span>
-                        {saleData?.saleDetails?.access}
+                        <span className="fw-bold">Access Type : </span>
+                        {saleInfo.sale.isPublic ? "Public" : "Private"}
                       </p>
                     </Col>
                     <Col>
                       <p>
-                        <span className="fw-bold">Hard Cap: </span>
-                        {saleData?.saleDetails?.round}
+                        <span className="fw-bold">Hard Cap : </span>
+                        {saleInfo ? formatEther(saleInfo.sale.hardCap) : 0} BNB
                       </p>
                     </Col>
                   </Row>
 
-                  <p className="mb-0 py-1 border-bottom border-white border-opacity-50">
-                    SoftCap/Hardcap:{" "}
-                    <span className="text-primary">
-                      {saleData?.saleParams.softCap} -{" "}
+                  <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
+                    <div className="w-25 fw-bold">Swap Rate</div>
+                    <div className="text-primary">
+                      : {saleData?.saleParams.softCap} -{" "}
                       {saleData?.saleParams.hardCap} Tokens
-                    </span>
-                  </p>
+                    </div>
+                  </div>
 
-                  <p className="mb-0 py-1 border-bottom border-white border-opacity-50">
-                    Min/Max (participation):{" "}
-                    <span className="text-primary">
-                      {saleData?.saleParams.minBuy} -{" "}
-                      {saleData?.saleParams.maxBuy} BNB
-                    </span>
-                  </p>
+                  <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
+                    <div className="w-25 fw-bold">Start / End</div>
+                    <div className="text-primary">
+                      : {saleData?.saleParams.softCap} -{" "}
+                      {saleData?.saleParams.hardCap} Tokens
+                    </div>
+                  </div>
 
-                  <p className="mb-0 py-1 border-bottom border-white border-opacity-50">
-                    Start/End: <br></br>
-                    <span className="text-primary">
-                      {moment(saleData?.saleParams.startDate).format("llll")} -{" "}
-                      {moment(saleData?.saleParams.endDate).format("llll")}
-                    </span>
-                  </p>
+                  <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
+                    <div className="w-25 fw-bold">Base Allocation</div>
+                    <div className="text-primary">
+                      : {saleData?.saleParams.softCap} -{" "}
+                      {saleData?.saleParams.hardCap} Tokens
+                    </div>
+                  </div>
+                </div>
 
-                  <p className="mb-0 py-1 border-bottom border-white border-opacity-50">
-                    Price:{" "}
-                    <span className="text-primary">
-                      {saleData?.saleParams?.price} BNB
-                    </span>
-                  </p>
-
-                  <p className="mb-0 py-1 border-bottom border-white border-opacity-50">
-                    Sold:{" "}
-                    <span className="text-primary">
-                      {saleData?.saleParams?.sold}
-                    </span>
-                  </p>
-
-                  <p className="mb-0 py-1 border-bottom border-white border-opacity-50">
-                    Holders:{" "}
-                    <span className="text-primary">
-                      {saleData?.saleParams?.holders}
-                    </span>
-                  </p>
+                <div className="row">
+                  <Col md={7}>
+                    <div className="text-white font-size-14 mb-4">
+                      <h5 className="text-primary">Token Info</h5>
+                      <div className="d-flex w-100 flex-wrap mb-0 py-1">
+                        <div className="w-25 fw-bold">Name</div>
+                        <div className="text-primary">: {tokenInfo?.name}</div>
+                      </div>
+                      <div className="d-flex w-100 flex-wrap mb-0 py-1">
+                        <div className="w-25 fw-bold">Symbols</div>
+                        <div className="text-primary">
+                          : {tokenInfo?.symbol}
+                        </div>
+                      </div>
+                      <div className="d-flex w-100 flex-wrap mb-0 py-1">
+                        <div className="w-25 fw-bold">Decimals</div>
+                        <div className="text-primary">
+                          : {tokenInfo?.decimals}
+                        </div>
+                      </div>
+                      <div className="d-flex w-100 flex-wrap mb-0 py-1">
+                        <div className="w-25 fw-bold">Supply</div>
+                        <div className="text-primary">
+                          :{" "}
+                          {tokenInfo
+                            ? formatBigNumber(
+                                tokenInfo.totalSupply,
+                                tokenInfo.decimals
+                              )
+                            : 0}
+                        </div>
+                      </div>
+                      <div className="d-flex w-100 flex-wrap mb-0 py-1">
+                        <div className="w-25 fw-bold">Type</div>
+                        <div className="text-primary">: BEP20 / ERC20</div>
+                      </div>
+                    </div>
+                  </Col>
                 </div>
               </Col>
 
-              <Col md={5} lg={3}>
-                <div className="d-flex flex-md-column align-items-start flex-wrap">
-                  {saleData?.user === "buyer" && (
-                    <>
-                      <button
-                        className="btn btn-lg btn-gradient-green mb-3 me-3 w-lg"
-                        onClick={() => setShowParticipateModal(true)}
-                      >
-                        Participate
-                      </button>
+              <Col md={4}>
+                <SaleDetailCard
+                  saleData={saleData}
+                  tokenInfo={tokenInfo}
+                  saleInfo={saleInfo}
+                />
 
-                      <button
-                        className="btn btn-lg btn-gradient-green mb-3 me-3 w-lg"
-                        onClick={() => withdraw(params.id, setIsProcessing)}
-                        disabled={isProcessing}
-                      >
-                        {isProcessing ? (
-                          <>
-                            <Spinner
-                              as="span"
-                              animation="border"
-                              size="sm"
-                              role="status"
-                              aria-hidden="true"
-                            />{" "}
-                            Processing...
-                          </>
-                        ) : (
-                          " Withdraw Tokens"
-                        )}
-                      </button>
-
-                      <button
-                        className="btn btn-lg btn-gradient-green mb-3 me-3 w-lg"
-                        onClick={() =>
-                          withdrawUnused(params.id, setIsProcessing)
-                        }
-                        disabled={isProcessing}
-                      >
-                        {isProcessing ? (
-                          <>
-                            <Spinner
-                              as="span"
-                              animation="border"
-                              size="sm"
-                              role="status"
-                              aria-hidden="true"
-                            />{" "}
-                            Processing...
-                          </>
-                        ) : (
-                          " Withdraw Unused"
-                        )}
-                      </button>
-                    </>
-                  )}
-
-                  {saleData?.user === "seller" && (
-                    <>
-                      <button
-                        className="btn btn-lg btn-gradient-green mb-3 me-3 w-lg"
-                        onClick={() =>
-                          depositTokens(params.id, setIsProcessing)
-                        }
-                        disabled={isProcessing}
-                      >
-                        {isProcessing ? (
-                          <>
-                            <Spinner
-                              as="span"
-                              animation="border"
-                              size="sm"
-                              role="status"
-                              aria-hidden="true"
-                            />{" "}
-                            Processing...
-                          </>
-                        ) : (
-                          "Deposit Tokens"
-                        )}
-                      </button>
-
-                      <button
-                        className="btn btn-lg btn-gradient-green mb-3 me-3 w-lg"
-                        onClick={() =>
-                          withdrawDeposit(params.id, setIsProcessing)
-                        }
-                        disabled={isProcessing}
-                      >
-                        {isProcessing ? (
-                          <>
-                            <Spinner
-                              as="span"
-                              animation="border"
-                              size="sm"
-                              role="status"
-                              aria-hidden="true"
-                            />{" "}
-                            Processing...
-                          </>
-                        ) : (
-                          " Withdraw Deposit"
-                        )}
-                      </button>
-
-                      <button
-                        className="btn btn-lg btn-gradient-green mb-3 me-3 w-lg"
-                        onClick={() =>
-                          withdrawEarnings(params.id, setIsProcessing)
-                        }
-                        disabled={isProcessing}
-                      >
-                        {isProcessing ? (
-                          <>
-                            <Spinner
-                              as="span"
-                              animation="border"
-                              size="sm"
-                              role="status"
-                              aria-hidden="true"
-                            />{" "}
-                            Processing...
-                          </>
-                        ) : (
-                          " Withdraw Earnings"
-                        )}
-                      </button>
-                    </>
-                  )}
-
-                  {saleData?.user === "admin" && (
-                    <button
-                      className="btn btn-lg btn-gradient-green mb-3 me-3 w-lg"
-                      onClick={() => finishSale(params.id, setIsProcessing)}
-                      disabled={isProcessing}
-                    >
-                      {isProcessing ? (
-                        <>
-                          <Spinner
-                            as="span"
-                            animation="border"
-                            size="sm"
-                            role="status"
-                            aria-hidden="true"
-                          />{" "}
-                          Processing...
-                        </>
-                      ) : (
-                        " Finish Sale"
-                      )}
-                    </button>
-                  )}
-                </div>
+                <BuyDetailCard
+                  saleData={saleData}
+                  tokenInfo={tokenInfo}
+                  saleInfo={saleInfo}
+                />
               </Col>
             </Row>
           )}

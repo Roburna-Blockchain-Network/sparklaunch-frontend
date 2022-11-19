@@ -164,7 +164,8 @@ const ProjectSetup = () => {
     const START_SALE = moment(data.startdt).unix()
     const END_SALE = moment(data.enddt).unix()
     const PUBLIC_SALE = moment(data.publicDate).unix()
-    const PUBLIC_DELTA = END_SALE - (PUBLIC_SALE + 10)
+    // const PUBLIC_DELTA = END_SALE - (PUBLIC_SALE + 10)
+    const PUBLIC_DELTA = 10
     let startTimes = []
     let isPublic = "false"
 
