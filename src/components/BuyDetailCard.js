@@ -137,7 +137,7 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo }) => {
         </Form.Group>
       </div>
       <div className="my-2">
-        {canBuy && account ? (
+        {canBuy ? (
           <Button
             className="btn buy-or-connect"
             href="#"
@@ -151,19 +151,9 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo }) => {
             className="btn buy-or-connect"
             href="#"
             id="links"
-            // onClick={() => activateBrowserWallet()}
+            onClick={!account ? () => activateBrowserWallet() : () => {}}
           >
-            SALE IS NOT STARTED
-          </Button>
-        )}
-        {!account && (
-          <Button
-            className="btn buy-or-connect"
-            href="#"
-            id="links"
-            onClick={() => activateBrowserWallet()}
-          >
-            CONNECT WALLET
+            {account ? " SALE IS NOT STARTED / FINISHED" : "CONNECT WALLET"}
           </Button>
         )}
       </div>
