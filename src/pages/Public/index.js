@@ -102,10 +102,16 @@ const Public = props => {
   }
 
   useEffect(async () => {
-    const sales = await fetchAllSales(selectedChain)
-    dispatch(setInitialSales(sales))
-    setDeployedSales(sales)
-    setFilteredSales(sales)
+    setIsLoading(true)
+    try {
+      const sales = await fetchAllSales(selectedChain)
+      dispatch(setInitialSales(sales))
+      setDeployedSales(sales)
+      setFilteredSales(sales)
+      setIsLoading(false)
+    } catch (error) {
+      console.log(error)
+    }
     setIsLoading(false)
   }, [selectedChain])
 
@@ -120,7 +126,7 @@ const Public = props => {
           <Hero />
           <FeaturedCard featuredSales />
 
-          <div className="my-4">
+          <div className="my-4" id="pools">
             {isLoading ? (
               <div className="text-center mt-4">
                 <img src={smLogo} className="blinking-item" height={150} />
@@ -197,14 +203,14 @@ const Public = props => {
                   </Col>
                 </Row>
 
-                <Row className="g-4 my-4" id="pools">
+                <Row className="g-4 my-4">
                   {filteredSales?.length > 0 ? (
                     filteredSales
                       ?.filter(item => {
                         return contains(item, searchTerm)
                       })
                       .map((sale, key) => (
-                        <Col key={key} lg={3} md={4} sm={6}>
+                        <Col key={key} lg={4} md={4} sm={6}>
                           <SaleCard sale={sale} />
                         </Col>
                       ))

@@ -18,3 +18,15 @@
   margin-left: 6px;
   margin-right: 6px;
 }
+
+.btn-kyc {
+  background: #2c2e30;
+  border-radius: 12px;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  min-width: 100px;
+  padding: 11px;
+  &:hover {
+    color: #131618 !important;
+  }
+}

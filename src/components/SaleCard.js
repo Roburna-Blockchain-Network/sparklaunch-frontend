@@ -1,18 +1,33 @@
 import React from "react"
 import moment from "moment/moment"
 
-import { Col, ProgressBar, Row } from "react-bootstrap"
+import { Button, Col, ProgressBar, Row } from "react-bootstrap"
 
 import discordLogo from "assets/images/icons/discord.png"
-import { useHistory } from "react-router-dom"
+import { Link, useHistory } from "react-router-dom"
 import { useSelector } from "react-redux"
+import useTokenInfo from "hooks/useTokenInfo"
+import { useEtherBalance } from "@usedapp/core"
+import { formatEther, parseEther } from "ethers/lib/utils"
+import useSaleInfo from "hooks/useSaleInfo"
+import { BigNumber as BN } from "ethers"
 
 const SaleCard = ({ sale }) => {
   const currentDate = moment().unix()
   let history = useHistory()
-
+  const users = useSelector(state => state.User)
+  /**
+   * info
+   */
+  // const saleBalance = useEtherBalance(sale.saleToken.address, {
+  //   chainId: users.selectedChain,
+  // })
+  const tokenInfo = useTokenInfo(sale?.saleToken.address)
+  const saleInfo = useSaleInfo(sale?.address)
+  const formattedRaised = saleInfo ? formatEther(saleInfo?.totalBNBRaised) : 0
+  console.log(saleInfo)
   const handleClick = e => {
-    if (e.target.id === "social") {
+    if (e.target.id === "social" || e.target.id === "links") {
       void 0
     } else {
       history.push(`/sale/${sale.id}`)
@@ -28,8 +43,8 @@ const SaleCard = ({ sale }) => {
     >
       <div className="d-flex flex-nowrap">
         <div className="flex-grow-1">
-          <h4 className="text-primary mb-0">{sale.saleToken?.name}</h4>
-          <h5>{sale.saleToken.symbol ? sale.saleToken.symbol : "SPL"}</h5>
+          <h4 className="text-primary mb-0">{tokenInfo?.name}</h4>
+          <h5>{tokenInfo?.symbol ? tokenInfo.symbol : "SPL"}</h5>
         </div>
 
         <div>
@@ -43,7 +58,7 @@ const SaleCard = ({ sale }) => {
                   objectFit: "cover",
                   objectPosition: "10% 20%",
                 }}
-                alt={sale.saleToken.symbol ? sale.saleToken.symbol : "SPL"}
+                alt={tokenInfo?.symbol ? tokenInfo?.symbol : "SPL"}
               />
             </div>
           </div>
@@ -90,6 +105,7 @@ const SaleCard = ({ sale }) => {
           </a>
         </li>
       </ul>
+
       {sale.saleParams.startDate > currentDate && (
         <span className="bg-primary text-dark fw-bold px-2 rounded-pill font-size-11 me-2">
           UPCOMING
@@ -111,31 +127,24 @@ const SaleCard = ({ sale }) => {
       </p>
 
       <div className="text-white font-size-11">
-        <Row>
-          <Col xs={6}>SoftCap</Col>
-          <Col xs={6} className="text-primary">
-            {sale.saleParams.softCap} Token
+        <Row className="mb-2">
+          <Col xs={4}>Total Raise </Col>
+          <Col xs={8} className="text-primary fs-6 text-end fw-bold">
+            {formattedRaised} BNB
           </Col>
         </Row>
 
-        <Row>
-          <Col xs={6}>Raised</Col>
-          <Col xs={6} className="text-primary">
-            {sale.saleParams.raised} BNB
+        <Row className="mb-2">
+          <Col xs={4}>Starts</Col>
+          <Col xs={8} className="text-primary fs-6 text-end fw-bold">
+            {moment.unix(sale.saleParams.startDate).format("lll")}
           </Col>
         </Row>
 
-        <Row>
-          <Col xs={6}>Price</Col>
-          <Col xs={6} className="text-primary">
-            {sale.saleParams.price} BNB
-          </Col>
-        </Row>
-
-        <Row>
-          <Col xs={6}>End</Col>
-          <Col xs={6} className="text-primary">
-            {moment.unix(sale.saleParams.endDate).format("llll")}
+        <Row className="mb-2">
+          <Col xs={4}>Price</Col>
+          <Col xs={8} className="text-primary fs-6 text-end fw-bold">
+            {saleInfo ? formatEther(saleInfo?.tokenPriceInBNB) : 0} BNB
           </Col>
         </Row>
       </div>
@@ -143,21 +152,36 @@ const SaleCard = ({ sale }) => {
       <div>
         <div className="mt-3 d-flex justify-content-between font-size-11">
           <span className="text-white">{sale.saleDetails.diff}</span>
-
           <span className="text-primary">{sale.saleDetails.percentage} %</span>
         </div>
 
         <ProgressBar variant="primary" now={sale.saleDetails.percentage} />
 
         <Row className="mt-3 font-size-10">
-          <Col xs={6}>Holders</Col>
-          <Col xs={6}>Listing Time</Col>
+          <Col xs={4}>1x (approx)</Col>
+          <Col xs={8} className="text-end">
+            Listing Time
+          </Col>
 
-          <Col xs={6} className="text-primary">
+          <Col xs={4} className="text-primary fs-6 fw-bold">
             {sale.saleDetails.holders}
           </Col>
-          <Col xs={6} className="text-primary">
-            {moment(sale.saleDetails.listingDate).format("llll")}
+          <Col xs={8} className="text-primary text-end fs-6 fw-bold">
+            {moment.unix(sale.saleParams.endDate).format("lll")}
+          </Col>
+        </Row>
+        <Row className="mt-3 font-size-10">
+          <Col xs={6} className="text-center">
+            <Button className="btn btn-kyc" href="#" id="links">
+              {" "}
+              AUDIT
+            </Button>
+          </Col>
+          <Col xs={6} className="text-center">
+            <Button className="btn btn-kyc" href="#" id="links">
+              {" "}
+              KYC
+            </Button>
           </Col>
         </Row>
       </div>

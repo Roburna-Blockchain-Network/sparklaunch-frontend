@@ -122,7 +122,7 @@ const Header = props => {
             <Navbar className="p-0 navbar-dark d-none d-lg-inline">
               <Nav className="me-auto px-4 d-flex align-items-center">
                 <Link
-                  to="/home"
+                  to="/"
                   className={classnames("nav-link me-3 px-0", {
                     active:
                       window.location.pathname === "/" ||
@@ -132,14 +132,14 @@ const Header = props => {
                   HOME
                 </Link>
 
-                <a
-                  href="/#pools"
+                <Link
+                  to="/#pools"
                   className={classnames("nav-link me-3 px-0", {
-                    active: window.location.pathname === "/#pools",
+                    active: window.location.pathname === "/pools",
                   })}
                 >
                   POOLS
-                </a>
+                </Link>
 
                 <Link
                   to="#"
