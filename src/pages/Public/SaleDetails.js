@@ -168,7 +168,7 @@ const SaleDetails = props => {
                     </Col>
                     <Col>
                       <p>
-                        <span className="fw-bold">Round: </span>
+                        <span className="fw-bold">Hard Cap: </span>
                         {saleData?.saleDetails?.round}
                       </p>
                     </Col>

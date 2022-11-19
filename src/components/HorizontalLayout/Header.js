@@ -30,26 +30,38 @@ const Header = props => {
 
   const users = useSelector(state => state.User)
   const dispatch = useDispatch()
+  let options = []
+  options[97] = {
+    id: 0,
+    value: ChainId.BSCTestnet,
+    text: "Binance Smart",
+    logo: bscLogo,
+  }
 
-  const options = [
-    { id: 0, value: ChainId.BSCTestnet, text: "Binance Smart", logo: bscLogo },
-    { id: 1, value: 159, text: "Roburna Chain", logo: roburnaLogo },
-  ]
-  const [selected, setSelected] = useState(options[0])
+  options[159] = { id: 1, value: 159, text: "Roburna Chain", logo: roburnaLogo }
+
+  const [selected, setSelected] = useState(options[users.selectedChain])
 
   const handleSwitchNetwork = async e => {
     if (account) {
-      if (chainId === e.value) {
+      if (chainId === e) {
         return
       } else {
-        await switchNetwork(e.value)
+        try {
+          await switchNetwork(e)
+          setSelected(options[e])
+          dispatch(setSelectedChain(e))
+        } catch (error) {
+          dispatch(setSelectedChain(chainId))
+          setSelected(options[chainId])
+        }
       }
     } else {
-      if (users.selectedChain === e.value) {
+      if (users.selectedChain === e) {
         return
       } else {
-        dispatch(setSelectedChain(e.value))
-        setSelected(e)
+        dispatch(setSelectedChain(e))
+        setSelected(options[e])
       }
     }
   }
@@ -58,12 +70,17 @@ const Header = props => {
     if (typeof account == "undefined") {
       dispatch(setLoginStatus(false))
     } else {
+      console.log(chainId)
       dispatch(setLoginStatus(true))
       if (SUPPORTED_CHAIN.includes(chainId)) {
-        dispatch(setSelectedChain(chainId))
+        if (selected.value == chainId) {
+          dispatch(setSelectedChain(chainId))
+        } else {
+          handleSwitchNetwork(selected.value)
+        }
       }
     }
-  }, [account])
+  }, [account, chainId])
 
   return (
     <React.Fragment>
@@ -165,7 +182,7 @@ const Header = props => {
                 {options.map((item, key) => (
                   <Dropdown.Item
                     key={key}
-                    onClick={() => handleSwitchNetwork(item)}
+                    onClick={() => handleSwitchNetwork(item.value)}
                   >
                     <img src={item.logo} height={18} className="me-2" />
                     {item.text}
