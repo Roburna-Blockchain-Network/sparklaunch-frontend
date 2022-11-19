@@ -89,7 +89,7 @@
   align-items: center;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
-  color: #5BE944;
+  color: #5be944;
   border-radius: 3rem;
   border: 2px solid $primary;
   background: transparent;
@@ -99,7 +99,7 @@
   background-color: transparent;
   border: none;
   flex-grow: 1;
-  color: #5BE944;
+  color: #5be944;
 
   &:focus {
     outline: none;
@@ -114,6 +114,22 @@
   padding: 1rem;
   margin: 0.25rem;
   height: 100%;
+  color: $white;
+  -webkit-transition: $transition-custom;
+  -moz-transition: $transition-custom;
+  -o-transition: $transition-custom;
+  transition: $transition-custom;
+
+  &:hover {
+    background-color: #666a;
+  }
+}
+.sale-detail-card {
+  background-color: #0006;
+  border: 1px solid $primary;
+  border-radius: 1rem;
+  padding: 1rem;
+  margin: 0.25rem;
   color: $white;
   -webkit-transition: $transition-custom;
   -moz-transition: $transition-custom;

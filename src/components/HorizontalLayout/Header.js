@@ -70,7 +70,6 @@ const Header = props => {
     if (typeof account == "undefined") {
       dispatch(setLoginStatus(false))
     } else {
-      console.log(chainId)
       dispatch(setLoginStatus(true))
       if (SUPPORTED_CHAIN.includes(chainId)) {
         if (selected.value == chainId) {

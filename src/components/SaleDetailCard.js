@@ -12,7 +12,7 @@ import { formatEther, parseEther } from "ethers/lib/utils"
 import useSaleInfo from "hooks/useSaleInfo"
 import { BigNumber as BN } from "ethers"
 
-const SaleCard = ({ sale }) => {
+const SaleDetailCard = ({ sale }) => {
   const currentDate = moment().unix()
   let history = useHistory()
   const users = useSelector(state => state.User)
@@ -37,7 +37,7 @@ const SaleCard = ({ sale }) => {
   return (
     <div
       onClick={handleClick}
-      className="sale-card"
+      className="sale-detail-card"
       id="sale-card"
       style={{ cursor: "pointer" }}
     >
@@ -189,4 +189,4 @@ const SaleCard = ({ sale }) => {
   )
 }
 
-export default SaleCard
+export default SaleDetailCard
