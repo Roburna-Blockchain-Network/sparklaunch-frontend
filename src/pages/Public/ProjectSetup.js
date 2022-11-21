@@ -35,12 +35,14 @@ import { tokenRate } from "utils/helpers"
 import { useSelector } from "react-redux"
 import { getTokenAllowance } from "utils/factoryHelper"
 import { BIG_TEN } from "utils/numbers"
+import useServiceFee from "hooks/useServiceFee"
 dayjs.extend(utc)
 const ProjectSetup = () => {
   let history = useHistory()
   const { account, chainId, library, activateBrowserWallet } = useEthers()
 
   const deployFee = useDeploymentFee()
+  const servicesFee = useServiceFee()
 
   const user = useSelector(state => state.User)
 
@@ -66,6 +68,7 @@ const ProjectSetup = () => {
     round5: 0,
     isPublic: true,
   })
+
   const [valid2, setValid2] = useState({
     softCap: true,
     hardCap: true,
@@ -122,6 +125,7 @@ const ProjectSetup = () => {
   const [displayInfo, setDisplayInfo] = useState(false)
 
   const [deploymentFee, setDeploymentFee] = useState(0.0)
+  const [serviceFee, setServiceFee] = useState(0.0)
 
   const [isLoading, setIsLoading] = useState(false)
   const [isPrivateSale, setIsPrivateSale] = useState(false)
@@ -157,6 +161,11 @@ const ProjectSetup = () => {
     const feeVal = ethers.utils.formatEther(deployFee)
     setDeploymentFee(feeVal)
   }, [deployFee])
+
+  useEffect(async () => {
+    const feeVal = ethers.utils.formatEther(servicesFee)
+    setServiceFee(feeVal)
+  }, [servicesFee])
 
   const validateStep2 = async () => {
     /**
@@ -404,8 +413,8 @@ const ProjectSetup = () => {
       title: step1?.title,
       price: presaleRatePrice.toString(),
       address: tokenInfo.address,
-      softcap: tokenSoftCap.toString(),
-      hardcap: tokenHardCap.toString(),
+      softcap: parseUnits(tokenSoftCap.toString(), tokenInfo.decimal * 1),
+      hardcap: parseUnits(tokenHardCap.toString(), tokenInfo.decimal * 1),
       maxbuy: parseEther(_maxBuy.toString())
         .div(BigNumber.from(DIVISION_BASE))
         .toString(),
@@ -419,7 +428,7 @@ const ProjectSetup = () => {
       round3: step2?.round3,
       round4: step2?.round4,
       round5: step2?.round5,
-      listingPrice: step2.listingRate,
+      listingPrice: parseUnits(step2.listingRate, tokenInfo.decimal * 1),
       liquidityPercent: (step2.liquidityPercent * 100).toString(),
       liquidityLock: (step2?.liquidityLock * 86400).toString(),
       publicDate: step2?.publicTime,
@@ -670,7 +679,7 @@ const ProjectSetup = () => {
                   <Form.Label>Fee Info</Form.Label>
                   <p className="form-text text-info">
                     Pool creation fee: {deploymentFee} BNB <br />
-                    Pool service fee: {deploymentFee} BNB
+                    Pool service fee: {serviceFee} BNB
                   </p>
                   <p className="form-text text-info"></p>
                 </Form.Group>
