@@ -6,18 +6,40 @@ import { Button, Col, ProgressBar, Row } from "react-bootstrap"
 import discordLogo from "assets/images/icons/discord.png"
 import { Link, useHistory, useParams } from "react-router-dom"
 import { useSelector } from "react-redux"
-import { formatEther, parseEther } from "ethers/lib/utils"
+import { formatEther, parseEther, parseUnits } from "ethers/lib/utils"
 import { BigNumber as BN } from "ethers"
 import { getRoundInfo, getSaleInfo, getTokenInfo } from "utils/factoryHelper"
+import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc"
+dayjs.extend(utc)
+import Countdown, { zeroPad } from "react-countdown"
 
+const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
+const Completionist = () => <span>Sale is End</span>
+const renderer = ({ days, hours, minutes, completed }) => {
+  if (completed) {
+    // Render a completed state
+    return <Completionist />
+  } else {
+    // Render a countdown
+    return (
+      <span>
+        Sale Close in {zeroPad(days)} days, {zeroPad(hours)} Hours,{" "}
+        {zeroPad(minutes)} Minutes
+      </span>
+    )
+  }
+}
 const SaleCard = ({ sale }) => {
   const currentDate = moment().unix()
   let history = useHistory()
   const users = useSelector(state => state.User)
+  const sales = useSelector(state => state.Sales)
 
   const [tokenInfo, setTokenInfo] = useState()
   const [saleInfo, setSaleInfo] = useState()
   const [ready, setReady] = useState(false)
+  const [tokenPriceOriginal, setTokenPriceOriginal] = useState()
 
   /**
    * info
@@ -26,7 +48,6 @@ const SaleCard = ({ sale }) => {
   //   chainId: users.selectedChain,
   // })
 
-  const formattedRaised = saleInfo ? formatEther(saleInfo?.totalBNBRaised) : 0
   const handleClick = e => {
     if (e.target.id === "social" || e.target.id === "links") {
       void 0
@@ -39,7 +60,7 @@ const SaleCard = ({ sale }) => {
     const abortController = new AbortController()
     try {
       const token = await getTokenInfo(users.selectedChain, sale?.tokenAddress)
-      const sales = await getSaleInfo(users.selectedChain, sale?.tokenAddress)
+      const sales = await getSaleInfo(users.selectedChain, sale?.address)
 
       if (token.success) {
         setTokenInfo(token.data)
@@ -52,6 +73,7 @@ const SaleCard = ({ sale }) => {
         setTokenPriceOriginal(tokenPrice)
         setSaleInfo(sales.data)
       }
+      console.log(sales)
     } catch (error) {
       console.log(error)
     }
@@ -63,6 +85,10 @@ const SaleCard = ({ sale }) => {
       abortController.abort()
     }
   }, [])
+
+  const formattedRaised = saleInfo ? formatEther(saleInfo?.raisedBNB) : 0
+  const percentSold =
+    (formattedRaised * 100) / (formatEther(saleInfo.hardCapBNB) * 1)
 
   return (
     <>
@@ -138,21 +164,21 @@ const SaleCard = ({ sale }) => {
             </li>
           </ul>
 
-          {/* {sale.saleParams.startDate > currentDate && (
+          {saleInfo.saleStart > currentDate && (
             <span className="bg-primary text-dark fw-bold px-2 rounded-pill font-size-11 me-2">
               UPCOMING
             </span>
           )}
-          {sale.saleParams.startDate < currentDate && (
+          {saleInfo.saleStart < currentDate && (
             <span className="bg-primary text-dark fw-bold px-2 rounded-pill font-size-11 me-2">
               LIVE
             </span>
           )}
-          {sale.saleParams.endDate < currentDate && (
+          {saleInfo.saleEnd < currentDate && (
             <span className="bg-primary text-dark fw-bold px-2 rounded-pill font-size-11 me-2">
               ENDED
             </span>
-          )} */}
+          )}
 
           <p className="my-2 text-white font-size-12 line-truncate-2">
             {sale.description}
@@ -162,44 +188,55 @@ const SaleCard = ({ sale }) => {
             <Row className="mb-2">
               <Col xs={4}>Total Raise </Col>
               <Col xs={8} className="text-primary fs-6 text-end fw-bold">
-                {/* {formattedRaised} BNB */}
+                {formattedRaised} BNB
               </Col>
             </Row>
 
             <Row className="mb-2">
               <Col xs={4}>Starts</Col>
               <Col xs={8} className="text-primary fs-6 text-end fw-bold">
-                {/* {moment.unix(sale.saleParams.startDate).format("lll")} */}
+                {saleInfo
+                  ? dayjs
+                      .utc(saleInfo.saleStart * 1000)
+                      .format(DEFAULT_DATE_FORMAT)
+                  : 0}
               </Col>
             </Row>
 
             <Row className="mb-2">
               <Col xs={4}>Price</Col>
               <Col xs={8} className="text-primary fs-6 text-end fw-bold">
-                {saleInfo ? formatEther(saleInfo?.tokenPriceInBNB) : 0} BNB
+                {saleInfo ? formatEther(saleInfo?.tokenPrice) : 0} BNB
               </Col>
             </Row>
           </div>
 
           <div>
             <div className="mt-3 d-flex justify-content-between font-size-11">
-              <span className="text-white">5</span>
-              <span className="text-primary">"40" %</span>
+              <Countdown
+                date={dayjs.utc(saleInfo.saleEnd * 1000)}
+                renderer={renderer}
+              ></Countdown>
+              <span className="text-primary">{percentSold} %</span>
             </div>
 
-            <ProgressBar variant="primary" now="40" />
+            <ProgressBar className="mt-2" variant="primary" now={percentSold} />
 
             <Row className="mt-3 font-size-10">
-              <Col xs={4}>1x (approx)</Col>
+              <Col xs={4}>1 BNB (approx)</Col>
               <Col xs={8} className="text-end">
                 Listing Time
               </Col>
 
               <Col xs={4} className="text-primary fs-6 fw-bold">
-                {/* {sale.saleDetails.holders} */}
+                {tokenPriceOriginal} {tokenInfo.symbol}
               </Col>
               <Col xs={8} className="text-primary text-end fs-6 fw-bold">
-                {/* {moment.unix(sale.saleParams.endDate).format("lll")} */}
+                {saleInfo
+                  ? dayjs
+                      .utc(saleInfo.saleEnd * 1000)
+                      .format(DEFAULT_DATE_FORMAT)
+                  : 0}
               </Col>
             </Row>
             <Row className="mt-3 font-size-10">

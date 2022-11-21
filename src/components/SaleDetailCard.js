@@ -16,7 +16,7 @@ import utc from "dayjs/plugin/utc"
 dayjs.extend(utc)
 
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
-const Completionist = () => <span>You are good to go!</span>
+const Completionist = () => <span>Sale is End</span>
 const renderer = ({ days, hours, minutes, completed }) => {
   if (completed) {
     // Render a completed state

@@ -39,7 +39,8 @@ const getSaleInfo = async (chain, address) => {
     calls.push(tokenContract.tokensAmountForLiquidity())
     calls.push(tokenContract.publicRoundStartDelta())
     calls.push(tokenContract.getCurrentRound())
-    // console.log(calls)
+    // calls.push(tokenContract.getNumberOfRegisteredUsers())
+    console.log(calls)
     const [
       sale,
       saleStart,
@@ -52,6 +53,7 @@ const getSaleInfo = async (chain, address) => {
       tokenLiquidity,
       publicRoundStartDelta,
       getCurrentRound,
+      //   numberOfParticipants,
     ] = await ethcallProvider.all(calls)
 
     const bnbDecimals = parseUnits("1", "18")
@@ -88,6 +90,7 @@ const getSaleInfo = async (chain, address) => {
         tokenLiquidity: tokenLiquidity.toString(),
         publicRoundStartDelta: publicRoundStartDelta.toNumber(),
         getCurrentRound: getCurrentRound.toNumber(),
+        // participants: numberOfParticipants.toNumber(),
       },
     }
   } catch (error) {
