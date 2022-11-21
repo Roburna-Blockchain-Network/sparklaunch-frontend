@@ -408,7 +408,7 @@ const ProjectSetup = () => {
 
     const _minBuy = step2.minBuy * DIVISION_BASE
     const _maxBuy = step2.maxBuy * DIVISION_BASE
-
+    // console.log(step2)
     const values = {
       title: step1?.title,
       price: presaleRatePrice.toString(),
@@ -428,7 +428,7 @@ const ProjectSetup = () => {
       round3: step2?.round3,
       round4: step2?.round4,
       round5: step2?.round5,
-      listingPrice: parseUnits(step2.listingRate, tokenInfo.decimal * 1),
+      listingPrice: parseUnits(step2.listingRate.toString(), tokenInfo.decimal),
       liquidityPercent: (step2.liquidityPercent * 100).toString(),
       liquidityLock: (step2?.liquidityLock * 86400).toString(),
       publicDate: step2?.publicTime,
@@ -447,6 +447,7 @@ const ProjectSetup = () => {
       youtube: step3?.youtube,
       description: description,
     }
+    // console.log(values)
     try {
       const [id, contractAddress] = await handleDeploySale(values)
 
@@ -456,10 +457,12 @@ const ProjectSetup = () => {
       values.chainId = chainId
 
       const dbId = await saveData(values)
-
-      setIsLoading(false)
-
-      history.push(`/sale/${id}`)
+      if (dbId) {
+        setIsLoading(false)
+        history.push(`/sale/${id}`)
+      } else {
+        console.log(`backend error`)
+      }
     } catch (error) {
       console.log(error)
     }

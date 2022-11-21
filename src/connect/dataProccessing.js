@@ -293,51 +293,11 @@ export const getSaleById = async (id, setIsLoading) => {
 
 export const saveData = async values => {
   try {
-    const START_SALE = moment(values.startdt).unix()
-    const END_SALE = moment(values.enddt).unix()
-    const PUBLIC_SALE = moment(values.publicDate).unix()
-    const PUBLIC_DELTA = END_SALE - (PUBLIC_SALE + 10)
-
-    if (typeof values.round1 == "undefined") {
-      values.round1 = START_SALE + 1
-      values.round2 = START_SALE + 2
-      values.round3 = START_SALE + 3
-      values.round4 = START_SALE + 4
-      values.round5 = START_SALE + 5
-    } else {
-      values.round1 = moment(values.round1).unix()
-      values.round2 = moment(values.round2).unix()
-      values.round3 = moment(values.round3).unix()
-      values.round4 = moment(values.round4).unix()
-      values.round5 = moment(values.round5).unix()
-    }
-
     const input = JSON.stringify({
       id: values.id,
       address: values.contractAddress,
       chainId: values.chainId,
-      saleToken: {
-        name: values.title,
-        symbol: values.symbol,
-        address: values.address,
-      },
-      saleParams: {
-        softCap: values.softcap,
-        hardCap: values.hardcap,
-        minBuy: values.minbuy,
-        maxBuy: values.maxbuy,
-        startDate: START_SALE,
-        endDate: END_SALE,
-        price: values.price,
-        saleOwner: values.saleOwner,
-        round1: values.round1,
-        round2: values.round2,
-        round3: values.round3,
-        round4: values.round4,
-        round5: values.round5,
-        publicroundDelta: PUBLIC_DELTA,
-      },
-
+      tokenAddress: values.address,
       saleLinks: {
         logo: values.logo,
         fb: values.facebook,
@@ -350,11 +310,10 @@ export const saveData = async values => {
         discord: values.discord,
         youtube: values.youtube,
       },
-      saleDetails: {
-        description: values.description,
-        whilelist: values.whilelist,
-        saleAddress: values.contractAddress,
-      },
+      description: values.description,
+      featured: false,
+      featuredImage: "",
+      visited: 0,
     })
 
     const requestOptions = {
@@ -367,9 +326,10 @@ export const saveData = async values => {
     const data = await response.json()
     let id = await data._id
 
-    return { id }
+    return true
   } catch (e) {
     console.log("Err: ", e.message)
+    return false
   }
 
   //console.log(data)

@@ -31,6 +31,7 @@ import { API_URL } from "constants/Address"
 import { getRoundInfo, getSaleInfo, getTokenInfo } from "utils/factoryHelper"
 import { formatBigNumber } from "utils/numbers"
 import BuyDetailCard from "components/BuyDetailCard"
+import { BigNumber } from "ethers"
 dayjs.extend(utc)
 
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
@@ -61,10 +62,7 @@ const SaleDetails = props => {
       const res = await response.json()
       setSaleData(res.data[0])
 
-      const token = await getTokenInfo(
-        selectedChain,
-        res.data[0].saleToken.address
-      )
+      const token = await getTokenInfo(selectedChain, res.data[0].tokenAddress)
 
       // console.log(res.data[0].address)
 
@@ -130,11 +128,7 @@ const SaleDetails = props => {
                             objectFit: "cover",
                             objectPosition: "10% 20%",
                           }}
-                          alt={
-                            saleData?.saleToken.symbol
-                              ? saleData?.saleToken.symbol
-                              : "SPL"
-                          }
+                          alt={tokenInfo?.symbol ? tokenInfo?.symbol : "SPL"}
                         />
                       </div>
                     </div>
@@ -165,7 +159,7 @@ const SaleDetails = props => {
                 </div>
 
                 <p className="my-3 text-white font-size-12 line-truncate-2">
-                  {saleData?.saleDetails.description}
+                  {saleData?.description}
                 </p>
 
                 <ul className="list-unstyled d-flex my-4">
@@ -237,7 +231,12 @@ const SaleDetails = props => {
                   <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
                     <div className="w-25 fw-bold">Dex Swap Rate</div>
                     <div className="text-primary">
-                      : 1 BNB : {saleInfo.listingRate} {tokenInfo.symbol}
+                      : 1 BNB :{" "}
+                      {formatUnits(
+                        BigNumber.from(saleInfo.listingRate),
+                        tokenInfo.decimals
+                      ) * 1}{" "}
+                      {tokenInfo.symbol}
                     </div>
                   </div>
 
