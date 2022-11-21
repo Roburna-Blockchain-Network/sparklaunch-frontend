@@ -2,6 +2,7 @@ import React from "react"
 import moment from "moment/moment"
 
 import { Button, Col, ProgressBar, Row } from "react-bootstrap"
+import Countdown, { zeroPad } from "react-countdown"
 
 import discordLogo from "assets/images/icons/discord.png"
 import { Link, useHistory } from "react-router-dom"
@@ -10,23 +11,37 @@ import useTokenInfo from "hooks/useTokenInfo"
 import { useEtherBalance } from "@usedapp/core"
 import { formatEther, parseEther } from "ethers/lib/utils"
 import { BigNumber as BN } from "ethers"
+import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc"
+dayjs.extend(utc)
 
-const SaleDetailCard = ({ saleData, tokenInfo, saleInfo }) => {
-  const currentDate = moment().unix()
+const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
+const Completionist = () => <span>You are good to go!</span>
+const renderer = ({ days, hours, minutes, completed }) => {
+  if (completed) {
+    // Render a completed state
+    return <Completionist />
+  } else {
+    // Render a countdown
+    return (
+      <span>
+        Sale Close in {zeroPad(days)} days, {zeroPad(hours)} Hours,{" "}
+        {zeroPad(minutes)} Minutes
+      </span>
+    )
+  }
+}
+
+const SaleDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
+  const currentDate = dayjs.utc().unix()
   let history = useHistory()
 
   const handleClick = e => {
     if (e.target.id === "social" || e.target.id === "links") {
       void 0
-    } else {
-      history.push(`/sale/${sale.id}`)
     }
   }
-
   const sale = saleData
-
-  const formattedRaised = 0
-  // const formattedRaised = sale ? formatEther(sale.sale.totalBNBRaised) : 0
 
   return (
     <div
@@ -62,7 +77,7 @@ const SaleDetailCard = ({ saleData, tokenInfo, saleInfo }) => {
         {sale.saleDetails.description}
       </p>
 
-      <div className="text-white font-size-11">
+      {/* <div className="text-white font-size-11">
         <Row className="mb-2">
           <Col xs={4}>Total Raise </Col>
           <Col xs={8} className="text-primary fs-6 text-end fw-bold">
@@ -83,15 +98,84 @@ const SaleDetailCard = ({ saleData, tokenInfo, saleInfo }) => {
             {saleInfo ? formatEther(saleInfo.sale.tokenPriceInBNB) : 0} BNB
           </Col>
         </Row>
-      </div>
+      </div> */}
 
       <div>
         <div className="mt-3 d-flex justify-content-between font-size-11">
-          <span className="text-white">{sale.saleDetails.diff}</span>
-          <span className="text-primary">{sale.saleDetails.percentage} %</span>
+          <Countdown
+            date={dayjs.utc(saleInfo.saleEnd * 1000)}
+            renderer={renderer}
+          ></Countdown>
+          <span className="text-primary">45 %</span>
+        </div>
+        <ProgressBar className="mt-1" variant="primary" now={45} />
+
+        <div className="d-flex w-100 flex-wrap mb-0 mt-3 py-1 border-bottom border-white border-opacity-50 text-center">
+          <div className="w-100 fw-bold">Round Info</div>
         </div>
 
-        <ProgressBar variant="primary" now={sale.saleDetails.percentage} />
+        <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
+          <div className="w-50 fw-bold">Round 1</div>
+          <div className="text-primary">
+            :{" "}
+            {saleInfo.getCurrentRound == 1 && roundInfo.round1 > currentDate
+              ? "On Going"
+              : "Ended"}
+          </div>
+        </div>
+        <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
+          <div className="w-50 fw-bold">Round 2</div>
+          <div className="text-primary">
+            :{" "}
+            {saleInfo.getCurrentRound == 2 && roundInfo.round2 > currentDate
+              ? "On Going"
+              : "Ended"}
+          </div>
+        </div>
+
+        <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
+          <div className="w-50 fw-bold">Round 3</div>
+          <div className="text-primary">
+            :{" "}
+            {saleInfo.getCurrentRound == 3 && roundInfo.round3 > currentDate
+              ? "On Going"
+              : "Ended"}
+          </div>
+        </div>
+
+        <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
+          <div className="w-50 fw-bold">Round 4</div>
+          <div className="text-primary">
+            :{" "}
+            {saleInfo.getCurrentRound == 4 && roundInfo.round4 > currentDate
+              ? "On Going"
+              : "Ended"}
+          </div>
+        </div>
+
+        <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
+          <div className="w-50 fw-bold">Round 5</div>
+          <div className="text-primary">
+            :{" "}
+            {saleInfo.getCurrentRound == 5 &&
+            roundInfo.round5 > currentDate &&
+            currentDate < roundInfo.publicRound
+              ? "On Going"
+              : "Ended"}
+          </div>
+        </div>
+
+        <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
+          <div className="w-50 fw-bold">Public Round</div>
+          <div className="text-primary">
+            :{" "}
+            {saleInfo.getCurrentRound == 5 &&
+            roundInfo.publicRound < currentDate &&
+            currentDate < roundInfo.end
+              ? "On Going"
+              : "Ended"}
+          </div>
+        </div>
 
         <Row className="mt-3 font-size-10">
           <Col xs={6} className="text-center">

@@ -15,6 +15,7 @@ import SalesABI from "constants/abi/Sales.json"
 
 import { ethers, BigNumber as BN } from "ethers"
 import { Contract, Provider, setMulticallAddress } from "ethers-multicall"
+import { parseUnits } from "ethers/lib/utils"
 
 const getSaleInfo = async (chain, address) => {
   setMulticallAddress(chain, MULTICALL_ADDRESS[chain])
@@ -32,13 +33,12 @@ const getSaleInfo = async (chain, address) => {
     calls.push(tokenContract.minParticipation())
     calls.push(tokenContract.maxParticipation())
     calls.push(tokenContract.lpPercentage())
-    calls.push(tokenContract.defaultPair())
+    calls.push(tokenContract.defaultDexRouter())
     calls.push(tokenContract.pcsListingRate())
     calls.push(tokenContract.BNBAmountForLiquidity())
     calls.push(tokenContract.tokensAmountForLiquidity())
     calls.push(tokenContract.publicRoundStartDelta())
     calls.push(tokenContract.getCurrentRound())
-    calls.push(tokenContract.tierIdToTierStartTime(5))
     // console.log(calls)
     const [
       sale,
@@ -46,30 +46,48 @@ const getSaleInfo = async (chain, address) => {
       min,
       max,
       lpPercent,
-      defaultPair,
+      defaultDexRouter,
       listingRate,
       bnbLiquidity,
       tokenLiquidity,
       publicRoundStartDelta,
       getCurrentRound,
-      tierIdToTierStartTime,
     ] = await ethcallProvider.all(calls)
 
+    const bnbDecimals = parseUnits("1", "18")
+    const hardCapBNB = sale.hardCap
+      .mul(sale.tokenPriceInBNB)
+      .div(bnbDecimals)
+      .toString()
+    const softCapBNB = sale.softCap
+      .mul(sale.tokenPriceInBNB)
+      .div(bnbDecimals)
+      .toString()
     return {
       success: true,
       data: {
-        sale: sale,
-        saleStart: saleStart,
-        min: min,
-        max: max,
-        lpPercent: lpPercent,
-        defaultPair: defaultPair,
-        listingRate: listingRate,
-        bnbLiquidity: bnbLiquidity,
-        tokenLiquidity: tokenLiquidity,
-        publicRoundStartDelta: publicRoundStartDelta,
-        getCurrentRound: getCurrentRound,
-        tierIdToTierStartTime: tierIdToTierStartTime,
+        saleStart: saleStart.toNumber(),
+        saleEnd: sale.saleEnd.toNumber(),
+        softCapBNB: softCapBNB,
+        hardCapBNB: hardCapBNB,
+        softCap: sale.softCap.toString(),
+        hardCap: sale.hardCap.toString(),
+        tokenPrice: sale.tokenPriceInBNB.toString(),
+        tokenPriceBNB: sale.tokenPriceInBNB.toString(),
+        raisedBNB: sale.totalBNBRaised.toString(),
+        soldToken: sale.totalTokensSold.toString(),
+        saleOwner: sale.saleOwner,
+        isPublic: sale.isPublic,
+        earningsWithdrawn: sale.earningsWithdrawn,
+        min: min.toString(),
+        max: max.toString(),
+        lpPercent: lpPercent.div("100").toNumber(),
+        defaultDexRouter: defaultDexRouter,
+        listingRate: listingRate.toString(),
+        bnbLiquidity: bnbLiquidity.toString(),
+        tokenLiquidity: tokenLiquidity.toString(),
+        publicRoundStartDelta: publicRoundStartDelta.toNumber(),
+        getCurrentRound: getCurrentRound.toNumber(),
       },
     }
   } catch (error) {

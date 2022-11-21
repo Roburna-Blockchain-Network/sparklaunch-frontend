@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react"
 import moment from "moment/moment"
-
+import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc"
+dayjs.extend(utc)
 import { Button, Col, ProgressBar, Row, Form } from "react-bootstrap"
 
 import { useEtherBalance, useEthers } from "@usedapp/core"
@@ -15,24 +17,25 @@ import {
 import { Contract } from "@ethersproject/contracts"
 
 import SaleAbi from "constants/abi/Sale.json"
-
-const BuyDetailCard = ({ saleData, tokenInfo, saleInfo }) => {
-  const currentDate = moment.utc().unix()
-  //   const [saleStatus, setSaleStatus] = useState()
-
+const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
+const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
+  const currentDate = dayjs.utc().unix()
   const { account, chainId, activateBrowserWallet, library } = useEthers()
 
   const [buyVal, setBuyVal] = useState(0)
   const [canBuy, setCanBuy] = useState(false)
 
-  const sale = saleData
+  console.log(saleData)
+  console.log(tokenInfo)
+  console.log(saleInfo)
+  console.log(roundInfo)
 
   const minBuy = Number(formatEther(saleInfo.min))
   const maxBuy = Number(formatEther(saleInfo.max))
-  const isPublic = saleInfo.sale.isPublic
+  const isPublic = saleInfo.isPublic
 
   const saleStart = BN.from(saleInfo.saleStart).toNumber()
-  const saleEnd = BN.from(saleInfo.sale.saleEnd).toNumber()
+  const saleEnd = BN.from(saleInfo.saleEnd).toNumber()
 
   let saleStatus = ""
   if (saleStart > currentDate) {
@@ -58,15 +61,6 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo }) => {
     }
     setBuyVal(newVal)
   }
-
-  const publicRoundStartDelta = BN.from(
-    saleInfo.publicRoundStartDelta
-  ).toNumber()
-  const getCurrentRound = BN.from(saleInfo.getCurrentRound).toNumber()
-  //   const getCurrentRound = BN.from(saleInfo.getCurrentRound).toNumber()
-  const tierIdToTierStartTime = BN.from(
-    saleInfo.tierIdToTierStartTime
-  ).toNumber()
 
   const handleBuyButton = async () => {
     if (validBuyVal(buyVal)) {

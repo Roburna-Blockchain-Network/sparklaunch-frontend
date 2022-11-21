@@ -3,6 +3,8 @@ import { MetaTags } from "react-meta-tags"
 
 import { Col, Container, Form, Modal, Row, Spinner } from "react-bootstrap"
 import moment from "moment/moment"
+import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc"
 
 import {
   depositTokens,
@@ -23,13 +25,16 @@ import { useHistory, useParams } from "react-router-dom"
 import { ChainId, useConfig, useEthers } from "@usedapp/core"
 import useTokenInfo from "hooks/useTokenInfo"
 import useSaleInfo from "hooks/useSaleInfo"
-import { formatEther, formatUnits } from "ethers/lib/utils"
+import { formatEther, formatUnits, parseUnits } from "ethers/lib/utils"
 import SaleDetailCard from "components/SaleDetailCard"
 import { API_URL } from "constants/Address"
 import { getRoundInfo, getSaleInfo, getTokenInfo } from "utils/factoryHelper"
 import { formatBigNumber } from "utils/numbers"
 import BuyDetailCard from "components/BuyDetailCard"
+dayjs.extend(utc)
 
+const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
+const currentDate = dayjs.utc()
 const SaleDetails = props => {
   const [isLoading, setIsLoading] = useState(false)
   const [ready, setReady] = useState(false)
@@ -37,10 +42,14 @@ const SaleDetails = props => {
   const [saleData, setSaleData] = useState()
   const [tokenInfo, setTokenInfo] = useState()
   const [saleInfo, setSaleInfo] = useState()
+  const [roundInfo, setRoundInfo] = useState()
+  const [tokenPriceOriginal, setTokenPriceOriginal] = useState()
 
   const { sales } = useSelector(state => state.Sales)
   const { selectedChain } = useSelector(state => state.User)
   const { id } = useParams()
+
+  const { account } = useEthers()
 
   useEffect(async () => {
     const abortController = new AbortController()
@@ -61,19 +70,29 @@ const SaleDetails = props => {
 
       const sales = await getSaleInfo(selectedChain, res.data[0].address)
 
+      // console.log(sales)
       const round = await getRoundInfo(selectedChain, res.data[0].address)
-      console.log(`Round info :`, round)
+      if (round.success) {
+        setRoundInfo(round.data)
+      }
 
+      // console.log(round)
       if (token.success) {
         setTokenInfo(token.data)
       }
+
       if (sales.success) {
+        const tokenDec = parseUnits("1", tokenInfo?.decimals)
+
+        const tokenPrice = tokenDec.div(sales.data.tokenPriceBNB).toString()
+        setTokenPriceOriginal(tokenPrice)
         setSaleInfo(sales.data)
       }
     } catch (error) {
       console.log(error)
     }
-    // console.log(saleInfo)
+
+    console.log(saleInfo)
     setReady(true)
 
     return () => {
@@ -194,38 +213,54 @@ const SaleDetails = props => {
                     <Col>
                       <p>
                         <span className="fw-bold">Access Type : </span>
-                        {saleInfo.sale.isPublic ? "Public" : "Private"}
+                        {saleInfo?.isPublic ? "Public" : "Private"}
                       </p>
                     </Col>
                     <Col>
                       <p>
                         <span className="fw-bold">Hard Cap : </span>
-                        {saleInfo ? formatEther(saleInfo.sale.hardCap) : 0} BNB
+                        {saleInfo
+                          ? formatUnits(saleInfo.hardCap, tokenInfo.decimals)
+                          : 0}{" "}
+                        BNB
                       </p>
                     </Col>
                   </Row>
 
                   <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
-                    <div className="w-25 fw-bold">Swap Rate</div>
+                    <div className="w-25 fw-bold">Presale Rate</div>
                     <div className="text-primary">
-                      : {saleData?.saleParams.softCap} -{" "}
-                      {saleData?.saleParams.hardCap} Tokens
+                      : 1 BNB : {tokenPriceOriginal} {tokenInfo.symbol}
+                    </div>
+                  </div>
+
+                  <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
+                    <div className="w-25 fw-bold">Dex Swap Rate</div>
+                    <div className="text-primary">
+                      : 1 BNB : {saleInfo.listingRate} {tokenInfo.symbol}
                     </div>
                   </div>
 
                   <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
                     <div className="w-25 fw-bold">Start / End</div>
                     <div className="text-primary">
-                      : {saleData?.saleParams.softCap} -{" "}
-                      {saleData?.saleParams.hardCap} Tokens
+                      :{" "}
+                      {dayjs
+                        .utc(saleInfo.saleStart * 1000)
+                        .format(DEFAULT_DATE_FORMAT)}{" "}
+                      -{" "}
+                      {dayjs
+                        .utc(saleInfo.saleEnd * 1000)
+                        .format(DEFAULT_DATE_FORMAT)}
                     </div>
                   </div>
 
                   <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
                     <div className="w-25 fw-bold">Base Allocation</div>
                     <div className="text-primary">
-                      : {saleData?.saleParams.softCap} -{" "}
-                      {saleData?.saleParams.hardCap} Tokens
+                      : {formatUnits(saleInfo.softCap, tokenInfo.decimals)} -{" "}
+                      {formatUnits(saleInfo.hardCap, tokenInfo.decimals)}{" "}
+                      {tokenInfo.symbol}
                     </div>
                   </div>
                 </div>
@@ -276,12 +311,14 @@ const SaleDetails = props => {
                   saleData={saleData}
                   tokenInfo={tokenInfo}
                   saleInfo={saleInfo}
+                  roundInfo={roundInfo}
                 />
 
                 <BuyDetailCard
                   saleData={saleData}
                   tokenInfo={tokenInfo}
                   saleInfo={saleInfo}
+                  roundInfo={roundInfo}
                 />
               </Col>
             </Row>
