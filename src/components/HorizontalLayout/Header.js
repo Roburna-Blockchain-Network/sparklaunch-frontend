@@ -140,14 +140,15 @@ const Header = props => {
                   POOLS
                 </Link>
 
-                <Link
-                  to="#"
+                <a
+                  href="https://spark-launch.gitbook.io/"
+                  target="_blank"
                   className={classnames("nav-link me-3 px-0", {
                     active: window.location.pathname === "/about",
                   })}
                 >
                   ABOUT
-                </Link>
+                </a>
 
                 <Link
                   to="/token-locker"

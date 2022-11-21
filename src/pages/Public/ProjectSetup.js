@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react"
 import { MetaTags } from "react-meta-tags"
-import moment from "moment"
 import { useContractFunction, useEthers, useToken } from "@usedapp/core"
 import { Contract } from "@ethersproject/contracts"
 
 import { Col, Container, Form, Row, Spinner } from "react-bootstrap"
 import { Link, Redirect, useHistory } from "react-router-dom"
+import { DatePicker } from "antd"
 
 import { ethers, utils } from "ethers"
 import useDeploymentFee from "hooks/useDeploymentFee"
@@ -20,15 +20,56 @@ import {
 import FactoryAbi from "constants/abi/Factory.json"
 import ERCAbi from "constants/abi/ERC20.json"
 import { saveData } from "connect/dataProccessing"
+import { isAddress } from "ethers/lib/utils"
+import moment from "moment"
 
 const ProjectSetup = () => {
   let history = useHistory()
   const { account, chainId, library } = useEthers()
   const deployFee = useDeploymentFee()
+
   const [activeTab, setActiveTab] = useState(1)
   const [step1, setStep1] = useState(null)
 
-  const [step2, setStep2] = useState(null)
+  const [step2, setStep2] = useState({
+    softCap: 0,
+    hardCap: 0,
+    minBuy: 0,
+    maxBuy: 0,
+    presaleRate: 0,
+    listingRate: 0,
+    startTime: 0,
+    endTime: 0,
+    publicTime: 0,
+    liquidityPercent: 0,
+    liquidityLock: 0,
+    round1: 0,
+    round2: 0,
+    round3: 0,
+    round4: 0,
+    round5: 0,
+    isPublic: false,
+  })
+  const [valid2, setValid2] = useState({
+    softCap: true,
+    hardCap: true,
+    minBuy: true,
+    maxBuy: true,
+    presaleRate: true,
+    listingRate: true,
+    startTime: true,
+    endTime: true,
+    publicTime: true,
+    liquidityPercent: true,
+    liquidityLock: true,
+    round1: true,
+    round2: true,
+    round3: true,
+    round4: true,
+    round5: true,
+    isPublic: false,
+  })
+  const [step2data, setStep2data] = useState()
   const [isAble, setIsAble] = useState(false)
 
   const [step3, setStep3] = useState(null)
@@ -38,7 +79,9 @@ const ProjectSetup = () => {
     decimal: "",
     symbol: "",
   })
+
   const [isValidStep1, setIsValidStep1] = useState(false)
+  const [isValidStep2, setIsValidStep2] = useState(false)
   const [displayInfo, setDisplayInfo] = useState(false)
 
   const [deploymentFee, setDeploymentFee] = useState(0.0)
@@ -53,16 +96,18 @@ const ProjectSetup = () => {
     event.preventDefault()
     event.stopPropagation()
 
-    const isAlreadyApprove = await handleBeforeSubmit({
-      address: form.address.value,
-    })
+    // const isAlreadyApprove = await handleBeforeSubmit({
+    //   address: form.address.value,
+    // })
+
+    const isAlreadyApprove = true
 
     if (isAlreadyApprove) {
       setStep1({
         title: form.title.value,
         // symbol: form.symbol.value,
         address: form.address.value,
-        price: form.price.value,
+        // price: form.price.value,
       })
 
       setActiveTab(activeTab + 1)
@@ -294,9 +339,16 @@ const ProjectSetup = () => {
     const inputtedAddress = e.target.value
     setDisplayInfo(false)
     setIsValidStep1(false)
+
+    const validAddress = isAddress(inputtedAddress)
+    console.log(validAddress)
+    if (!validAddress) {
+      return
+    }
     const response = await fetch(
       `${API_URL}check/${chainId}/${inputtedAddress}`
     )
+
     const data = await response.json()
     if (data.success === false) {
       e.target.focus()
@@ -317,9 +369,13 @@ const ProjectSetup = () => {
     setSaleType(selectedType)
   }
 
-  // useEffect(() => {
+  const handleInputValue = (name, value) => {
+    return console.log([name, value])
+  }
 
-  // }, [tokenInfo, inputAddress])
+  useEffect(() => {
+    console.log(step2)
+  }, [step2])
 
   const steps = [
     {
@@ -422,7 +478,7 @@ const ProjectSetup = () => {
                     defaultValue={step1?.address}
                     placeholder="Ex. 0x...q34f"
                     required
-                    onBlur={addressValidation}
+                    onChange={addressValidation}
                   />
                   <Form.Text className="text-primary">
                     Pool creation fee: {deploymentFee} BNB
@@ -455,21 +511,18 @@ const ProjectSetup = () => {
                     Users will pay with BNB for your token
                   </Form.Text>
                 </Form.Group>
-
-                <Form.Group className="mb-2" as={Col} controlId="price">
-                  <Form.Label>Token Price (BNB) *</Form.Label>
-                  <Form.Control
-                    defaultValue={step1?.price}
-                    type="number"
-                    placeholder="0"
-                    step=".0000001"
-                    min="0"
-                    required
-                  />
+                <Form.Group className="mb-2">
+                  <Form.Label>Fee Info</Form.Label>
                   <p className="form-text text-info">
-                    If I want to buy 1 Token how many BNB Should I spend?
+                    Pool creation fee: {deploymentFee} BNB <br />
+                    Pool service fee: {deploymentFee} BNB
                   </p>
+                  <p className="form-text text-info"></p>
                 </Form.Group>
+
+                {/* <Form.Group className="mb-2">
+                  <DatePicker showTime onChange={onChange} onOk={onOk} />
+                </Form.Group> */}
 
                 <div className="text-end">
                   <button
@@ -482,6 +535,7 @@ const ProjectSetup = () => {
                 </div>
               </Form>
             )}
+
             {/* FORM 2 */}
             {activeTab === 2 && (
               <Form onSubmit={handleSubmit2}>
@@ -494,17 +548,25 @@ const ProjectSetup = () => {
                     md={6}
                     controlId="softcap"
                   >
-                    <Form.Label>SoftCap (any)</Form.Label>
+                    <Form.Label>SoftCap (BNB)</Form.Label>
                     <Form.Control
-                      defaultValue={step2?.softcap}
+                      defaultValue={step2?.softCap}
                       type="number"
                       placeholder="0"
-                      step=".0000001"
+                      step="1"
                       min="0"
+                      onChange={e =>
+                        setStep2(prevState => {
+                          return {
+                            ...prevState,
+                            softCap: Number(e.target.value),
+                          }
+                        })
+                      }
                     />
-                    {/* <p className="form-text text-info">
-                      Softcap must be >= 50% of Hardcap!
-                    </p> */}
+                    <p className="form-text text-info">
+                      Softcap must be {">="} 50% of Hardcap!
+                    </p>
                   </Form.Group>
 
                   <Form.Group
@@ -513,14 +575,23 @@ const ProjectSetup = () => {
                     md={6}
                     controlId="hardcap"
                   >
-                    <Form.Label>Hardcap (any) *</Form.Label>
+                    <Form.Label>Hardcap (BNB) *</Form.Label>
                     <Form.Control
-                      defaultValue={step2?.hardcap}
+                      defaultValue={step2?.hardCap}
                       type="number"
                       placeholder="0"
-                      step=".0000001"
-                      min="0"
+                      step="1"
+                      min={step2.softCap}
+                      max={step2.softCap * 2}
                       required
+                      onChange={e =>
+                        setStep2(prevState => {
+                          return {
+                            ...prevState,
+                            hardCap: Number(e.target.value),
+                          }
+                        })
+                      }
                     />
                   </Form.Group>
 
@@ -532,13 +603,24 @@ const ProjectSetup = () => {
                   >
                     <Form.Label>Minimum Buy(BNB) *</Form.Label>
                     <Form.Control
-                      defaultValue={step2?.minbuy}
+                      defaultValue={step2?.minBuy}
                       type="number"
                       placeholder="0"
-                      step=".0000001"
+                      step=".0001"
                       min="0"
                       required
+                      onChange={e =>
+                        setStep2(prevState => {
+                          return {
+                            ...prevState,
+                            minBuy: Number(e.target.value),
+                          }
+                        })
+                      }
                     />
+                    <p className="form-text text-info">
+                      Minimum Buy must be {">"} Maximum Buy!
+                    </p>
                   </Form.Group>
 
                   <Form.Group
@@ -549,18 +631,84 @@ const ProjectSetup = () => {
                   >
                     <Form.Label>Maximum Buy(BNB) *</Form.Label>
                     <Form.Control
-                      defaultValue={step2?.maxbuy}
+                      defaultValue={step2?.maxBuy}
+                      type="number"
+                      placeholder="0"
+                      step=".0001"
+                      min="0"
+                      required
+                      onChange={e =>
+                        setStep2(prevState => {
+                          return {
+                            ...prevState,
+                            maxBuy: Number(e.target.value),
+                          }
+                        })
+                      }
+                    />
+                    <p className="form-text text-info">
+                      Maximum Buy must be {"<"} Minimum Buy
+                    </p>
+                  </Form.Group>
+                  <Form.Group className="mb-2" as={Col} controlId="price">
+                    <Form.Label>Token Presale Rate *</Form.Label>
+                    <Form.Control
+                      defaultValue={step2?.presaleRate}
                       type="number"
                       placeholder="0"
                       step=".0000001"
                       min="0"
                       required
+                      onChange={e =>
+                        setStep2(prevState => {
+                          return {
+                            ...prevState,
+                            presaleRate: Number(e.target.value),
+                          }
+                        })
+                      }
                     />
+                    <p className="form-text text-info">
+                      If I spend 1 BNB how many tokens will I receive?
+                    </p>
+                  </Form.Group>
+                  <Form.Group
+                    className="mb-2"
+                    as={Col}
+                    md={6}
+                    controlId="listingPrice"
+                  >
+                    <Form.Label>Exchange Listing Rate *</Form.Label>
+                    <Form.Control
+                      defaultValue={step2?.listingRate}
+                      type="number"
+                      required
+                      placeholder="0"
+                      // min="60"
+                      // max="100"
+                      // placeholder="51"
+                      step="0.1"
+                      onChange={e =>
+                        setStep2(prevState => {
+                          return {
+                            ...prevState,
+                            listingRate: Number(e.target.value),
+                          }
+                        })
+                      }
+                    />
+                    <p className="form-text text-info">
+                      If I spend 1 BNB how many tokens will I receive? Usually
+                      this amount is lower than presale rate to allow for a
+                      higher listing price on Dex Exchange
+                    </p>
                   </Form.Group>
 
-                  <p className="form-text text-primary mb-2">
-                    Select time & end time (UTC) *
+                  <p className="form-text text-center text-warning pb-2 pt-2 mb-2 fs-5  border-top border-bottom border-white border-opacity-50">
+                    Need 0 {tokenInfo.symbol} to create launchpad.
                   </p>
+
+                  <p className="mb-3 fs-5">Set Date Parameters</p>
 
                   <Form.Group
                     className="mb-2"
@@ -569,12 +717,24 @@ const ProjectSetup = () => {
                     controlId="startdt"
                   >
                     <Form.Label>Start time (UTC) *</Form.Label>
-                    <Form.Control
-                      defaultValue={step2?.startdt}
-                      type="datetime-local"
-                      placeholder="0"
-                      required
+                    <DatePicker
+                      format="YYYY-MM-DD HH:mm"
+                      showTime={{
+                        format: "HH:mm",
+                      }}
+                      onChange={(value, date) => {
+                        setStep2(prevState => {
+                          return {
+                            ...prevState,
+                            startTime: moment.utc(date).unix(),
+                          }
+                        })
+                      }}
                     />
+                    <p className="form-text text-info">
+                      Sale Start Time MUST BEFORE Sale End Time and Public Sale
+                      Time
+                    </p>
                   </Form.Group>
 
                   <Form.Group
@@ -584,12 +744,25 @@ const ProjectSetup = () => {
                     controlId="enddt"
                   >
                     <Form.Label>End time (UTC) *</Form.Label>
-                    <Form.Control
-                      defaultValue={step2?.enddt}
-                      type="datetime-local"
-                      placeholder="0"
-                      required
+                    <DatePicker
+                      placeholder="Select End Date"
+                      format="YYYY-MM-DD HH:mm"
+                      showTime={{
+                        format: "HH:mm",
+                      }}
+                      onChange={(value, date) => {
+                        setStep2(prevState => {
+                          return {
+                            ...prevState,
+                            endTime: moment.utc(date).unix(),
+                          }
+                        })
+                      }}
                     />
+                    <p className="form-text text-info">
+                      Sale End Time MUST after Sale Start Time and Public Sale
+                      Time
+                    </p>
                   </Form.Group>
 
                   <Form.Group
@@ -599,34 +772,26 @@ const ProjectSetup = () => {
                     controlId="publicDate"
                   >
                     <Form.Label>Public Round Start Date *</Form.Label>
-                    <Form.Control
-                      defaultValue={step2?.publicDate}
-                      type="datetime-local"
-                      placeholder="0"
-                      required
+                    <DatePicker
+                      placeholder="Select End Date"
+                      format="YYYY-MM-DD HH:mm"
+                      showTime={{
+                        format: "HH:mm",
+                      }}
+                      onChange={(value, date) => {
+                        setStep2(prevState => {
+                          return {
+                            ...prevState,
+                            publicTime: moment.utc(date).unix(),
+                          }
+                        })
+                      }}
                     />
+                    <p className="form-text text-info">
+                      Public Sale Time MUST BETWEEN Start Time and Public Time
+                    </p>
                   </Form.Group>
 
-                  <Form.Group
-                    className="mb-2"
-                    as={Col}
-                    md={6}
-                    controlId="listingPrice"
-                  >
-                    <Form.Label>Listing Price *</Form.Label>
-                    <Form.Control
-                      defaultValue={step2?.listingPrice}
-                      type="number"
-                      required
-                      // min="60"
-                      // max="100"
-                      // placeholder="51"
-                      step="0.1"
-                    />
-                    {/* <p className="form-text text-primary">
-                      Leave blank if you are the sale owner
-                    </p> */}
-                  </Form.Group>
                   <Form.Group
                     className="mb-2"
                     as={Col}
@@ -642,7 +807,18 @@ const ProjectSetup = () => {
                       placeholder="51"
                       step="1"
                       required
+                      onChange={e =>
+                        setStep2(prevState => {
+                          return {
+                            ...prevState,
+                            liquidityPercent: Number(e.target.value),
+                          }
+                        })
+                      }
                     />
+                    <p className="form-text text-info">
+                      Liquidity percentage MUST Between 51 and 100
+                    </p>
                   </Form.Group>
 
                   <Form.Group
@@ -651,15 +827,26 @@ const ProjectSetup = () => {
                     md={6}
                     controlId="liquidityLock"
                   >
-                    <Form.Label>Liquidity Lock (minutes)</Form.Label>
+                    <Form.Label>Liquidity Lock (days)</Form.Label>
                     <Form.Control
                       defaultValue={step2?.liquidityLock}
                       type="number"
-                      min="5"
+                      min="1"
                       placeholder="5"
                       step="1"
                       required
+                      onChange={e =>
+                        setStep2(prevState => {
+                          return {
+                            ...prevState,
+                            liquidityLock: Number(e.target.value),
+                          }
+                        })
+                      }
                     />
+                    <p className="form-text text-info">
+                      Please input Liquidity Lock in days
+                    </p>
                   </Form.Group>
                 </Row>
                 <Row>
@@ -675,7 +862,7 @@ const ProjectSetup = () => {
                         onChange={handleSaletype}
                         checked={saleType === "public"}
                       />
-                      <label className="form-check-label" for="saleType1">
+                      <label className="form-check-label" htmlFor="saleType1">
                         Public
                       </label>
                     </div>
@@ -710,10 +897,20 @@ const ProjectSetup = () => {
                         controlId="round1"
                       >
                         <Form.Label>Rounds 1 </Form.Label>
-                        <Form.Control
-                          defaultValue={step2?.round1}
-                          type="datetime-local"
-                          required
+                        <DatePicker
+                          placeholder="Select Round 1 Date"
+                          format="YYYY-MM-DD HH:mm"
+                          showTime={{
+                            format: "HH:mm",
+                          }}
+                          onChange={(value, date) => {
+                            setStep2(prevState => {
+                              return {
+                                ...prevState,
+                                round1: moment.utc(date).unix(),
+                              }
+                            })
+                          }}
                         />
                       </Form.Group>
 
@@ -724,11 +921,21 @@ const ProjectSetup = () => {
                         lg={4}
                         controlId="round2"
                       >
-                        <Form.Label>Round 2 (Hrs) *</Form.Label>
-                        <Form.Control
-                          defaultValue={step2?.round2}
-                          type="datetime-local"
-                          required
+                        <Form.Label>Round 2 *</Form.Label>
+                        <DatePicker
+                          placeholder="Select Round 2 Date"
+                          format="YYYY-MM-DD HH:mm"
+                          showTime={{
+                            format: "HH:mm",
+                          }}
+                          onChange={(value, date) => {
+                            setStep2(prevState => {
+                              return {
+                                ...prevState,
+                                round2: moment.utc(date).unix(),
+                              }
+                            })
+                          }}
                         />
                       </Form.Group>
 
@@ -739,11 +946,21 @@ const ProjectSetup = () => {
                         lg={4}
                         controlId="round3"
                       >
-                        <Form.Label>Round 3 (Hrs) *</Form.Label>
-                        <Form.Control
-                          defaultValue={step2?.round3}
-                          type="datetime-local"
-                          required
+                        <Form.Label>Round 3 *</Form.Label>
+                        <DatePicker
+                          placeholder="Select Round 3 Date"
+                          format="YYYY-MM-DD HH:mm"
+                          showTime={{
+                            format: "HH:mm",
+                          }}
+                          onChange={(value, date) => {
+                            setStep2(prevState => {
+                              return {
+                                ...prevState,
+                                round3: moment.utc(date).unix(),
+                              }
+                            })
+                          }}
                         />
                       </Form.Group>
 
@@ -755,10 +972,20 @@ const ProjectSetup = () => {
                         controlId="round4"
                       >
                         <Form.Label>Rounds 4 (Hrs) *</Form.Label>
-                        <Form.Control
-                          defaultValue={step2?.round4}
-                          type="datetime-local"
-                          required
+                        <DatePicker
+                          placeholder="Select Round 4 Date"
+                          format="YYYY-MM-DD HH:mm"
+                          showTime={{
+                            format: "HH:mm",
+                          }}
+                          onChange={(value, date) => {
+                            setStep2(prevState => {
+                              return {
+                                ...prevState,
+                                round4: moment.utc(date).unix(),
+                              }
+                            })
+                          }}
                         />
                       </Form.Group>
 
@@ -770,51 +997,25 @@ const ProjectSetup = () => {
                         controlId="round5"
                       >
                         <Form.Label>Round 5 (Hrs) *</Form.Label>
-                        <Form.Control
-                          defaultValue={step2?.round5}
-                          type="datetime-local"
-                          required
+                        <DatePicker
+                          placeholder="Select Round 5 Date"
+                          format="YYYY-MM-DD HH:mm"
+                          showTime={{
+                            format: "HH:mm",
+                          }}
+                          onChange={(value, date) => {
+                            setStep2(prevState => {
+                              return {
+                                ...prevState,
+                                round5: moment.utc(date).unix(),
+                              }
+                            })
+                          }}
                         />
                       </Form.Group>
-
-                      {/* <Form.Group
-                    className="mb-2"
-                    as={Col}
-                    md={6}
-                    lg={4}
-                    controlId="publicRound"
-                  >
-                    <Form.Label>Public Round (Hrs) *</Form.Label>
-                    <Form.Control
-                      defaultValue={step2?.publicRound}
-                      type="datetime-local"
-                      required
-                    />
-                  </Form.Group> */}
                     </Row>
                   </>
                 )}
-                {/* <p className="form-text mb-3 fs-5">Set Sale Whitelist</p> */}
-                {/* <Row>
-                  <Form.Group className="" as={Col} md={6} controlId="csvlink">
-                    <Form.Label>CSV File Link </Form.Label>
-                    <Form.Control
-                      defaultValue={step2?.csvlink}
-                      placeholder="Ex. https://bit.ly/3yW3ieR"
-                    />
-                  </Form.Group>
-                  <Form.Group className="mt-4 fs-5" as={Col} md={6}>
-                    <Form.Text>
-                      <a
-                        href="https://bit.ly/3yW3ieR"
-                        target="_blank"
-                        className="text-"
-                      >
-                        see example.
-                      </a>
-                    </Form.Text>
-                  </Form.Group>
-                </Row> */}
 
                 <div className="d-flex justify-content-between mt-5">
                   <button
@@ -827,6 +1028,7 @@ const ProjectSetup = () => {
                   <button
                     className="btn btn-primary px-3 fw-bolder"
                     type="submit"
+                    disabled={!isValidStep2}
                   >
                     Next {">>"}
                   </button>

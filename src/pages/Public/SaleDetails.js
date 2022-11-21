@@ -26,7 +26,7 @@ import useSaleInfo from "hooks/useSaleInfo"
 import { formatEther, formatUnits } from "ethers/lib/utils"
 import SaleDetailCard from "components/SaleDetailCard"
 import { API_URL } from "constants/Address"
-import { getSaleInfo, getTokenInfo } from "utils/factoryHelper"
+import { getRoundInfo, getSaleInfo, getTokenInfo } from "utils/factoryHelper"
 import { formatBigNumber } from "utils/numbers"
 import BuyDetailCard from "components/BuyDetailCard"
 
@@ -60,7 +60,9 @@ const SaleDetails = props => {
       // console.log(res.data[0].address)
 
       const sales = await getSaleInfo(selectedChain, res.data[0].address)
-      // console.log(sales)
+
+      const round = await getRoundInfo(selectedChain, res.data[0].address)
+      console.log(`Round info :`, round)
 
       if (token.success) {
         setTokenInfo(token.data)

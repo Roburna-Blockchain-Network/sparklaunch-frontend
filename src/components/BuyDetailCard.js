@@ -67,17 +67,6 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo }) => {
   const tierIdToTierStartTime = BN.from(
     saleInfo.tierIdToTierStartTime
   ).toNumber()
-  console.log()
-  console.log(`publicRoundStartDelta :`, publicRoundStartDelta)
-  //   console.log(`getCurrentRound :`, getCurrentRound)
-  console.log(`tierIdToTierStartTime :`, tierIdToTierStartTime)
-  console.log(`bcdate :`, publicRoundStartDelta + tierIdToTierStartTime)
-  console.log(`now :`, currentDate)
-  console.log(
-    `selisih :`,
-    publicRoundStartDelta + tierIdToTierStartTime - currentDate
-  )
-  console.log(getCurrentRound)
 
   const handleBuyButton = async () => {
     if (validBuyVal(buyVal)) {
