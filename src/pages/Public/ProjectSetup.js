@@ -163,8 +163,8 @@ const ProjectSetup = () => {
   }, [deployFee])
 
   useEffect(async () => {
-    const feeVal = ethers.utils.formatEther(servicesFee)
-    setServiceFee(feeVal)
+    const feeVal = ethers.utils.formatUnits(servicesFee, "4")
+    setServiceFee(feeVal * 100)
   }, [servicesFee])
 
   const validateStep2 = async () => {
@@ -679,7 +679,7 @@ const ProjectSetup = () => {
                   <Form.Label>Fee Info</Form.Label>
                   <p className="form-text text-info">
                     Pool creation fee: {deploymentFee} BNB <br />
-                    Pool service fee: {serviceFee} BNB
+                    Pool service fee: {serviceFee.toFixed(2)} %
                   </p>
                   <p className="form-text text-info"></p>
                 </Form.Group>
