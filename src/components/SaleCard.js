@@ -6,7 +6,12 @@ import { Button, Col, ProgressBar, Row } from "react-bootstrap"
 import discordLogo from "assets/images/icons/discord.png"
 import { Link, useHistory, useParams } from "react-router-dom"
 import { useSelector } from "react-redux"
-import { formatEther, parseEther, parseUnits } from "ethers/lib/utils"
+import {
+  formatEther,
+  formatUnits,
+  parseEther,
+  parseUnits,
+} from "ethers/lib/utils"
 import { BigNumber as BN } from "ethers"
 import { getRoundInfo, getSaleInfo, getTokenInfo } from "utils/factoryHelper"
 import dayjs from "dayjs"
@@ -87,6 +92,9 @@ const SaleCard = ({ sale }) => {
   }, [])
 
   const formattedRaised = saleInfo ? formatEther(saleInfo?.raisedBNB) : 0
+  const formattedSold = saleInfo
+    ? formatUnits(saleInfo?.soldToken, tokenInfo.decimals)
+    : 0
   const percentSold =
     (formattedRaised * 100) / (formatEther(saleInfo.hardCapBNB) * 1)
 

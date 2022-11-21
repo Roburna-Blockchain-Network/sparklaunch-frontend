@@ -9,7 +9,7 @@ import { Link, useHistory } from "react-router-dom"
 import { useSelector } from "react-redux"
 import useTokenInfo from "hooks/useTokenInfo"
 import { useEtherBalance } from "@usedapp/core"
-import { formatEther, parseEther } from "ethers/lib/utils"
+import { formatEther, parseEther, formatUnits } from "ethers/lib/utils"
 import { BigNumber as BN } from "ethers"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
@@ -42,6 +42,13 @@ const SaleDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
     }
   }
   const sale = saleData
+
+  const formattedRaised = saleInfo ? formatEther(saleInfo?.raisedBNB) : 0
+  const formattedSold = saleInfo
+    ? formatUnits(saleInfo?.soldToken, tokenInfo.decimals)
+    : 0
+  const percentSold =
+    (formattedRaised * 100) / (formatEther(saleInfo.hardCapBNB) * 1)
 
   return (
     <div
@@ -101,14 +108,25 @@ const SaleDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
       </div> */}
 
       <div>
+        <div className="d-flex w-100 flex-wrap mt-3 mb-0 py-1 border-bottom border-white border-opacity-50"></div>
+        <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
+          <div className="w-50 fw-bold">Total Raised</div>
+          <div className="text-primary">: {formattedRaised} BNB</div>
+        </div>
+        <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
+          <div className="w-50 fw-bold">Token Sold</div>
+          <div className="text-primary">
+            : {formattedSold} {tokenInfo.symbol}
+          </div>
+        </div>
         <div className="mt-3 d-flex justify-content-between font-size-11">
           <Countdown
             date={dayjs.utc(saleInfo.saleEnd * 1000)}
             renderer={renderer}
           ></Countdown>
-          <span className="text-primary">45 %</span>
+          <span className="text-primary">{percentSold} %</span>
         </div>
-        <ProgressBar className="mt-1" variant="primary" now={45} />
+        <ProgressBar className="mt-1" variant="primary" now={percentSold} />
 
         <div className="d-flex w-100 flex-wrap mb-0 mt-3 py-1 border-bottom border-white border-opacity-50 text-center">
           <div className="w-100 fw-bold">Round Info</div>
