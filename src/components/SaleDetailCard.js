@@ -73,9 +73,9 @@ const SaleDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
         </div>
       </div>
 
-      <p className="my-2 text-white font-size-12 line-truncate-2">
+      {/* <p className="my-2 text-white font-size-12 line-truncate-2">
         {sale.saleDetails.description}
-      </p>
+      </p> */}
 
       {/* <div className="text-white font-size-11">
         <Row className="mb-2">
