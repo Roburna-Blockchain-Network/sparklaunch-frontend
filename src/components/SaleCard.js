@@ -92,11 +92,9 @@ const SaleCard = ({ sale }) => {
   }, [])
 
   const formattedRaised = saleInfo ? formatEther(saleInfo?.raisedBNB) : 0
-  const formattedSold = saleInfo
-    ? formatUnits(saleInfo?.soldToken, tokenInfo.decimals)
+  const percentSold = saleInfo
+    ? (formattedRaised * 100) / (formatEther(saleInfo?.hardCapBNB) * 1)
     : 0
-  const percentSold =
-    (formattedRaised * 100) / (formatEther(saleInfo.hardCapBNB) * 1)
 
   return (
     <>
