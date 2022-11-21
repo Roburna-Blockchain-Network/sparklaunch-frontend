@@ -7,7 +7,10 @@ import { Col, Container, Form, Row, Spinner } from "react-bootstrap"
 import { Link, Redirect, useHistory } from "react-router-dom"
 import { DatePicker } from "antd"
 
-import { ethers, utils } from "ethers"
+import dayjs from "dayjs"
+
+import utc from "dayjs/plugin/utc"
+import { BigNumber, ethers, utils } from "ethers"
 import useDeploymentFee from "hooks/useDeploymentFee"
 
 import {
@@ -20,13 +23,26 @@ import {
 import FactoryAbi from "constants/abi/Factory.json"
 import ERCAbi from "constants/abi/ERC20.json"
 import { saveData } from "connect/dataProccessing"
-import { isAddress } from "ethers/lib/utils"
+import {
+  formatEther,
+  formatUnits,
+  isAddress,
+  parseEther,
+  parseUnits,
+} from "ethers/lib/utils"
 import moment from "moment"
-
+import { tokenRate } from "utils/helpers"
+import { useSelector } from "react-redux"
+import { getTokenAllowance } from "utils/factoryHelper"
+import { BIG_TEN } from "utils/numbers"
+dayjs.extend(utc)
 const ProjectSetup = () => {
   let history = useHistory()
-  const { account, chainId, library } = useEthers()
+  const { account, chainId, library, activateBrowserWallet } = useEthers()
+
   const deployFee = useDeploymentFee()
+
+  const user = useSelector(state => state.User)
 
   const [activeTab, setActiveTab] = useState(1)
   const [step1, setStep1] = useState(null)
@@ -48,7 +64,7 @@ const ProjectSetup = () => {
     round3: 0,
     round4: 0,
     round5: 0,
-    isPublic: false,
+    isPublic: true,
   })
   const [valid2, setValid2] = useState({
     softCap: true,
@@ -67,21 +83,42 @@ const ProjectSetup = () => {
     round3: true,
     round4: true,
     round5: true,
-    isPublic: false,
+    isPublic: true,
   })
-  const [step2data, setStep2data] = useState()
+
+  const [step2data, setStep2data] = useState({
+    softCap: 0,
+    hardCap: 0,
+    minBuy: 0,
+    maxBuy: 0,
+    presaleRate: 0,
+    listingRate: 0,
+    startTime: 0,
+    endTime: 0,
+    publicTime: 0,
+    liquidityPercent: 0,
+    liquidityLock: 0,
+    round1: 0,
+    round2: 0,
+    round3: 0,
+    round4: 0,
+    round5: 0,
+    isPublic: true,
+  })
   const [isAble, setIsAble] = useState(false)
 
   const [step3, setStep3] = useState(null)
   const [description, setDescription] = useState("")
   const [tokenInfo, setTokenInfo] = useState({
+    address: "",
     name: "",
     decimal: "",
     symbol: "",
   })
 
   const [isValidStep1, setIsValidStep1] = useState(false)
-  const [isValidStep2, setIsValidStep2] = useState(false)
+  const [userAllow, setUserAllow] = useState("0")
+  const [requiredToken, setRequiredToken] = useState("0")
   const [displayInfo, setDisplayInfo] = useState(false)
 
   const [deploymentFee, setDeploymentFee] = useState(0.0)
@@ -121,51 +158,98 @@ const ProjectSetup = () => {
     setDeploymentFee(feeVal)
   }, [deployFee])
 
-  const handleSubmit2 = event => {
+  const validateStep2 = async () => {
+    /**
+     * check initial
+     */
+
+    if (
+      step2.softCap == 0 ||
+      step2.hardCap == 0 ||
+      step2.minBuy == 0 ||
+      step2.maxBuy == 0 ||
+      step2.presaleRate == 0 ||
+      step2.listingRate == 0 ||
+      step2.startTime == 0 ||
+      step2.endTime == 0 ||
+      step2.publicTime == 0 ||
+      step2.liquidityPercent == 0 ||
+      step2.liquidityLock == 0
+    ) {
+      return false
+    }
+
+    if (!step2.isPublic) {
+      if (
+        step2.round1 == 0 ||
+        step2.round2 == 0 ||
+        step2.round3 == 0 ||
+        step2.round4 == 0 ||
+        step2.round5 == 0
+      ) {
+        return false
+      }
+    }
+
+    if (step2.minBuy > step2.maxBuy) {
+      return false
+    }
+
+    if (step2.startTime > step2.endTime) {
+      return false
+    }
+
+    if (step2.startTime > step2.publicTime) {
+      return false
+    }
+
+    if (step2.publicTime > step2.endTime) {
+      return false
+    }
+
+    if (!step2.isPublic) {
+      if (step2.round1 > step2.round2) {
+        return false
+      }
+      if (step2.round2 > step2.round3) {
+        return false
+      }
+      if (step2.round3 > step2.round4) {
+        return false
+      }
+      if (step2.round4 > step2.round5) {
+        return false
+      }
+      if (step2.round5 > step2.publicTime) {
+        return false
+      }
+    }
+
+    if (BigNumber.from(userAllow).lt(BigNumber.from(requiredToken))) {
+      const res = await handleBeforeSubmit(requiredToken)
+    }
+    const userBalance = await handleCheckBalance()
+
+    if (!userBalance) {
+      return false
+    }
+    console.log(`sukses`)
+    return true
+  }
+
+  const handleSubmit2 = async event => {
     const form = event.currentTarget
 
     event.preventDefault()
     event.stopPropagation()
+    console.log(step2)
 
-    if (saleType === "public") {
-      setStep2({
-        softcap: form.softcap.value,
-        hardcap: form.hardcap.value,
-        minbuy: form.minbuy.value,
-        maxbuy: form.maxbuy.value,
-        startdt: form.startdt.value,
-        enddt: form.enddt.value,
-        publicDate: form.publicDate.value,
-        listingPrice: form.listingPrice.value,
-        liquidityPercent: form.liquidityPercent.value,
-        liquidityLock: form.liquidityLock.value,
-        // round1: form.round1.value,
-        // round2: form.round2.value,
-        // round3: form.round3.value,
-        // round4: form.round4.value,
-        // round5: form.round5.value,
-      })
-    } else {
-      setStep2({
-        selectedSaleType: saleType,
-        softcap: form.softcap.value,
-        hardcap: form.hardcap.value,
-        minbuy: form.minbuy.value,
-        maxbuy: form.maxbuy.value,
-        startdt: form.startdt.value,
-        enddt: form.enddt.value,
-        publicDate: form.publicDate.value,
-        listingPrice: form.listingPrice.value,
-        liquidityPercent: form.liquidityPercent.value,
-        liquidityLock: form.liquidityLock.value,
-        round1: form.round1.value,
-        round2: form.round2.value,
-        round3: form.round3.value,
-        round4: form.round4.value,
-        round5: form.round5.value,
-      })
+    const isValid = await validateStep2()
+
+    if (isValid) {
+      setActiveTab(activeTab + 1)
     }
-    setActiveTab(activeTab + 1)
+    // console.log(step2data)
   }
 
   const handleSubmit3 = event => {
@@ -206,15 +290,15 @@ const ProjectSetup = () => {
     const routerAddress = ROUTER_ADDRESS[chainId]
     const adminAddress = ADMIN_ADDRESS[chainId]
     // const se
-    const START_SALE = moment(data.startdt).unix()
-    const END_SALE = moment(data.enddt).unix()
-    const PUBLIC_SALE = moment(data.publicDate).unix()
+    const START_SALE = data.startdt
+    const END_SALE = data.enddt
+    const PUBLIC_SALE = data.publicDate
     // const PUBLIC_DELTA = END_SALE - (PUBLIC_SALE + 10)
     const PUBLIC_DELTA = 10
     let startTimes = []
     let isPublic = "false"
 
-    if (typeof data.round1 == "undefined") {
+    if (step2.isPublic) {
       startTimes.push(START_SALE + 1)
       startTimes.push(START_SALE + 2)
       startTimes.push(START_SALE + 3)
@@ -234,18 +318,18 @@ const ProjectSetup = () => {
       const tx = await contract.deployNormalSale(
         [routerAddress, adminAddress, data.address, account],
         [
-          "1000",
-          utils.parseEther(data.minbuy),
-          utils.parseEther(data.maxbuy),
-          data.liquidityPercent * 100,
-          utils.parseEther(data.listingPrice),
-          data.liquidityLock * 60,
-          utils.parseEther(data.price),
+          "1000", // TODO : need change
+          data.minbuy,
+          data.maxbuy,
+          data.liquidityPercent,
+          data.listingPrice,
+          data.liquidityLock,
+          data.price,
           END_SALE,
           START_SALE,
           PUBLIC_DELTA,
-          utils.parseEther(data.hardcap),
-          utils.parseEther(data.softcap),
+          data.hardcap,
+          data.softcap,
         ],
         [adminAddress],
         [1],
@@ -263,16 +347,40 @@ const ProjectSetup = () => {
       console.log(error)
     }
   }
+
   const handleBeforeSubmit = async data => {
     const factoryContractAddress = FACTORY_ADDRESS[chainId]
-    const contract = new Contract(data.address, ERCAbi, library.getSigner())
+    const contract = new Contract(
+      tokenInfo.address,
+      ERCAbi,
+      library.getSigner()
+    )
+    const amount = parseUnits(requiredToken, BigNumber.from(tokenInfo.decimal))
+    try {
+      const approval = await contract.approve(factoryContractAddress, amount)
+
+      await approval.wait()
+
+      return true
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleCheckBalance = async data => {
+    const factoryContractAddress = FACTORY_ADDRESS[chainId]
+    const contract = new Contract(
+      tokenInfo.address,
+      ERCAbi,
+      library.getSigner()
+    )
 
     try {
-      await contract.approve(
-        factoryContractAddress,
-        "115792089237316195423570985008687907853269984665640564039457584007913129639935"
-      )
-      return true
+      const userbal = await contract.balanceOf(account)
+
+      if (userbal.gt(BigNumber.from(requiredToken))) return true
+
+      return false
     } catch (error) {
       console.log(error)
     }
@@ -282,26 +390,39 @@ const ProjectSetup = () => {
     event.preventDefault()
     event.stopPropagation()
     setIsLoading(true)
+
+    const DIVISION_BASE = 10000
+
+    const presaleRatePrice = tokenRate(step2.presaleRate, tokenInfo.decimal)
+    const tokenSoftCap = step2.presaleRate * step2.softCap
+    const tokenHardCap = step2.presaleRate * step2.hardCap
+
+    const _minBuy = step2.minBuy * DIVISION_BASE
+    const _maxBuy = step2.maxBuy * DIVISION_BASE
+
     const values = {
       title: step1?.title,
-      price: step1?.price,
-      address: step1?.address,
-
-      softcap: step2?.softcap,
-      hardcap: step2?.hardcap,
-      minbuy: step2?.minbuy,
-      maxbuy: step2?.maxbuy,
-      startdt: step2?.startdt,
-      enddt: step2?.enddt,
+      price: presaleRatePrice.toString(),
+      address: tokenInfo.address,
+      softcap: tokenSoftCap.toString(),
+      hardcap: tokenHardCap.toString(),
+      maxbuy: parseEther(_maxBuy.toString())
+        .div(BigNumber.from(DIVISION_BASE))
+        .toString(),
+      minbuy: parseEther(_minBuy.toString())
+        .div(BigNumber.from(DIVISION_BASE))
+        .toString(),
+      startdt: step2?.startTime,
+      enddt: step2?.endTime,
       round1: step2?.round1,
       round2: step2?.round2,
       round3: step2?.round3,
       round4: step2?.round4,
       round5: step2?.round5,
-      listingPrice: step2?.listingPrice,
-      liquidityPercent: step2?.liquidityPercent,
-      liquidityLock: step2?.liquidityLock,
-      publicDate: step2?.publicDate,
+      listingPrice: step2.listingRate,
+      liquidityPercent: (step2.liquidityPercent * 100).toString(),
+      liquidityLock: (step2?.liquidityLock * 86400).toString(),
+      publicDate: step2?.publicTime,
       saleOwner: account,
       whilelist: step2?.csvlink,
 
@@ -329,7 +450,7 @@ const ProjectSetup = () => {
 
       setIsLoading(false)
 
-      history.push("/")
+      history.push(`/sale/${id}`)
     } catch (error) {
       console.log(error)
     }
@@ -346,7 +467,7 @@ const ProjectSetup = () => {
       return
     }
     const response = await fetch(
-      `${API_URL}check/${chainId}/${inputtedAddress}`
+      `${API_URL}check/${user.selectedChain}/${inputtedAddress}`
     )
 
     const data = await response.json()
@@ -356,6 +477,7 @@ const ProjectSetup = () => {
     }
 
     setTokenInfo({
+      address: inputtedAddress,
       name: data.data.name,
       symbol: data.data.symbol,
       decimal: data.data.decimal,
@@ -364,18 +486,51 @@ const ProjectSetup = () => {
     setIsValidStep1(true)
   }
 
-  const handleSaletype = e => {
-    const selectedType = e.target.value
-    setSaleType(selectedType)
-  }
+  useEffect(async () => {
+    if (activeTab == 2 && account) {
+      try {
+        const allow = await getTokenAllowance(
+          user.selectedChain,
+          tokenInfo.address,
+          account
+        )
+        if (allow.success) {
+          setUserAllow(allow.data.allowance)
+        }
 
-  const handleInputValue = (name, value) => {
-    return console.log([name, value])
-  }
+        // console.log(allow)
+      } catch (error) {}
+    }
+  }, [activeTab])
 
   useEffect(() => {
-    console.log(step2)
-  }, [step2])
+    if (activeTab != 2) {
+      return
+    }
+    if (
+      step2.hardCap > 0 &&
+      step2.softCap > 0 &&
+      step2.listingRate > 0 &&
+      step2.presaleRate > 0
+    ) {
+      const hardCapBNB = parseUnits(step2.hardCap.toString(), "18")
+      const presaleRateToken = BigNumber.from(step2.presaleRate.toString())
+      const listingRateToken = BigNumber.from(step2.listingRate)
+
+      const reqHard = hardCapBNB
+        .mul(presaleRateToken)
+        .div(parseUnits("1", tokenInfo.decimal.toString()))
+
+      const reqLP = hardCapBNB
+        .mul(listingRateToken)
+        .div(parseUnits("1", tokenInfo.decimal.toString()))
+      const presaleRateBNB = tokenRate(presaleRateToken, "18")
+
+      setRequiredToken(reqHard.add(reqLP).toString())
+    }
+
+    return () => {}
+  }, [step2.hardCap, step2.softCap, step2.listingRate, step2.presaleRate])
 
   const steps = [
     {
@@ -526,7 +681,7 @@ const ProjectSetup = () => {
 
                 <div className="text-end">
                   <button
-                    disabled={!isValidStep1}
+                    disabled={!isValidStep1 || !account}
                     className="btn btn-primary px-3 fw-bolder"
                     type="submit"
                   >
@@ -564,9 +719,9 @@ const ProjectSetup = () => {
                         })
                       }
                     />
-                    <p className="form-text text-info">
+                    {/* <p className="form-text text-info">
                       Softcap must be {">="} 50% of Hardcap!
-                    </p>
+                    </p> */}
                   </Form.Group>
 
                   <Form.Group
@@ -619,7 +774,7 @@ const ProjectSetup = () => {
                       }
                     />
                     <p className="form-text text-info">
-                      Minimum Buy must be {">"} Maximum Buy!
+                      Minimum Buy must be {"<"} Maximum Buy!
                     </p>
                   </Form.Group>
 
@@ -647,7 +802,7 @@ const ProjectSetup = () => {
                       }
                     />
                     <p className="form-text text-info">
-                      Maximum Buy must be {"<"} Minimum Buy
+                      Maximum Buy must be {">"} Minimum Buy
                     </p>
                   </Form.Group>
                   <Form.Group className="mb-2" as={Col} controlId="price">
@@ -656,7 +811,7 @@ const ProjectSetup = () => {
                       defaultValue={step2?.presaleRate}
                       type="number"
                       placeholder="0"
-                      step=".0000001"
+                      step="1"
                       min="0"
                       required
                       onChange={e =>
@@ -684,10 +839,7 @@ const ProjectSetup = () => {
                       type="number"
                       required
                       placeholder="0"
-                      // min="60"
-                      // max="100"
-                      // placeholder="51"
-                      step="0.1"
+                      step="1"
                       onChange={e =>
                         setStep2(prevState => {
                           return {
@@ -705,7 +857,7 @@ const ProjectSetup = () => {
                   </Form.Group>
 
                   <p className="form-text text-center text-warning pb-2 pt-2 mb-2 fs-5  border-top border-bottom border-white border-opacity-50">
-                    Need 0 {tokenInfo.symbol} to create launchpad.
+                    Need {requiredToken} {tokenInfo.symbol} to create launchpad.
                   </p>
 
                   <p className="mb-3 fs-5">Set Date Parameters</p>
@@ -719,6 +871,12 @@ const ProjectSetup = () => {
                     <Form.Label>Start time (UTC) *</Form.Label>
                     <DatePicker
                       format="YYYY-MM-DD HH:mm"
+                      allowClear="false"
+                      defaultValue={
+                        step2.startTime > 0
+                          ? dayjs.utc(dayjs.unix(step2.startTime))
+                          : dayjs.utc()
+                      }
                       showTime={{
                         format: "HH:mm",
                       }}
@@ -747,6 +905,12 @@ const ProjectSetup = () => {
                     <DatePicker
                       placeholder="Select End Date"
                       format="YYYY-MM-DD HH:mm"
+                      allowClear="false"
+                      defaultValue={
+                        step2.endTime > 0
+                          ? dayjs.utc(dayjs.unix(step2.endTime))
+                          : dayjs.utc()
+                      }
                       showTime={{
                         format: "HH:mm",
                       }}
@@ -778,6 +942,12 @@ const ProjectSetup = () => {
                       showTime={{
                         format: "HH:mm",
                       }}
+                      allowClear="false"
+                      defaultValue={
+                        step2.publicTime > 0
+                          ? dayjs.utc(dayjs.unix(step2.publicTime))
+                          : dayjs.utc()
+                      }
                       onChange={(value, date) => {
                         setStep2(prevState => {
                           return {
@@ -859,8 +1029,15 @@ const ProjectSetup = () => {
                         value="public"
                         name="saleType"
                         id="saleType1"
-                        onChange={handleSaletype}
-                        checked={saleType === "public"}
+                        onChange={e =>
+                          setStep2(prevState => {
+                            return {
+                              ...prevState,
+                              isPublic: true,
+                            }
+                          })
+                        }
+                        checked={step2.isPublic}
                       />
                       <label className="form-check-label" htmlFor="saleType1">
                         Public
@@ -873,8 +1050,15 @@ const ProjectSetup = () => {
                         value="private"
                         name="saleType"
                         id="saleType2"
-                        onChange={handleSaletype}
-                        checked={saleType == "private"}
+                        onChange={e =>
+                          setStep2(prevState => {
+                            return {
+                              ...prevState,
+                              isPublic: false,
+                            }
+                          })
+                        }
+                        checked={!step2.isPublic}
                       />
                       <label className="form-check-label" for="saleType2">
                         Private
@@ -882,7 +1066,7 @@ const ProjectSetup = () => {
                     </div>
                   </div>
                 </Row>
-                {saleType == "private" && (
+                {!step2.isPublic && (
                   <>
                     <p className="mb-3 mt-3 fs-5">Set Sale Rounds</p>
                     <Row>
@@ -903,6 +1087,12 @@ const ProjectSetup = () => {
                           showTime={{
                             format: "HH:mm",
                           }}
+                          allowClear="false"
+                          defaultValue={
+                            step2.round1 > 0
+                              ? dayjs.utc(dayjs.unix(step2.round1))
+                              : dayjs.utc()
+                          }
                           onChange={(value, date) => {
                             setStep2(prevState => {
                               return {
@@ -928,6 +1118,12 @@ const ProjectSetup = () => {
                           showTime={{
                             format: "HH:mm",
                           }}
+                          allowClear="false"
+                          defaultValue={
+                            step2.round2 > 0
+                              ? dayjs.utc(dayjs.unix(step2.round2))
+                              : dayjs.utc()
+                          }
                           onChange={(value, date) => {
                             setStep2(prevState => {
                               return {
@@ -953,6 +1149,12 @@ const ProjectSetup = () => {
                           showTime={{
                             format: "HH:mm",
                           }}
+                          allowClear="false"
+                          defaultValue={
+                            step2.round3 > 0
+                              ? dayjs.utc(dayjs.unix(step2.round3))
+                              : dayjs.utc()
+                          }
                           onChange={(value, date) => {
                             setStep2(prevState => {
                               return {
@@ -978,6 +1180,12 @@ const ProjectSetup = () => {
                           showTime={{
                             format: "HH:mm",
                           }}
+                          allowClear="false"
+                          defaultValue={
+                            step2.round4 > 0
+                              ? dayjs.utc(dayjs.unix(step2.round4))
+                              : dayjs.utc()
+                          }
                           onChange={(value, date) => {
                             setStep2(prevState => {
                               return {
@@ -1003,6 +1211,12 @@ const ProjectSetup = () => {
                           showTime={{
                             format: "HH:mm",
                           }}
+                          allowClear="false"
+                          defaultValue={
+                            step2.round5 > 0
+                              ? dayjs.utc(dayjs.unix(step2.round5))
+                              : dayjs.utc()
+                          }
                           onChange={(value, date) => {
                             setStep2(prevState => {
                               return {
@@ -1028,7 +1242,7 @@ const ProjectSetup = () => {
                   <button
                     className="btn btn-primary px-3 fw-bolder"
                     type="submit"
-                    disabled={!isValidStep2}
+                    // disabled={!isValidStep2}
                   >
                     Next {">>"}
                   </button>

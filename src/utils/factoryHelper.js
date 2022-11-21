@@ -112,7 +112,7 @@ const getRoundInfo = async (chain, address) => {
     ] = await ethcallProvider.all(calls)
 
     const end = BN.from(sale.saleEnd).toNumber()
-    const publicRound = BN.from(round5).add(round5).toNumber()
+    const publicRound = BN.from(round5).add(delta).toNumber()
 
     return {
       success: true,
@@ -194,6 +194,31 @@ const getTotalSaleDeployed = async chain => {
 
 const getSaleDetails = async (chain, address) => {}
 
+const getTokenAllowance = async (chain, token, address) => {
+  setMulticallAddress(chain, MULTICALL_ADDRESS[chain])
+  const provider = new ethers.providers.JsonRpcProvider(RPC_ADDRESS[chain])
+  const ethcallProvider = new Provider(provider)
+  await ethcallProvider.init()
+
+  const tokenContract = new Contract(token, ERC20ABI)
+  let calls = []
+  try {
+    calls.push(tokenContract.allowance(address, FACTORY_ADDRESS[chain]))
+    const [userAllow] = await ethcallProvider.all(calls)
+    return {
+      success: true,
+      data: {
+        allowance: userAllow.toString(),
+      },
+    }
+  } catch (error) {
+    return {
+      success: false,
+      data: {},
+    }
+  }
+}
+
 const getTokenInfo = async (chain, address) => {
   setMulticallAddress(chain, MULTICALL_ADDRESS[chain])
   const provider = new ethers.providers.JsonRpcProvider(RPC_ADDRESS[chain])
@@ -228,4 +253,10 @@ const getTokenInfo = async (chain, address) => {
   }
 }
 
-export { getSaleInfo, getTokenInfo, getRoundInfo, getSaleAddressById }
+export {
+  getSaleInfo,
+  getTokenInfo,
+  getRoundInfo,
+  getSaleAddressById,
+  getTokenAllowance,
+}
