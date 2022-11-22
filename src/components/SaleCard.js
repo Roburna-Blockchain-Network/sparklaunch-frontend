@@ -43,13 +43,6 @@ const SaleCard = ({ sale }) => {
   const [ready, setReady] = useState(true)
   const [tokenPriceOriginal, setTokenPriceOriginal] = useState()
 
-  /**
-   * info
-   */
-  // const saleBalance = useEtherBalance(sale.saleToken.address, {
-  //   chainId: users.selectedChain,
-  // })
-
   const handleClick = e => {
     if (e.target.id === "social" || e.target.id === "links") {
       void 0

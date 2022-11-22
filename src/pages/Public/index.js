@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react"
 import MetaTags from "react-meta-tags"
 import { Link } from "react-router-dom"
-
+import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc"
+dayjs.extend(utc)
 import { Col, Container, Row } from "react-bootstrap"
 import { fetchAllSales } from "connect/dataProccessing"
 import SaleCard from "components/SaleCard"
@@ -14,79 +16,90 @@ import { setInitialSales, setSaleDeployed } from "store/actions"
 import { BigNumber } from "ethers"
 import { useEthers } from "@usedapp/core"
 import { getSaleInfo } from "utils/factoryHelper"
+const currentDate = dayjs.utc().unix()
 
 const Public = props => {
   const dispatch = useDispatch()
   const { isLogin, selectedChain } = useSelector(state => state.User)
   const allSales = useSelector(state => state.Sales)
 
-  const [featuredSales, setFeaturedSales] = useState([])
-  const [deployedSales, setDeployedSales] = useState([])
-  const [filteredSales, setFilteredSales] = useState([])
-  const [allSale, setAllSale] = useState([])
-
-  const [isReady, setIsReady] = useState(false)
+  const [filtered, setFiltered] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedBtn, setSelectedBtn] = useState("ALL")
 
   const contains = (item, searchValue) => {
-    if (searchValue === null || searchValue.trim() === "") {
-      return true
-    }
-
-    const saleDetails = JSON.stringify(Object.values(item.saleDetails))
-    const saleToken = Object.values(item.saleToken)
-      .toString()
-      .toLocaleLowerCase()
-
+    // console.log(currentDate)
+    console.log(item)
     if (
-      saleDetails.includes(searchValue.toLocaleLowerCase()) ||
-      saleToken.includes(searchValue.toLocaleLowerCase())
+      searchValue === null ||
+      searchValue.trim() === "" ||
+      searchValue === "ALL"
     ) {
       return true
     }
 
-    return false
+    if (searchValue === "UPCOMMING") {
+      return item.round.start > currentDate
+    }
+
+    if (searchValue === "ENDED") {
+      return item.round.end < currentDate
+    }
+
+    if (searchValue === "CLOSED") {
+      return item.round.end < currentDate
+    }
+
+    if (searchValue === "LIVE") {
+      return item.round.end > currentDate && item.round.start < currentDate
+    }
+
+    return (
+      item.address
+        .toLocaleLowerCase()
+        .includes(searchValue.toLocaleLowerCase()) ||
+      item.description
+        .toLocaleLowerCase()
+        .includes(searchValue.toLocaleLowerCase()) ||
+      item.token.name
+        .toLocaleLowerCase()
+        .includes(searchValue.toLocaleLowerCase()) ||
+      item.token.symbol
+        .toLocaleLowerCase()
+        .includes(searchValue.toLocaleLowerCase())
+    )
+
+    // return true
+
+    // const saleDetails = JSON.stringify(Object.values(item.saleDetails))
+    // const saleToken = Object.values(item.saleToken)
+    //   .toString()
+    //   .toLocaleLowerCase()
+
+    // if (
+    //   saleDetails.includes(searchValue.toLocaleLowerCase()) ||
+    //   saleToken.includes(searchValue.toLocaleLowerCase())
+    // ) {
+    //   return true
+    // }
+
+    // return false
   }
 
   const handleBtnFilter = term => {
     setSearchTerm("")
     setSelectedBtn(term)
-
-    if (term === "ALL") {
-      setFilteredSales(deployedSales)
-      return
-    }
-
-    if (typeof deployedSales == "undefined") {
-      return
-    }
-    if (deployedSales.length <= 0) {
-      return
-    }
-
-    setFilteredSales(
-      deployedSales.filter(item => {
-        if (
-          item.saleDetails.status.toLocaleLowerCase() ===
-          term.toLocaleLowerCase()
-        ) {
-          return item
-        }
-      })
-    )
+    setFiltered(term)
   }
 
   useEffect(async () => {
     setIsLoading(true)
-    console.log(`use effect run`)
-    console.log(allSales)
     if (allSales.isInit) {
       setIsLoading(false)
     }
   }, [selectedChain, allSales])
-  // console.log(allSales)
+
   return (
     <React.Fragment>
       <div className="page-content">
@@ -168,8 +181,8 @@ const Public = props => {
                         type="search"
                         placeholder="Search.."
                         aria-label="Search"
-                        value={searchTerm}
-                        onChange={e => setSearchTerm(e.target.value)}
+                        defaultValue={searchTerm}
+                        onChange={e => setFiltered(e.target.value)}
                       />
                     </div>
                   </Col>
@@ -179,7 +192,7 @@ const Public = props => {
                   {allSales.sales?.length > 0 ? (
                     allSales.sales
                       ?.filter(item => {
-                        return contains(item, searchTerm)
+                        return contains(item, filtered)
                       })
                       .map((sale, key) => (
                         <Col key={key} lg={4} md={4} sm={6}>
