@@ -36,7 +36,6 @@ const renderer = ({ days, hours, minutes, completed }) => {
 
 const SaleDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   const currentDate = dayjs.utc().unix()
-  let history = useHistory()
 
   const handleClick = e => {
     if (e.target.id === "social" || e.target.id === "links") {

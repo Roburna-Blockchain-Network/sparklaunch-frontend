@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import moment from "moment/moment"
 
-import { Button, Col, ProgressBar, Row } from "react-bootstrap"
+import { Button, Col, ProgressBar, Row, Placeholder } from "react-bootstrap"
 
 import discordLogo from "assets/images/icons/discord.png"
 import { Link, useHistory, useParams } from "react-router-dom"
@@ -262,7 +262,9 @@ const SaleCard = ({ sale }) => {
           </div>
         </div>
       ) : (
-        <></>
+        <>
+          <div className="sale-card-animation" id="sale-card"></div>
+        </>
       )}
     </>
   )
