@@ -88,7 +88,6 @@ const Public = props => {
     setIsLoading(true)
     try {
       const sales = await fetchAllSales(selectedChain)
-      console.log(sales)
       dispatch(setInitialSales(sales))
     } catch (error) {
       console.log(error)

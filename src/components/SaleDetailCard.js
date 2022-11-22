@@ -13,6 +13,8 @@ import { formatEther, parseEther, formatUnits } from "ethers/lib/utils"
 import { BigNumber as BN } from "ethers"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
+import RoundInfo from "pages/Public/details/RoundInfo"
+import AuditInfo from "pages/Public/details/AuditInfo"
 dayjs.extend(utc)
 
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
@@ -80,33 +82,6 @@ const SaleDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
         </div>
       </div>
 
-      {/* <p className="my-2 text-white font-size-12 line-truncate-2">
-        {sale.saleDetails.description}
-      </p> */}
-
-      {/* <div className="text-white font-size-11">
-        <Row className="mb-2">
-          <Col xs={4}>Total Raise </Col>
-          <Col xs={8} className="text-primary fs-6 text-end fw-bold">
-            {formattedRaised} BNB
-          </Col>
-        </Row>
-
-        <Row className="mb-2">
-          <Col xs={4}>Starts</Col>
-          <Col xs={8} className="text-primary fs-6 text-end fw-bold">
-            {moment.unix(sale.saleParams.startDate).format("lll")}
-          </Col>
-        </Row>
-
-        <Row className="mb-2">
-          <Col xs={4}>Price</Col>
-          <Col xs={8} className="text-primary fs-6 text-end fw-bold">
-            {saleInfo ? formatEther(saleInfo.sale.tokenPriceInBNB) : 0} BNB
-          </Col>
-        </Row>
-      </div> */}
-
       <div>
         <div className="d-flex w-100 flex-wrap mt-3 mb-0 py-1 border-bottom border-white border-opacity-50"></div>
         <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
@@ -128,87 +103,8 @@ const SaleDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
         </div>
         <ProgressBar className="mt-1" variant="primary" now={percentSold} />
 
-        <div className="d-flex w-100 flex-wrap mb-0 mt-3 py-1 border-bottom border-white border-opacity-50 text-center">
-          <div className="w-100 fw-bold">Round Info</div>
-        </div>
-
-        <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
-          <div className="w-50 fw-bold">Round 1</div>
-          <div className="text-primary">
-            :{" "}
-            {saleInfo.getCurrentRound == 1 && roundInfo.round1 > currentDate
-              ? "On Going"
-              : "Ended"}
-          </div>
-        </div>
-        <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
-          <div className="w-50 fw-bold">Round 2</div>
-          <div className="text-primary">
-            :{" "}
-            {saleInfo.getCurrentRound == 2 && roundInfo.round2 > currentDate
-              ? "On Going"
-              : "Ended"}
-          </div>
-        </div>
-
-        <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
-          <div className="w-50 fw-bold">Round 3</div>
-          <div className="text-primary">
-            :{" "}
-            {saleInfo.getCurrentRound == 3 && roundInfo.round3 > currentDate
-              ? "On Going"
-              : "Ended"}
-          </div>
-        </div>
-
-        <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
-          <div className="w-50 fw-bold">Round 4</div>
-          <div className="text-primary">
-            :{" "}
-            {saleInfo.getCurrentRound == 4 && roundInfo.round4 > currentDate
-              ? "On Going"
-              : "Ended"}
-          </div>
-        </div>
-
-        <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
-          <div className="w-50 fw-bold">Round 5</div>
-          <div className="text-primary">
-            :{" "}
-            {saleInfo.getCurrentRound == 5 &&
-            roundInfo.round5 > currentDate &&
-            currentDate < roundInfo.publicRound
-              ? "On Going"
-              : "Ended"}
-          </div>
-        </div>
-
-        <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
-          <div className="w-50 fw-bold">Public Round</div>
-          <div className="text-primary">
-            :{" "}
-            {saleInfo.getCurrentRound == 5 &&
-            roundInfo.publicRound < currentDate &&
-            currentDate < roundInfo.end
-              ? "On Going"
-              : "Ended"}
-          </div>
-        </div>
-
-        <Row className="mt-3 font-size-10">
-          <Col xs={6} className="text-center">
-            <Button className="btn btn-kyc" href="#" id="links">
-              {" "}
-              AUDIT
-            </Button>
-          </Col>
-          <Col xs={6} className="text-center">
-            <Button className="btn btn-kyc" href="#" id="links">
-              {" "}
-              KYC
-            </Button>
-          </Col>
-        </Row>
+        <RoundInfo saleInfo={saleInfo} roundInfo={roundInfo} />
+        <AuditInfo info={saleInfo} />
       </div>
     </div>
   )
