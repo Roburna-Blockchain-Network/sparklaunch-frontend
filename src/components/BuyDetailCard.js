@@ -4,6 +4,7 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 dayjs.extend(utc)
 import { Button, Col, ProgressBar, Row, Form } from "react-bootstrap"
+import { NotificationManager } from "react-notifications"
 
 import { useEtherBalance, useEthers } from "@usedapp/core"
 import { formatEther, parseEther } from "ethers/lib/utils"
@@ -24,11 +25,6 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
 
   const [buyVal, setBuyVal] = useState(0)
   const [canBuy, setCanBuy] = useState(false)
-
-  console.log(saleData)
-  console.log(tokenInfo)
-  console.log(saleInfo)
-  console.log(roundInfo)
 
   const minBuy = Number(formatEther(saleInfo.min))
   const maxBuy = Number(formatEther(saleInfo.max))
@@ -54,8 +50,6 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
     let newVal = buyVal
     if (val > maxBuy) {
       return
-    } else if (val < minBuy) {
-      newVal = minBuy
     } else {
       newVal = val
     }
@@ -75,6 +69,7 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
         const estimation = await contract.estimateGas.participate("0", {
           value: amountBuy,
         })
+        console.log(estimation)
       } catch (error) {
         console.log(error.message)
         return
@@ -89,7 +84,7 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
         console.log(error)
       }
     } else {
-      alert("Buy Value is not valid")
+      NotificationManager.error("Buy Value Not Valid", "Error")
     }
   }
 
@@ -105,16 +100,16 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
     <div className="buy-detail-card" id="buy-card">
       <div className="my-2">
         <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-          <Form.Label>amount</Form.Label>
+          <Form.Label>Amount In BNB (max {maxBuy})</Form.Label>
           <Form.Control
-            // defaultValue={buyVal}
+            defaultValue={buyVal}
             value={buyVal}
             type="number"
             placeholder="0"
-            step=".0000001"
-            min={minBuy}
+            // step=".0000001"
+            // min={minBuy}
             max={maxBuy}
-            onKeyUp={e => handleChangeValue(Number(e.target.value))}
+            // onKeyUp={e => handleChangeValue(Number(e.target.value))}
             onChange={e => handleChangeValue(Number(e.target.value))}
           />
         </Form.Group>

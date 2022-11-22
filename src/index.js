@@ -3,6 +3,7 @@ import ReactDOM from "react-dom"
 import App from "./App"
 import * as serviceWorker from "./serviceWorker"
 import { BrowserRouter } from "react-router-dom"
+import { NotificationContainer } from "react-notifications"
 
 import { Provider } from "react-redux"
 import {
@@ -14,6 +15,7 @@ import { getDefaultProvider } from "ethers"
 
 import store from "./store"
 import { RbaChain } from "constants/RbaChain"
+import "react-notifications/lib/notifications.css"
 
 const config = {
   readOnlyChainId: RbaChain.chainId,
@@ -28,6 +30,7 @@ const app = (
   <DAppProvider config={config}>
     <Provider store={store}>
       <BrowserRouter>
+        <NotificationContainer />
         <App />
       </BrowserRouter>
     </Provider>
