@@ -45,7 +45,7 @@ const SaleDetails = props => {
   const [saleInfo, setSaleInfo] = useState()
   const [roundInfo, setRoundInfo] = useState()
   const [tokenPriceOriginal, setTokenPriceOriginal] = useState()
-
+  const history = useHistory()
   const { sales } = useSelector(state => state.Sales)
   const { selectedChain } = useSelector(state => state.User)
   const { id } = useParams()
@@ -59,7 +59,13 @@ const SaleDetails = props => {
         `${API_URL}sale/chain/${selectedChain}/id/${id}`,
         { signal: abortController.signal }
       )
+
       const res = await response.json()
+      if (res.data.length == 0) {
+        alert(`sale not found`)
+        history.push("/")
+      }
+
       setSaleData(res.data[0])
 
       const token = await getTokenInfo(selectedChain, res.data[0].tokenAddress)

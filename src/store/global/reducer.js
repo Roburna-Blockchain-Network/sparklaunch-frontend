@@ -79,7 +79,7 @@ export const Sales = (
 export const User = (
   state = {
     isLogin: false,
-    selectedChain: 97,
+    selectedChain: 159,
     isAdmin: false,
   },
   action
