@@ -33,6 +33,7 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   const { selectedChain } = useSelector(state => state.User)
   const [buyVal, setBuyVal] = useState(0)
   const [canBuy, setCanBuy] = useState(false)
+  const [enabled, setEnabled] = useState(false)
   const [participate, setParticipate] = useState()
 
   const minBuy = Number(formatEther(saleInfo.min))
@@ -84,7 +85,7 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
 
   const handleBuyButton = async () => {
     if (participate.token !== "0") {
-      console.log(userBalance)
+      // console.log(userBalance)
       NotificationManager.error("Already Participated !", "Error")
       return
     }
@@ -94,6 +95,8 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
     }
 
     if (validBuyVal(buyVal)) {
+      setEnabled(false)
+
       const saleContractAddress = saleData.address
       const contract = new Contract(
         saleContractAddress,
@@ -101,24 +104,17 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
         library.getSigner()
       )
       const amountBuy = parseEther(buyVal.toString()).toString()
-      try {
-        const estimation = await contract.estimateGas.participate("0", {
-          value: amountBuy,
-        })
-        console.log(estimation)
-      } catch (error) {
-        console.log(error.message)
-        return
-      }
 
       try {
         const tx = await contract.participate("0", {
           value: amountBuy,
         })
         await tx.wait()
+        NotificationManager.success("Thanks for participation", "Thanks")
       } catch (error) {
         console.log(error)
       }
+      setEnabled(true)
     } else {
       NotificationManager.error("Buy Value Not Valid", "Error")
     }
@@ -153,6 +149,7 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
       <div className="my-2">
         {canBuy ? (
           <Button
+            disabled={enabled}
             className="btn buy-or-connect"
             href="#"
             id="links"
