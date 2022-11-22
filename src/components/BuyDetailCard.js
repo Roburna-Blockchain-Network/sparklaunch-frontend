@@ -7,8 +7,13 @@ import { Button, Col, ProgressBar, Row, Form } from "react-bootstrap"
 import { NotificationManager } from "react-notifications"
 
 import { useEtherBalance, useEthers } from "@usedapp/core"
-import { formatEther, parseEther } from "ethers/lib/utils"
-import { BigNumber as BN } from "ethers"
+import {
+  formatEther,
+  formatUnits,
+  parseEther,
+  parseUnits,
+} from "ethers/lib/utils"
+import { BigNumber, BigNumber as BN } from "ethers"
 import {
   FACTORY_ADDRESS,
   API_URL,
@@ -18,13 +23,17 @@ import {
 import { Contract } from "@ethersproject/contracts"
 
 import SaleAbi from "constants/abi/Sale.json"
+import { getUserParticipation } from "utils/factoryHelper"
+import { useSelector } from "react-redux"
+import { BIG_ONE } from "utils/numbers"
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
 const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   const currentDate = dayjs.utc().unix()
   const { account, chainId, activateBrowserWallet, library } = useEthers()
-
+  const { selectedChain } = useSelector(state => state.User)
   const [buyVal, setBuyVal] = useState(0)
   const [canBuy, setCanBuy] = useState(false)
+  const [participate, setParticipate] = useState()
 
   const minBuy = Number(formatEther(saleInfo.min))
   const maxBuy = Number(formatEther(saleInfo.max))
@@ -32,6 +41,23 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
 
   const saleStart = BN.from(saleInfo.saleStart).toNumber()
   const saleEnd = BN.from(saleInfo.saleEnd).toNumber()
+
+  const userBalance = useEtherBalance(account)
+
+  useEffect(async () => {
+    if (!account) {
+      return
+    }
+    try {
+      const userParticipate = await getUserParticipation(
+        selectedChain,
+        saleData.address,
+        account
+      )
+      userParticipate.success ? setParticipate(userParticipate.data) : ""
+      return
+    } catch (error) {}
+  }, [account, selectedChain])
 
   let saleStatus = ""
   if (saleStart > currentDate) {
@@ -57,6 +83,16 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   }
 
   const handleBuyButton = async () => {
+    if (participate.token !== "0") {
+      console.log(userBalance)
+      NotificationManager.error("Already Participated !", "Error")
+      return
+    }
+    if (parseEther(buyVal.toString()).gt(userBalance)) {
+      NotificationManager.error("You dont have enough money !", "Error")
+      return
+    }
+
     if (validBuyVal(buyVal)) {
       const saleContractAddress = saleData.address
       const contract = new Contract(
@@ -137,6 +173,17 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
       </div>
       <div className="text-white font-size-11">
         <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50"></div>
+        <div className="text-white font-size-11">
+          <div className="d-flex w-100 flex-wrap justify-content-between mb-0 py-1 border-bottom border-white border-opacity-50">
+            <div className="fw-bold">Your Participation</div>
+            {participate && (
+              <div className="text-white">
+                {formatUnits(participate.token, tokenInfo.decimals)}{" "}
+                {tokenInfo.symbol} / {formatUnits(participate.native, 18)} BNB
+              </div>
+            )}
+          </div>
+        </div>
         <div className="d-flex w-100 flex-wrap justify-content-between mb-0 py-1 border-bottom border-white border-opacity-50">
           <div className="w-25 fw-bold">Status</div>
           <div className="text-white">{saleStatus}</div>

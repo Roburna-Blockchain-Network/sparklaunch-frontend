@@ -213,6 +213,37 @@ const getTotalSaleDeployed = async chain => {
     }
   }
 }
+const getUserParticipation = async (chain, saleAddress, userAddress) => {
+  setMulticallAddress(chain, MULTICALL_ADDRESS[chain])
+  const provider = new ethers.providers.JsonRpcProvider(RPC_ADDRESS[chain])
+  const ethcallProvider = new Provider(provider)
+  await ethcallProvider.init()
+  const tokenContract = new Contract(saleAddress, SalesABI)
+
+  let calls = []
+  try {
+    calls.push(tokenContract.getParticipation(userAddress))
+    const [data] = await ethcallProvider.all(calls)
+
+    return {
+      success: true,
+      data: {
+        tokenB: data[0],
+        token: data[0].toString(),
+        native: data[1].toString(),
+        tier: data[2].toString(),
+        tokenWithdrawn: data[3],
+        nativeWithdrawn: data[4],
+      },
+    }
+  } catch (error) {
+    return {
+      success: false,
+      data: { address },
+      msg: error,
+    }
+  }
+}
 
 const getSaleDetails = async (chain, address) => {}
 
@@ -281,4 +312,5 @@ export {
   getRoundInfo,
   getSaleAddressById,
   getTokenAllowance,
+  getUserParticipation,
 }
