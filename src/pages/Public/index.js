@@ -9,32 +9,26 @@ import smLogo from "assets/images/logos/smlogo.png"
 import api from "connect/BaseApi"
 import Hero from "./home/Hero"
 import FeaturedCard from "./home/FeaturedCard"
-import useDeployedSales from "hooks/useDeployedSales"
 import { useDispatch, useSelector } from "react-redux"
 import { setInitialSales, setSaleDeployed } from "store/actions"
 import { BigNumber } from "ethers"
 import { useEthers } from "@usedapp/core"
+import { getSaleInfo } from "utils/factoryHelper"
 
 const Public = props => {
   const dispatch = useDispatch()
   const { isLogin, selectedChain } = useSelector(state => state.User)
-  const { sales } = useSelector(state => state.Sales)
+  const allSales = useSelector(state => state.Sales)
 
   const [featuredSales, setFeaturedSales] = useState([])
   const [deployedSales, setDeployedSales] = useState([])
   const [filteredSales, setFilteredSales] = useState([])
+  const [allSale, setAllSale] = useState([])
 
+  const [isReady, setIsReady] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedBtn, setSelectedBtn] = useState("ALL")
-
-  const allSales = useDeployedSales()
-
-  useEffect(() => {
-    if (allSales instanceof BigNumber) {
-      dispatch(setSaleDeployed(allSales.toNumber()))
-    }
-  }, [])
 
   const contains = (item, searchValue) => {
     if (searchValue === null || searchValue.trim() === "") {
@@ -86,14 +80,13 @@ const Public = props => {
 
   useEffect(async () => {
     setIsLoading(true)
-    try {
-      const sales = await fetchAllSales(selectedChain)
-      dispatch(setInitialSales(sales))
-    } catch (error) {
-      console.log(error)
+    console.log(`use effect run`)
+    console.log(allSales)
+    if (allSales.isInit) {
+      setIsLoading(false)
     }
-    setIsLoading(false)
-  }, [selectedChain])
+  }, [selectedChain, allSales])
+  // console.log(allSales)
   return (
     <React.Fragment>
       <div className="page-content">
@@ -183,8 +176,8 @@ const Public = props => {
                 </Row>
 
                 <Row className="g-4 my-4">
-                  {sales?.length > 0 ? (
-                    sales
+                  {allSales.sales?.length > 0 ? (
+                    allSales.sales
                       ?.filter(item => {
                         return contains(item, searchTerm)
                       })

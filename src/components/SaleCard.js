@@ -13,7 +13,6 @@ import {
   parseUnits,
 } from "ethers/lib/utils"
 import { BigNumber as BN } from "ethers"
-import { getRoundInfo, getSaleInfo, getTokenInfo } from "utils/factoryHelper"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 dayjs.extend(utc)
@@ -41,9 +40,7 @@ const SaleCard = ({ sale }) => {
   let history = useHistory()
   const dispatch = useDispatch()
   const users = useSelector(state => state.User)
-  const [tokenInfo, setTokenInfo] = useState()
-  const [saleInfo, setSaleInfo] = useState()
-  const [ready, setReady] = useState(false)
+  const [ready, setReady] = useState(true)
   const [tokenPriceOriginal, setTokenPriceOriginal] = useState()
 
   /**
@@ -61,35 +58,8 @@ const SaleCard = ({ sale }) => {
     }
   }
 
-  useEffect(async () => {
-    const abortController = new AbortController()
-    try {
-      const token = await getTokenInfo(users.selectedChain, sale?.tokenAddress)
-      const sales = await getSaleInfo(users.selectedChain, sale?.address)
-
-      if (token.success) {
-        setTokenInfo(token.data)
-      }
-
-      if (sales.success) {
-        const tokenDec = parseUnits("1", tokenInfo?.decimals)
-
-        const tokenPrice = tokenDec.div(sales.data.tokenPriceBNB).toString()
-        setTokenPriceOriginal(tokenPrice)
-        setSaleInfo(sales.data)
-      }
-      // console.log(sales)
-    } catch (error) {
-      console.log(error)
-    }
-
-    // console.log(saleInfo)
-    setReady(true)
-
-    return () => {
-      abortController.abort()
-    }
-  }, [])
+  const saleInfo = sale.info
+  const tokenInfo = sale.token
 
   const formattedRaised = saleInfo ? formatEther(saleInfo?.raisedBNB) : 0
   const percentSold = saleInfo
@@ -103,7 +73,9 @@ const SaleCard = ({ sale }) => {
           onClick={handleClick}
           className="sale-card"
           id="sale-card"
-          style={{ cursor: "pointer" }}
+          style={{
+            cursor: "pointer",
+          }}
         >
           <div className="d-flex flex-nowrap">
             <div className="flex-grow-1">

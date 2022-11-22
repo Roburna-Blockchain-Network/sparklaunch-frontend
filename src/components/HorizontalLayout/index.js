@@ -7,6 +7,7 @@ import {
   changeLayout,
   changeTopbarTheme,
   changeLayoutWidth,
+  setInitialSales,
 } from "store/actions"
 
 //redux
@@ -16,9 +17,12 @@ import { useSelector, useDispatch } from "react-redux"
 import Navbar from "./Navbar"
 import Header from "./Header"
 import Footer from "./Footer"
+import { fetchAllSales } from "connect/dataProccessing"
+import { getRoundInfo, getSaleInfo, getTokenInfo } from "utils/factoryHelper"
 
 const Layout = props => {
   const dispatch = useDispatch()
+
   const [isMenuOpened, setIsMenuOpened] = useState(false)
 
   const { topbarTheme, layoutWidth, isPreloader } = useSelector(state => ({
@@ -27,6 +31,9 @@ const Layout = props => {
     isPreloader: state.Layout.isPreloader,
     showRightSidebar: state.Layout.showRightSidebar,
   }))
+
+  const allSales = useSelector(state => state.Sales)
+  const { selectedChain } = useSelector(state => state.User)
 
   /*
   document title
@@ -80,6 +87,33 @@ const Layout = props => {
       dispatch(changeLayoutWidth(layoutWidth))
     }
   }, [dispatch, layoutWidth])
+
+  useEffect(async () => {
+    console.log(allSales)
+    if (!allSales.isInit) {
+      const sales = await fetchAllSales(selectedChain)
+
+      for (const sale of sales) {
+        const [token, round, info] = await Promise.all([
+          getTokenInfo(selectedChain, sale.tokenAddress),
+          getRoundInfo(selectedChain, sale.address),
+          getSaleInfo(selectedChain, sale.address),
+        ])
+
+        sale.info = info?.data
+        sale.token = token?.data
+        sale.round = round?.data
+      }
+
+      console.log(sales)
+
+      try {
+        dispatch(setInitialSales(sales))
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }, [dispatch, allSales])
 
   const openMenu = () => {
     setIsMenuOpened(!isMenuOpened)

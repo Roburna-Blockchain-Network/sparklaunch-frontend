@@ -3,6 +3,7 @@ import * as ActionTypes from "./ActionTypes"
 export const Sales = (
   state = {
     isLoading: false,
+    isInit: false,
     errMess: null,
     deployedSales: 0,
     sales: [],
@@ -14,10 +15,12 @@ export const Sales = (
       return {
         ...state,
         isLoading: false,
+        isInit: true,
         errMess: null,
         deployedSales: state.deployedSales,
         sales: action.payload,
       }
+
     case ActionTypes.UPDATE_SALE:
       newSale = []
       state.sales.forEach(sale => {
@@ -29,6 +32,7 @@ export const Sales = (
           newSale.push(sale)
         }
       })
+
     case ActionTypes.UPDATE_SALE_TIME:
       let newSale = []
       state.sales.forEach(sale => {
@@ -45,6 +49,7 @@ export const Sales = (
       return {
         ...state,
         isLoading: false,
+        isInit: true,
         errMess: null,
         deployedSales: state.deployedSales,
         sales: state.sales,
@@ -53,6 +58,7 @@ export const Sales = (
       return {
         ...state,
         isLoading: false,
+        isInit: true,
         errMess: null,
         deployedSales: state.deployedSales + 1,
         sales: state.sales.concat([action.payload]),
@@ -61,6 +67,7 @@ export const Sales = (
       return {
         ...state,
         isLoading: false,
+        isInit: true,
         errMess: null,
         deployedSales: action.payload,
         sales: state.sales,
