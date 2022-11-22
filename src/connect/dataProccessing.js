@@ -50,9 +50,8 @@ export const fetchAllSales = async chainId => {
   try {
     const response = await fetch(`${backendURL}sale/chain/${chainId}`)
     const res = await response.json()
-    if (res.success) {
-      return res.data
-    }
+
+    return res.data
   } catch (e) {
     return []
   }
@@ -296,6 +295,8 @@ export const saveData = async values => {
     const input = JSON.stringify({
       id: values.id,
       address: values.contractAddress,
+      start: values.startdt,
+      end: values.enddt,
       chainId: values.chainId,
       tokenAddress: values.address,
       saleLinks: {

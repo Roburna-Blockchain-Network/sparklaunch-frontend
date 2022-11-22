@@ -40,7 +40,7 @@ const getSaleInfo = async (chain, address) => {
     calls.push(tokenContract.publicRoundStartDelta())
     calls.push(tokenContract.getCurrentRound())
     // calls.push(tokenContract.getNumberOfRegisteredUsers())
-    console.log(calls)
+    // console.log(calls)
     const [
       sale,
       saleStart,
@@ -68,6 +68,7 @@ const getSaleInfo = async (chain, address) => {
     return {
       success: true,
       data: {
+        address: address,
         saleStart: saleStart.toNumber(),
         saleEnd: sale.saleEnd.toNumber(),
         softCapBNB: softCapBNB,

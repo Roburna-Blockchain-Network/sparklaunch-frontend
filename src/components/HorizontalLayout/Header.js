@@ -41,6 +41,7 @@ const Header = props => {
   options[159] = { id: 1, value: 159, text: "Roburna Chain", logo: roburnaLogo }
 
   const [selected, setSelected] = useState(options[users.selectedChain])
+  // console.log(users)
 
   const handleSwitchNetwork = async e => {
     if (account) {

@@ -18,6 +18,37 @@ export const Sales = (
         deployedSales: state.deployedSales,
         sales: action.payload,
       }
+    case ActionTypes.UPDATE_SALE:
+      newSale = []
+      state.sales.forEach(sale => {
+        if (sale.id == action.payload.id) {
+          let x = sale
+          x.status = action.payload.status
+          newSale.push(x)
+        } else {
+          newSale.push(sale)
+        }
+      })
+    case ActionTypes.UPDATE_SALE_TIME:
+      let newSale = []
+      state.sales.forEach(sale => {
+        if (sale.address == action.payload.address) {
+          let x = sale
+          x.start = action.payload.start
+          x.end = action.payload.end
+          newSale.push(x)
+        } else {
+          newSale.push(sale)
+        }
+      })
+      console.log(newSale)
+      return {
+        ...state,
+        isLoading: false,
+        errMess: null,
+        deployedSales: state.deployedSales,
+        sales: state.sales,
+      }
     case ActionTypes.ADD_SALE:
       return {
         ...state,
@@ -42,6 +73,7 @@ export const User = (
   state = {
     isLogin: false,
     selectedChain: 97,
+    isAdmin: false,
   },
   action
 ) => {

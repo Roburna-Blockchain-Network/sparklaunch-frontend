@@ -18,7 +18,7 @@ import { useEthers } from "@usedapp/core"
 const Public = props => {
   const dispatch = useDispatch()
   const { isLogin, selectedChain } = useSelector(state => state.User)
-  const { sales } = useSelector(state => state.User)
+  const { sales } = useSelector(state => state.Sales)
 
   const [featuredSales, setFeaturedSales] = useState([])
   const [deployedSales, setDeployedSales] = useState([])
@@ -84,37 +84,17 @@ const Public = props => {
     )
   }
 
-  const fetchFeaturedSale = () => {
-    api
-      .get("featured/true", {
-        method: "GET",
-        headers: {
-          "content-type": "application/json",
-        },
-      })
-      .then(response => {
-        const data = response.data
-        setFeaturedSales(data)
-      })
-      .catch(error => {
-        console.log(error.response?.data?.message)
-      })
-  }
-
   useEffect(async () => {
     setIsLoading(true)
     try {
       const sales = await fetchAllSales(selectedChain)
+      console.log(sales)
       dispatch(setInitialSales(sales))
-      setDeployedSales(sales)
-      setFilteredSales(sales)
-      setIsLoading(false)
     } catch (error) {
       console.log(error)
     }
     setIsLoading(false)
   }, [selectedChain])
-
   return (
     <React.Fragment>
       <div className="page-content">
@@ -204,8 +184,8 @@ const Public = props => {
                 </Row>
 
                 <Row className="g-4 my-4">
-                  {filteredSales?.length > 0 ? (
-                    filteredSales
+                  {sales?.length > 0 ? (
+                    sales
                       ?.filter(item => {
                         return contains(item, searchTerm)
                       })

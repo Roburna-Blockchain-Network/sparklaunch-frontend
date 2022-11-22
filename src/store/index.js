@@ -37,7 +37,14 @@ import rootSaga from "./sagas"
 // export const { fetchData } = sparklaunchSlice.actions
 
 const sagaMiddleware = createSagaMiddleware()
-const middleware = [...getDefaultMiddleware({ thunk: false }), sagaMiddleware]
+const middleware = [
+  ...getDefaultMiddleware({
+    thunk: true,
+    // immutableCheck: false,
+    // serializableCheck: false,
+  }),
+  sagaMiddleware,
+]
 
 const store = configureStore({
   reducer: rootReducer,

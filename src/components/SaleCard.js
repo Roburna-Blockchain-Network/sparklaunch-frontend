@@ -5,7 +5,7 @@ import { Button, Col, ProgressBar, Row } from "react-bootstrap"
 
 import discordLogo from "assets/images/icons/discord.png"
 import { Link, useHistory, useParams } from "react-router-dom"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import {
   formatEther,
   formatUnits,
@@ -18,6 +18,7 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 dayjs.extend(utc)
 import Countdown, { zeroPad } from "react-countdown"
+import { updateSaleTime } from "store/actions"
 
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
 const Completionist = () => <span>Sale is End</span>
@@ -38,9 +39,8 @@ const renderer = ({ days, hours, minutes, completed }) => {
 const SaleCard = ({ sale }) => {
   const currentDate = moment().unix()
   let history = useHistory()
+  const dispatch = useDispatch()
   const users = useSelector(state => state.User)
-  const sales = useSelector(state => state.Sales)
-
   const [tokenInfo, setTokenInfo] = useState()
   const [saleInfo, setSaleInfo] = useState()
   const [ready, setReady] = useState(false)
@@ -78,12 +78,12 @@ const SaleCard = ({ sale }) => {
         setTokenPriceOriginal(tokenPrice)
         setSaleInfo(sales.data)
       }
-      console.log(sales)
+      // console.log(sales)
     } catch (error) {
       console.log(error)
     }
 
-    console.log(saleInfo)
+    // console.log(saleInfo)
     setReady(true)
 
     return () => {
