@@ -8,6 +8,7 @@ import classnames from "classnames"
 
 // Redux Store
 import {
+  clearAllSales,
   setLoginStatus,
   setSelectedChain,
   showRightSidebarAction,
@@ -29,12 +30,13 @@ const Header = props => {
     useEthers()
 
   const users = useSelector(state => state.User)
+  const allSales = useSelector(state => state.Sales)
   const dispatch = useDispatch()
   let options = []
   options[97] = {
     id: 0,
     value: ChainId.BSCTestnet,
-    text: "Binance Smart",
+    text: "BSC Testnet",
     logo: bscLogo,
   }
 
@@ -45,17 +47,23 @@ const Header = props => {
 
   const handleSwitchNetwork = async e => {
     if (account) {
-      if (chainId === e) {
+      if (chainId === e && users.selectedChain === e) {
         return
       } else {
         try {
           await switchNetwork(e)
           setSelected(options[e])
+          activateBrowserWallet()
+          dispatch(clearAllSales(false))
           dispatch(setSelectedChain(e))
         } catch (error) {
           dispatch(setSelectedChain(chainId))
           setSelected(options[chainId])
+          alert(
+            `Switch network to ${options[e].text} on your wallet to continue`
+          )
         }
+        dispatch(setSelectedChain(e))
       }
     } else {
       if (users.selectedChain === e) {
@@ -67,20 +75,25 @@ const Header = props => {
     }
   }
 
+  useEffect(() => {
+    dispatch(clearAllSales(false))
+    setSelected(options[users.selectedChain])
+  }, [users.selectedChain])
+
   useEffect(async () => {
     if (typeof account == "undefined") {
       dispatch(setLoginStatus(false))
     } else {
       dispatch(setLoginStatus(true))
       if (SUPPORTED_CHAIN.includes(chainId)) {
-        if (selected.value == chainId) {
+        if (users.selectedChain === chainId) {
           dispatch(setSelectedChain(chainId))
         } else {
           handleSwitchNetwork(selected.value)
         }
       }
     }
-  }, [account, chainId])
+  }, [account, chainId, dispatch])
 
   return (
     <React.Fragment>
@@ -172,11 +185,11 @@ const Header = props => {
             <Dropdown className="me-3">
               <Dropdown.Toggle variant="warning" className="py-0 ps-0">
                 <img
-                  src={selected.logo}
+                  src={selected?.logo}
                   height={28}
                   className="me-1 bg-dark rounded p-1"
                 />
-                {selected.text}
+                {selected?.text}
               </Dropdown.Toggle>
 
               <Dropdown.Menu variant="dark">

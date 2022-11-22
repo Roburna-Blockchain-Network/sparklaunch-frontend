@@ -32,9 +32,6 @@ const Layout = props => {
     showRightSidebar: state.Layout.showRightSidebar,
   }))
 
-  const allSales = useSelector(state => state.Sales)
-  const { selectedChain } = useSelector(state => state.User)
-
   /*
   document title
   */
@@ -87,33 +84,6 @@ const Layout = props => {
       dispatch(changeLayoutWidth(layoutWidth))
     }
   }, [dispatch, layoutWidth])
-
-  useEffect(async () => {
-    console.log(allSales)
-    if (!allSales.isInit) {
-      const sales = await fetchAllSales(selectedChain)
-
-      for (const sale of sales) {
-        const [token, round, info] = await Promise.all([
-          getTokenInfo(selectedChain, sale.tokenAddress),
-          getRoundInfo(selectedChain, sale.address),
-          getSaleInfo(selectedChain, sale.address),
-        ])
-
-        sale.info = info?.data
-        sale.token = token?.data
-        sale.round = round?.data
-      }
-
-      console.log(sales)
-
-      try {
-        dispatch(setInitialSales(sales))
-      } catch (error) {
-        console.log(error)
-      }
-    }
-  }, [dispatch, allSales])
 
   const openMenu = () => {
     setIsMenuOpened(!isMenuOpened)

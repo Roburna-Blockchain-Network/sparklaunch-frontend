@@ -24,6 +24,11 @@ export const setSaleDeployed = p => ({
   payload: p,
 })
 
+export const clearAllSales = p => ({
+  type: ActionTypes.CLEAR_SALE,
+  payload: p,
+})
+
 export const setLoginStatus = p => ({
   type: ActionTypes.SET_LOGIN_STATUS,
   payload: p,

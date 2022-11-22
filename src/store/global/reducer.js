@@ -1,5 +1,5 @@
 import * as ActionTypes from "./ActionTypes"
-
+const LAST_CHAIN = localStorage.getItem("lastChainSelected")
 export const Sales = (
   state = {
     isLoading: false,
@@ -54,6 +54,7 @@ export const Sales = (
         deployedSales: state.deployedSales,
         sales: state.sales,
       }
+
     case ActionTypes.ADD_SALE:
       return {
         ...state,
@@ -63,6 +64,7 @@ export const Sales = (
         deployedSales: state.deployedSales + 1,
         sales: state.sales.concat([action.payload]),
       }
+
     case ActionTypes.SET_NUMBER_DEPLOYED:
       return {
         ...state,
@@ -72,6 +74,16 @@ export const Sales = (
         deployedSales: action.payload,
         sales: state.sales,
       }
+
+    case ActionTypes.CLEAR_SALE:
+      return {
+        ...state,
+        isLoading: false,
+        isInit: false,
+        errMess: null,
+        deployedSales: state.deployedSales,
+        sales: state.sales,
+      }
     default:
       return state
   }
@@ -79,7 +91,7 @@ export const Sales = (
 export const User = (
   state = {
     isLogin: false,
-    selectedChain: 159,
+    selectedChain: LAST_CHAIN,
     isAdmin: false,
   },
   action
@@ -93,6 +105,7 @@ export const User = (
       }
 
     case ActionTypes.SET_CHAIN:
+      localStorage.setItem("lastChainSelected", action.payload)
       return {
         ...state,
         isLogin: state.isLogin,

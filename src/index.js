@@ -18,7 +18,7 @@ import { RbaChain } from "constants/RbaChain"
 import "react-notifications/lib/notifications.css"
 
 const config = {
-  readOnlyChainId: RbaChain.chainId,
+  // readOnlyChainId: [RbaChain.chainId, BSCTestnet.chainId],
   readOnlyUrls: {
     [RbaChain.chainId]: "https://preseed-testnet-1.roburna.com/",
     [BSCTestnet.chainId]: "https://rpc.ankr.com/bsc_testnet_chapel",

@@ -15,13 +15,15 @@ import { useDispatch, useSelector } from "react-redux"
 import { setInitialSales, setSaleDeployed } from "store/actions"
 import { BigNumber } from "ethers"
 import { useEthers } from "@usedapp/core"
-import { getSaleInfo } from "utils/factoryHelper"
+import { getRoundInfo, getSaleInfo, getTokenInfo } from "utils/factoryHelper"
 const currentDate = dayjs.utc().unix()
 
 const Public = props => {
   const dispatch = useDispatch()
   const { isLogin, selectedChain } = useSelector(state => state.User)
   const allSales = useSelector(state => state.Sales)
+
+  const { chainId, account } = useEthers()
 
   const [filtered, setFiltered] = useState("")
   const [isLoading, setIsLoading] = useState(true)
@@ -30,7 +32,6 @@ const Public = props => {
 
   const contains = (item, searchValue) => {
     // console.log(currentDate)
-    console.log(item)
     if (
       searchValue === null ||
       searchValue.trim() === "" ||
@@ -94,11 +95,35 @@ const Public = props => {
   }
 
   useEffect(async () => {
+    console.log(`effect run`)
+    console.log(allSales)
     setIsLoading(true)
-    if (allSales.isInit) {
-      setIsLoading(false)
+    if (!allSales.isInit) {
+      console.log(`fecth`)
+      const sales = await fetchAllSales(selectedChain)
+
+      for (const sale of sales) {
+        const [token, round, info] = await Promise.all([
+          getTokenInfo(selectedChain, sale.tokenAddress),
+          getRoundInfo(selectedChain, sale.address),
+          getSaleInfo(selectedChain, sale.address),
+        ])
+
+        sale.info = info?.data
+        sale.token = token?.data
+        sale.round = round?.data
+      }
+
+      console.log(sales)
+      try {
+        dispatch(setInitialSales(sales))
+      } catch (error) {
+        console.log(error)
+        setIsLoading(false)
+      }
     }
-  }, [selectedChain, allSales])
+    setIsLoading(false)
+  }, [selectedChain, dispatch])
 
   return (
     <React.Fragment>
