@@ -327,7 +327,7 @@ const ProjectSetup = () => {
     try {
       const saleId = await contract.getNumberOfSalesDeployed()
       const tx = await contract.deployNormalSale(
-        [routerAddress, adminAddress, data.address, account],
+        [routerAddress, adminAddress, data.tokenAddress, account],
         [
           "1000", // TODO : need change
           data.minbuy,
@@ -412,9 +412,9 @@ const ProjectSetup = () => {
     const _maxBuy = step2.maxBuy * DIVISION_BASE
     // console.log(step2)
     const values = {
-      title: step1?.title,
+      name: step1?.title,
       price: presaleRatePrice.toString(),
-      address: tokenInfo.address,
+      tokenAddress: tokenInfo.address,
       softcap: parseUnits(tokenSoftCap.toString(), tokenInfo.decimal * 1),
       hardcap: parseUnits(tokenHardCap.toString(), tokenInfo.decimal * 1),
       maxbuy: parseEther(_maxBuy.toString())
@@ -455,7 +455,7 @@ const ProjectSetup = () => {
 
       console.log(id, contractAddress)
       values.id = id
-      values.contractAddress = contractAddress
+      values.address = contractAddress
       values.chainId = chainId
 
       const dbId = await saveData(values)
