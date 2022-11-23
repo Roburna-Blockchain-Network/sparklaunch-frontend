@@ -294,11 +294,13 @@ export const saveData = async values => {
   try {
     const input = JSON.stringify({
       id: values.id,
-      address: values.contractAddress,
+      name: values.name,
+      address: values.address,
       start: values.startdt,
       end: values.enddt,
       chainId: values.chainId,
-      tokenAddress: values.address,
+      tokenAddress: values.tokenAddress,
+      tokenName: values.tokenName,
       saleLinks: {
         logo: values.logo,
         fb: values.facebook,

@@ -6,7 +6,7 @@ import OwlCarousel from "react-owl-carousel"
 const FeaturedCard = () => {
   const tempCard = (
     <div
-      class="featured-card"
+      className="featured-card"
       style={{
         backgroundImage: `url(https://res.cloudinary.com/dk8epvq9b/image/upload/v1664360000/cld-sample-4.jpg)`,
       }}

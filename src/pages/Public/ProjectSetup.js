@@ -244,7 +244,7 @@ const ProjectSetup = () => {
     if (!userBalance) {
       return false
     }
-    console.log(`sukses`)
+    // console.log(`sukses`)
     return true
   }
 
@@ -450,7 +450,7 @@ const ProjectSetup = () => {
       youtube: step3?.youtube,
       description: description,
     }
-    // console.log(values)
+
     try {
       const [id, contractAddress] = await handleDeploySale(values)
 

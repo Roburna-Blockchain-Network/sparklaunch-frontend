@@ -112,12 +112,12 @@ const Public = props => {
             sale.info = info?.data
             sale.token = token?.data
             sale.round = round?.data
-            dispatch(setInitialSales(sales))
           } else {
             setIsLoading(true)
             return
           }
         }
+        dispatch(setInitialSales(sales))
       } catch (error) {
         console.log(error)
         setIsLoading(true)
