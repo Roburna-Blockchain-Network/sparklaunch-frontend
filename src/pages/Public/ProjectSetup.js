@@ -415,6 +415,7 @@ const ProjectSetup = () => {
       name: step1?.title,
       price: presaleRatePrice.toString(),
       tokenAddress: tokenInfo.address,
+      tokenName: tokenInfo.name,
       softcap: parseUnits(tokenSoftCap.toString(), tokenInfo.decimal * 1),
       hardcap: parseUnits(tokenHardCap.toString(), tokenInfo.decimal * 1),
       maxbuy: parseEther(_maxBuy.toString())
