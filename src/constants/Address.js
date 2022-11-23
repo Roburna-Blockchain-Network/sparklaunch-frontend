@@ -33,6 +33,7 @@ const CHAIN_NUMBER = 159
 // }
 
 export const SUPPORTED_CHAIN = [159]
+export const CHAIN_NATIVE_SYMBOL = "RBA"
 
 const API_URL = process.env.REACT_APP_BACKEND_URL
 

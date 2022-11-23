@@ -18,6 +18,7 @@ import utc from "dayjs/plugin/utc"
 dayjs.extend(utc)
 import Countdown, { zeroPad } from "react-countdown"
 import { updateSaleTime } from "store/actions"
+import { CHAIN_NATIVE_SYMBOL } from "constants/Address"
 
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
 const Completionist = () => <span>Sale is End</span>
@@ -169,7 +170,7 @@ const SaleCard = ({ sale }) => {
             <Row className="mb-2">
               <Col xs={4}>Total Raise </Col>
               <Col xs={8} className="text-primary fs-6 text-end fw-bold">
-                {formattedRaised} BNB
+                {formattedRaised} {CHAIN_NATIVE_SYMBOL}
               </Col>
             </Row>
 
@@ -187,7 +188,8 @@ const SaleCard = ({ sale }) => {
             <Row className="mb-2">
               <Col xs={4}>Price</Col>
               <Col xs={8} className="text-primary fs-6 text-end fw-bold">
-                {saleInfo ? formatEther(saleInfo?.tokenPrice) : 0} BNB
+                {saleInfo ? formatEther(saleInfo?.tokenPrice) : 0}{" "}
+                {CHAIN_NATIVE_SYMBOL}
               </Col>
             </Row>
           </div>
@@ -204,7 +206,7 @@ const SaleCard = ({ sale }) => {
             <ProgressBar className="mt-2" variant="primary" now={percentSold} />
 
             <Row className="mt-3 font-size-10">
-              <Col xs={4}>1 BNB (approx)</Col>
+              <Col xs={4}>1 {CHAIN_NATIVE_SYMBOL} (approx)</Col>
               <Col xs={8} className="text-end">
                 Listing Time
               </Col>

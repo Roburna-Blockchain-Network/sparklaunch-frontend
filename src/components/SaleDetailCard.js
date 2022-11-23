@@ -15,6 +15,7 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import RoundInfo from "pages/Public/details/RoundInfo"
 import AuditInfo from "pages/Public/details/AuditInfo"
+import { CHAIN_NATIVE_SYMBOL } from "constants/Address"
 dayjs.extend(utc)
 
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
@@ -85,7 +86,9 @@ const SaleDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
         <div className="d-flex w-100 flex-wrap mt-3 mb-0 py-1 border-bottom border-white border-opacity-50"></div>
         <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
           <div className="w-50 fw-bold">Total Raised</div>
-          <div className="text-primary">: {formattedRaised} BNB</div>
+          <div className="text-primary">
+            : {formattedRaised} {CHAIN_NATIVE_SYMBOL}
+          </div>
         </div>
         <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
           <div className="w-50 fw-bold">Token Sold</div>

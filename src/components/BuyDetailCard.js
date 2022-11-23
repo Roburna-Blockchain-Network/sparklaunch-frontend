@@ -19,6 +19,7 @@ import {
   API_URL,
   ROUTER_ADDRESS,
   ADMIN_ADDRESS,
+  CHAIN_NATIVE_SYMBOL,
 } from "constants/Address"
 import { Contract } from "@ethersproject/contracts"
 
@@ -130,7 +131,9 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
     <div className="buy-detail-card" id="buy-card">
       <div className="my-2">
         <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-          <Form.Label>Amount In BNB (max {maxBuy})</Form.Label>
+          <Form.Label>
+            Amount In {CHAIN_NATIVE_SYMBOL} (max {maxBuy})
+          </Form.Label>
           <Form.Control
             defaultValue={buyVal}
             value={buyVal}
@@ -171,7 +174,8 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
             {participate && (
               <div className="text-white">
                 {formatUnits(participate.token, tokenInfo.decimals)}{" "}
-                {tokenInfo.symbol} / {formatUnits(participate.native, 18)} BNB
+                {tokenInfo.symbol} / {formatUnits(participate.native, 18)}{" "}
+                {CHAIN_NATIVE_SYMBOL}
               </div>
             )}
           </div>
@@ -188,11 +192,15 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
         </div>
         <div className="d-flex w-100 flex-wrap justify-content-between mb-0 py-1 border-bottom border-white border-opacity-50">
           <div className="w-25 fw-bold">Min Buy</div>
-          <div className="text-white">{minBuy} BNB</div>
+          <div className="text-white">
+            {minBuy} {CHAIN_NATIVE_SYMBOL}
+          </div>
         </div>
         <div className="d-flex w-100 flex-wrap justify-content-between mb-0 py-1 border-bottom border-white border-opacity-50">
           <div className="w-25 fw-bold">Max Buy</div>
-          <div className="text-white">{maxBuy} BNB</div>
+          <div className="text-white">
+            {maxBuy} {CHAIN_NATIVE_SYMBOL}
+          </div>
         </div>
       </div>
     </div>

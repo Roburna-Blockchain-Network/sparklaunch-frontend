@@ -18,14 +18,15 @@ import {
 } from "connect/dataProccessing"
 
 import smLogo from "assets/images/logos/smlogo.png"
-import bscLogo from "assets/images/logos/bsc.png"
+// import bscLogo from "assets/images/logos/bsc.png"
+import bscLogo from "assets/images/logos/rba.svg"
 import discordLogo from "assets/images/icons/discord.png"
 import { useSelector } from "react-redux"
 import { useHistory, useParams } from "react-router-dom"
 import { ChainId, useConfig, useEthers } from "@usedapp/core"
 import { formatEther, formatUnits, parseUnits } from "ethers/lib/utils"
 import SaleDetailCard from "components/SaleDetailCard"
-import { API_URL, CHAIN_NUMBER } from "constants/Address"
+import { API_URL, CHAIN_NATIVE_SYMBOL, CHAIN_NUMBER } from "constants/Address"
 import { getRoundInfo, getSaleInfo, getTokenInfo } from "utils/factoryHelper"
 import { formatBigNumber } from "utils/numbers"
 import BuyDetailCard from "components/BuyDetailCard"
@@ -220,7 +221,7 @@ const SaleDetails = props => {
                         {saleInfo
                           ? formatUnits(saleInfo.hardCap, tokenInfo.decimals)
                           : 0}{" "}
-                        BNB
+                        {CHAIN_NATIVE_SYMBOL}
                       </p>
                     </Col>
                   </Row>
@@ -228,14 +229,15 @@ const SaleDetails = props => {
                   <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
                     <div className="w-25 fw-bold">Presale Rate</div>
                     <div className="text-primary">
-                      : 1 BNB : {tokenPriceOriginal} {tokenInfo.symbol}
+                      : 1 {CHAIN_NATIVE_SYMBOL} : {tokenPriceOriginal}{" "}
+                      {tokenInfo.symbol}
                     </div>
                   </div>
 
                   <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
                     <div className="w-25 fw-bold">Dex Swap Rate</div>
                     <div className="text-primary">
-                      : 1 BNB :{" "}
+                      : 1 {CHAIN_NATIVE_SYMBOL} :{" "}
                       {formatUnits(
                         BigNumber.from(saleInfo.listingRate),
                         tokenInfo.decimals

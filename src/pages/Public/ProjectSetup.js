@@ -19,6 +19,7 @@ import {
   ROUTER_ADDRESS,
   ADMIN_ADDRESS,
   CHAIN_NUMBER,
+  CHAIN_NATIVE_SYMBOL,
 } from "constants/Address"
 
 import FactoryAbi from "constants/abi/Factory.json"
@@ -645,7 +646,7 @@ const ProjectSetup = () => {
                     onChange={addressValidation}
                   />
                   <Form.Text className="text-primary">
-                    Pool creation fee: {deploymentFee} BNB
+                    Pool creation fee: {deploymentFee} {CHAIN_NATIVE_SYMBOL}
                   </Form.Text>
                 </Form.Group>
                 {displayInfo && (
@@ -668,17 +669,18 @@ const ProjectSetup = () => {
                     id="currency"
                     type="radio"
                     defaultChecked
-                    label="BNB"
+                    label={CHAIN_NATIVE_SYMBOL}
                     required
                   />
                   <Form.Text className="text-primary">
-                    Users will pay with BNB for your token
+                    Users will pay with {CHAIN_NATIVE_SYMBOL} for your token
                   </Form.Text>
                 </Form.Group>
                 <Form.Group className="mb-2">
                   <Form.Label>Fee Info</Form.Label>
                   <p className="form-text text-info">
-                    Pool creation fee: {deploymentFee} BNB <br />
+                    Pool creation fee: {deploymentFee} {CHAIN_NATIVE_SYMBOL}{" "}
+                    <br />
                     Pool service fee: {serviceFee.toFixed(2)} %
                   </p>
                   <p className="form-text text-info"></p>
@@ -712,7 +714,7 @@ const ProjectSetup = () => {
                     md={6}
                     controlId="softcap"
                   >
-                    <Form.Label>SoftCap (BNB)</Form.Label>
+                    <Form.Label>SoftCap ({CHAIN_NATIVE_SYMBOL})</Form.Label>
                     <Form.Control
                       defaultValue={step2?.softCap}
                       type="number"
@@ -739,7 +741,7 @@ const ProjectSetup = () => {
                     md={6}
                     controlId="hardcap"
                   >
-                    <Form.Label>Hardcap (BNB) *</Form.Label>
+                    <Form.Label>Hardcap ({CHAIN_NATIVE_SYMBOL}) *</Form.Label>
                     <Form.Control
                       defaultValue={step2?.hardCap}
                       type="number"
@@ -765,7 +767,9 @@ const ProjectSetup = () => {
                     md={6}
                     controlId="minbuy"
                   >
-                    <Form.Label>Minimum Buy(BNB) *</Form.Label>
+                    <Form.Label>
+                      Minimum Buy({CHAIN_NATIVE_SYMBOL}) *
+                    </Form.Label>
                     <Form.Control
                       defaultValue={step2?.minBuy}
                       type="number"
@@ -793,7 +797,9 @@ const ProjectSetup = () => {
                     md={6}
                     controlId="maxbuy"
                   >
-                    <Form.Label>Maximum Buy(BNB) *</Form.Label>
+                    <Form.Label>
+                      Maximum Buy({CHAIN_NATIVE_SYMBOL}) *
+                    </Form.Label>
                     <Form.Control
                       defaultValue={step2?.maxBuy}
                       type="number"
@@ -833,7 +839,8 @@ const ProjectSetup = () => {
                       }
                     />
                     <p className="form-text text-info">
-                      If I spend 1 BNB how many tokens will I receive?
+                      If I spend 1 {CHAIN_NATIVE_SYMBOL} how many tokens will I
+                      receive?
                     </p>
                   </Form.Group>
                   <Form.Group
@@ -859,9 +866,9 @@ const ProjectSetup = () => {
                       }
                     />
                     <p className="form-text text-info">
-                      If I spend 1 BNB how many tokens will I receive? Usually
-                      this amount is lower than presale rate to allow for a
-                      higher listing price on Dex Exchange
+                      If I spend 1 {CHAIN_NATIVE_SYMBOL} how many tokens will I
+                      receive? Usually this amount is lower than presale rate to
+                      allow for a higher listing price on Dex Exchange
                     </p>
                   </Form.Group>
 
