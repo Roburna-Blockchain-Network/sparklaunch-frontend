@@ -37,7 +37,3 @@ export const setAdminStatus = p => ({
   type: ActionTypes.SET_ADMIN_STATUS,
   payload: p,
 })
-export const setSelectedChain = p => ({
-  type: ActionTypes.SET_CHAIN,
-  payload: p,
-})

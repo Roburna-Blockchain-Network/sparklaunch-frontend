@@ -16,11 +16,11 @@ import { setInitialSales, setSaleDeployed } from "store/actions"
 import { BigNumber } from "ethers"
 import { useEthers } from "@usedapp/core"
 import { getRoundInfo, getSaleInfo, getTokenInfo } from "utils/factoryHelper"
+import { CHAIN_NUMBER } from "constants/Address"
 const currentDate = dayjs.utc().unix()
 
 const Public = props => {
   const dispatch = useDispatch()
-  const { isLogin, selectedChain } = useSelector(state => state.User)
   const allSales = useSelector(state => state.Sales)
 
   const { chainId, account } = useEthers()
@@ -99,31 +99,32 @@ const Public = props => {
     console.log(allSales)
     setIsLoading(true)
     if (!allSales.isInit) {
-      console.log(`fecth`)
-      const sales = await fetchAllSales(selectedChain)
-
-      for (const sale of sales) {
-        const [token, round, info] = await Promise.all([
-          getTokenInfo(selectedChain, sale.tokenAddress),
-          getRoundInfo(selectedChain, sale.address),
-          getSaleInfo(selectedChain, sale.address),
-        ])
-
-        sale.info = info?.data
-        sale.token = token?.data
-        sale.round = round?.data
-      }
-
-      console.log(sales)
       try {
-        dispatch(setInitialSales(sales))
+        const sales = await fetchAllSales(CHAIN_NUMBER)
+        for (const sale of sales) {
+          const [token, round, info] = await Promise.all([
+            getTokenInfo(sale.tokenAddress),
+            getRoundInfo(sale.address),
+            getSaleInfo(sale.address),
+          ])
+
+          if (info.success && token.success && round.success) {
+            sale.info = info?.data
+            sale.token = token?.data
+            sale.round = round?.data
+            dispatch(setInitialSales(sales))
+          } else {
+            setIsLoading(true)
+            return
+          }
+        }
       } catch (error) {
         console.log(error)
-        setIsLoading(false)
+        setIsLoading(true)
       }
     }
     setIsLoading(false)
-  }, [selectedChain, dispatch])
+  }, [dispatch])
 
   return (
     <React.Fragment>

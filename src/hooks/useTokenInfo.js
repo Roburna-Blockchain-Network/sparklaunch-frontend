@@ -5,8 +5,6 @@ import { useCall, useCalls, useEthers } from "@usedapp/core"
 import { useSelector } from "react-redux"
 
 function useTokenInfo(tokenAddress) {
-  const { selectedChain } = useSelector(state => state.User)
-
   const partialCall = tokenAddress && {
     contract: new Contract(tokenAddress, ERC20Abi),
     address: tokenAddress,
@@ -16,7 +14,6 @@ function useTokenInfo(tokenAddress) {
     method => partialCall && { ...partialCall, method }
   )
   const [name, symbol, decimals, totalSupply] = useCalls(args, {
-    chainId: selectedChain,
     refresh: "never",
   })
 

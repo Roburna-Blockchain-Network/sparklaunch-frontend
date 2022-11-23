@@ -3,10 +3,8 @@ import SaleAbi from "constants/abi/Sale.json"
 
 import { useCall, useEthers } from "@usedapp/core"
 import { FACTORY_ADDRESS } from "constants/Address"
-import { useSelector } from "react-redux"
 
 function useSaleInfo(saleAddress) {
-  const { selectedChain } = useSelector(state => state.User)
   const { value, error } =
     useCall(
       {
@@ -16,7 +14,6 @@ function useSaleInfo(saleAddress) {
       },
       {
         refresh: "never",
-        chainId: selectedChain,
       }
     ) ?? {}
   if (error) {

@@ -27,7 +27,8 @@ import { getUserParticipation } from "utils/factoryHelper"
 import { useSelector } from "react-redux"
 import { BIG_ONE } from "utils/numbers"
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
-const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
+
+const UserDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   const currentDate = dayjs.utc().unix()
   const { account, chainId, activateBrowserWallet, library } = useEthers()
   const [buyVal, setBuyVal] = useState(0)
@@ -202,4 +203,4 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   )
 }
 
-export default BuyDetailCard
+export default UserDetailCard

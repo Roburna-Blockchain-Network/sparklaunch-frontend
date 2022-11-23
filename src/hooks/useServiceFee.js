@@ -6,18 +6,12 @@ import { FACTORY_ADDRESS } from "constants/Address"
 import { useSelector } from "react-redux"
 
 function useServiceFee() {
-  const { selectedChain } = useSelector(state => state.User)
   const { value, error } =
-    useCall(
-      {
-        contract: new Contract(FACTORY_ADDRESS[selectedChain], FactoryAbi),
-        method: "serviceFee",
-        args: [],
-      },
-      {
-        chainId: selectedChain,
-      }
-    ) ?? {}
+    useCall({
+      contract: new Contract(FACTORY_ADDRESS, FactoryAbi),
+      method: "serviceFee",
+      args: [],
+    }) ?? {}
   if (error) {
     console.log(error)
     return error

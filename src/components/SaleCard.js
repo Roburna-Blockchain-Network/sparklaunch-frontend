@@ -51,11 +51,13 @@ const SaleCard = ({ sale }) => {
     }
   }
 
-  const saleInfo = sale.info
-  const tokenInfo = sale.token
+  const saleInfo = sale?.info
+  const tokenInfo = sale?.token
 
-  const formattedRaised = saleInfo ? formatEther(saleInfo?.raisedBNB) : 0
-  const percentSold = saleInfo
+  const formattedRaised = saleInfo?.raisedBNB
+    ? formatEther(saleInfo?.raisedBNB)
+    : 0
+  const percentSold = saleInfo?.hardCapBNB
     ? (formattedRaised * 100) / (formatEther(saleInfo?.hardCapBNB) * 1)
     : 0
 
@@ -80,7 +82,7 @@ const SaleCard = ({ sale }) => {
               <div className="avatar-md">
                 <div className="avatar-title bg-primary bg-softer rounded-circle overflow-hidden fs-4">
                   <img
-                    src={sale.saleLinks?.logo}
+                    src={sale?.saleLinks?.logo}
                     style={{
                       height: "100%",
                       width: "100%",

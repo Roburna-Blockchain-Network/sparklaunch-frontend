@@ -7,7 +7,6 @@ import { NotificationContainer } from "react-notifications"
 
 import { Provider } from "react-redux"
 import {
-  BSCTestnet,
   DAppProvider,
   // DEFAULT_SUPPORTED_CHAINS,
 } from "@usedapp/core"
@@ -18,12 +17,13 @@ import { RbaChain } from "constants/RbaChain"
 import "react-notifications/lib/notifications.css"
 
 const config = {
-  // readOnlyChainId: [RbaChain.chainId, BSCTestnet.chainId],
+  readOnlyChainId: [RbaChain.chainId],
   readOnlyUrls: {
     [RbaChain.chainId]: "https://preseed-testnet-1.roburna.com/",
-    [BSCTestnet.chainId]: "https://rpc.ankr.com/bsc_testnet_chapel",
+    // [BSCTestnet.chainId]: "https://rpc.ankr.com/bsc_testnet_chapel",
   },
-  networks: [BSCTestnet, RbaChain],
+  networks: [RbaChain],
+  noMetamaskDeactivate: true,
 }
 
 const app = (

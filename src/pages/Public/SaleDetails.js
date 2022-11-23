@@ -25,7 +25,7 @@ import { useHistory, useParams } from "react-router-dom"
 import { ChainId, useConfig, useEthers } from "@usedapp/core"
 import { formatEther, formatUnits, parseUnits } from "ethers/lib/utils"
 import SaleDetailCard from "components/SaleDetailCard"
-import { API_URL } from "constants/Address"
+import { API_URL, CHAIN_NUMBER } from "constants/Address"
 import { getRoundInfo, getSaleInfo, getTokenInfo } from "utils/factoryHelper"
 import { formatBigNumber } from "utils/numbers"
 import BuyDetailCard from "components/BuyDetailCard"
@@ -45,7 +45,6 @@ const SaleDetails = props => {
   const [tokenPriceOriginal, setTokenPriceOriginal] = useState()
   const history = useHistory()
   const { sales } = useSelector(state => state.Sales)
-  const { selectedChain } = useSelector(state => state.User)
   const { id } = useParams()
 
   const { account } = useEthers()
@@ -54,7 +53,7 @@ const SaleDetails = props => {
     const abortController = new AbortController()
     try {
       const response = await fetch(
-        `${API_URL}sale/chain/${selectedChain}/id/${id}`,
+        `${API_URL}sale/chain/${CHAIN_NUMBER}/id/${id}`,
         { signal: abortController.signal }
       )
 
@@ -66,14 +65,14 @@ const SaleDetails = props => {
 
       setSaleData(res.data[0])
 
-      const token = await getTokenInfo(selectedChain, res.data[0].tokenAddress)
+      const token = await getTokenInfo(res.data[0].tokenAddress)
 
       // console.log(res.data[0].address)
 
-      const sales = await getSaleInfo(selectedChain, res.data[0].address)
+      const sales = await getSaleInfo(res.data[0].address)
 
       // console.log(sales)
-      const round = await getRoundInfo(selectedChain, res.data[0].address)
+      const round = await getRoundInfo(res.data[0].address)
       if (round.success) {
         setRoundInfo(round.data)
       }

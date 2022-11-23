@@ -10,7 +10,6 @@ import classnames from "classnames"
 import {
   clearAllSales,
   setLoginStatus,
-  setSelectedChain,
   showRightSidebarAction,
   toggleLeftmenu,
 } from "store/actions"
@@ -30,68 +29,56 @@ const Header = props => {
     useEthers()
 
   const users = useSelector(state => state.User)
-  const allSales = useSelector(state => state.Sales)
+  // const allSales = useSelector(state => state.Sales)
   const dispatch = useDispatch()
   let options = []
-  options[97] = {
-    id: 0,
-    value: ChainId.BSCTestnet,
-    text: "BSC Testnet",
-    logo: bscLogo,
-  }
+  // options[97] = {
+  //   id: 0,
+  //   value: ChainId.BSCTestnet,
+  //   text: "BSC Testnet",
+  //   logo: bscLogo,
+  // }
 
   options[159] = { id: 1, value: 159, text: "Roburna Chain", logo: roburnaLogo }
 
-  const [selected, setSelected] = useState(options[users.selectedChain])
+  const [selected, setSelected] = useState(options[159])
   // console.log(users)
 
-  const handleSwitchNetwork = async e => {
-    if (account) {
-      if (chainId === e && users.selectedChain === e) {
-        return
-      } else {
-        try {
-          await switchNetwork(e)
-          setSelected(options[e])
-          activateBrowserWallet()
-          dispatch(clearAllSales(false))
-          dispatch(setSelectedChain(e))
-        } catch (error) {
-          dispatch(setSelectedChain(chainId))
-          setSelected(options[chainId])
-          alert(
-            `Switch network to ${options[e].text} on your wallet to continue`
-          )
-        }
-        dispatch(setSelectedChain(e))
-      }
-    } else {
-      if (users.selectedChain === e) {
-        return
-      } else {
-        dispatch(setSelectedChain(e))
-        setSelected(options[e])
-      }
-    }
-  }
-
-  useEffect(() => {
-    dispatch(clearAllSales(false))
-    setSelected(options[users.selectedChain])
-  }, [users.selectedChain])
+  // const handleSwitchNetwork = async e => {
+  //   if (account) {
+  //     if (chainId === e && users.selectedChain === e) {
+  //       return
+  //     } else {
+  //       try {
+  //         await switchNetwork(e)
+  //         setSelected(options[e])
+  //         activateBrowserWallet()
+  //         dispatch(clearAllSales(false))
+  //         dispatch(setSelectedChain(e))
+  //       } catch (error) {
+  //         dispatch(setSelectedChain(chainId))
+  //         setSelected(options[chainId])
+  //         alert(
+  //           `Switch network to ${options[e].text} on your wallet to continue`
+  //         )
+  //       }
+  //       dispatch(setSelectedChain(e))
+  //     }
+  //   } else {
+  //     if (users.selectedChain === e) {
+  //       return
+  //     } else {
+  //       dispatch(setSelectedChain(e))
+  //       setSelected(options[e])
+  //     }
+  //   }
+  // }
 
   useEffect(async () => {
     if (typeof account == "undefined") {
       dispatch(setLoginStatus(false))
     } else {
       dispatch(setLoginStatus(true))
-      if (SUPPORTED_CHAIN.includes(chainId)) {
-        if (users.selectedChain === chainId) {
-          dispatch(setSelectedChain(chainId))
-        } else {
-          handleSwitchNetwork(selected.value)
-        }
-      }
     }
   }, [account, chainId, dispatch])
 
@@ -196,7 +183,8 @@ const Header = props => {
                 {options.map((item, key) => (
                   <Dropdown.Item
                     key={key}
-                    onClick={() => handleSwitchNetwork(item.value)}
+                    // onClick={() => handleSwitchNetwork(item.value)}
+                    onClick={() => console.log(item.value)}
                   >
                     <img src={item.logo} height={18} className="me-2" />
                     {item.text}
@@ -207,7 +195,7 @@ const Header = props => {
 
             {account ? (
               <button
-                onClick={deactivate}
+                onClick={() => deactivate()}
                 className="btn btn-sm btn-outline-primary text-primary rounded-3 me-3 ps-0 py-0 text-nowrap"
               >
                 <i className="fa-solid fa-wallet text-primary border border-primary rounded p-1 me-1 fs-5" />

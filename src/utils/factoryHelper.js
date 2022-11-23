@@ -5,6 +5,7 @@ import {
   API_URL,
   RPC_ADDRESS,
   MULTICALL_ADDRESS,
+  CHAIN_NUMBER,
 } from "constants/Address"
 
 import ERC20ABI from "constants/abi/ERC20.json"
@@ -17,9 +18,9 @@ import { ethers, BigNumber as BN } from "ethers"
 import { Contract, Provider, setMulticallAddress } from "ethers-multicall"
 import { parseUnits } from "ethers/lib/utils"
 
-const getSaleInfo = async (chain, address) => {
-  setMulticallAddress(chain, MULTICALL_ADDRESS[chain])
-  const provider = new ethers.providers.JsonRpcProvider(RPC_ADDRESS[chain])
+const getSaleInfo = async address => {
+  setMulticallAddress(CHAIN_NUMBER, MULTICALL_ADDRESS)
+  const provider = new ethers.providers.JsonRpcProvider(RPC_ADDRESS)
   const ethcallProvider = new Provider(provider)
   await ethcallProvider.init()
   //   return AdminABI
@@ -103,9 +104,9 @@ const getSaleInfo = async (chain, address) => {
   }
 }
 
-const getRoundInfo = async (chain, address) => {
-  setMulticallAddress(chain, MULTICALL_ADDRESS[chain])
-  const provider = new ethers.providers.JsonRpcProvider(RPC_ADDRESS[chain])
+const getRoundInfo = async address => {
+  setMulticallAddress(CHAIN_NUMBER, MULTICALL_ADDRESS)
+  const provider = new ethers.providers.JsonRpcProvider(RPC_ADDRESS)
   const ethcallProvider = new Provider(provider)
   await ethcallProvider.init()
   const tokenContract = new Contract(address, SalesABI)
@@ -160,12 +161,12 @@ const getRoundInfo = async (chain, address) => {
   }
 }
 
-const getSaleAddressById = async (chain, id) => {
-  setMulticallAddress(chain, MULTICALL_ADDRESS[chain])
-  const provider = new ethers.providers.JsonRpcProvider(RPC_ADDRESS[chain])
+const getSaleAddressById = async id => {
+  setMulticallAddress(CHAIN_NUMBER, MULTICALL_ADDRESS)
+  const provider = new ethers.providers.JsonRpcProvider(RPC_ADDRESS)
   const ethcallProvider = new Provider(provider)
   await ethcallProvider.init()
-  const tokenContract = new Contract(FACTORY_ADDRESS[chain], FactoryABI)
+  const tokenContract = new Contract(FACTORY_ADDRESS, FactoryABI)
 
   let calls = []
   try {
@@ -187,12 +188,12 @@ const getSaleAddressById = async (chain, id) => {
   }
 }
 
-const getTotalSaleDeployed = async chain => {
-  setMulticallAddress(chain, MULTICALL_ADDRESS[chain])
-  const provider = new ethers.providers.JsonRpcProvider(RPC_ADDRESS[chain])
+const getTotalSaleDeployed = async () => {
+  setMulticallAddress(CHAIN_NUMBER, MULTICALL_ADDRESS)
+  const provider = new ethers.providers.JsonRpcProvider(RPC_ADDRESS)
   const ethcallProvider = new Provider(provider)
   await ethcallProvider.init()
-  const tokenContract = new Contract(FACTORY_ADDRESS[chain], FactoryABI)
+  const tokenContract = new Contract(FACTORY_ADDRESS, FactoryABI)
 
   let calls = []
   try {
@@ -213,9 +214,9 @@ const getTotalSaleDeployed = async chain => {
     }
   }
 }
-const getUserParticipation = async (chain, saleAddress, userAddress) => {
-  setMulticallAddress(chain, MULTICALL_ADDRESS[chain])
-  const provider = new ethers.providers.JsonRpcProvider(RPC_ADDRESS[chain])
+const getUserParticipation = async (saleAddress, userAddress) => {
+  setMulticallAddress(CHAIN_NUMBER, MULTICALL_ADDRESS)
+  const provider = new ethers.providers.JsonRpcProvider(RPC_ADDRESS)
   const ethcallProvider = new Provider(provider)
   await ethcallProvider.init()
   const tokenContract = new Contract(saleAddress, SalesABI)
@@ -245,18 +246,18 @@ const getUserParticipation = async (chain, saleAddress, userAddress) => {
   }
 }
 
-const getSaleDetails = async (chain, address) => {}
+const getSaleDetails = async address => {}
 
-const getTokenAllowance = async (chain, token, address) => {
-  setMulticallAddress(chain, MULTICALL_ADDRESS[chain])
-  const provider = new ethers.providers.JsonRpcProvider(RPC_ADDRESS[chain])
+const getTokenAllowance = async (token, address) => {
+  setMulticallAddress(CHAIN_NUMBER, MULTICALL_ADDRESS)
+  const provider = new ethers.providers.JsonRpcProvider(RPC_ADDRESS)
   const ethcallProvider = new Provider(provider)
   await ethcallProvider.init()
 
   const tokenContract = new Contract(token, ERC20ABI)
   let calls = []
   try {
-    calls.push(tokenContract.allowance(address, FACTORY_ADDRESS[chain]))
+    calls.push(tokenContract.allowance(address, FACTORY_ADDRESS))
     const [userAllow] = await ethcallProvider.all(calls)
     return {
       success: true,
@@ -272,9 +273,9 @@ const getTokenAllowance = async (chain, token, address) => {
   }
 }
 
-const getTokenInfo = async (chain, address) => {
-  setMulticallAddress(chain, MULTICALL_ADDRESS[chain])
-  const provider = new ethers.providers.JsonRpcProvider(RPC_ADDRESS[chain])
+const getTokenInfo = async address => {
+  setMulticallAddress(CHAIN_NUMBER, MULTICALL_ADDRESS)
+  const provider = new ethers.providers.JsonRpcProvider(RPC_ADDRESS)
   const ethcallProvider = new Provider(provider)
   await ethcallProvider.init()
 

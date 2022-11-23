@@ -91,7 +91,6 @@ export const Sales = (
 export const User = (
   state = {
     isLogin: false,
-    selectedChain: LAST_CHAIN,
     isAdmin: false,
   },
   action
@@ -101,15 +100,6 @@ export const User = (
       return {
         ...state,
         isLogin: action.payload,
-        selectedChain: state.selectedChain,
-      }
-
-    case ActionTypes.SET_CHAIN:
-      localStorage.setItem("lastChainSelected", action.payload)
-      return {
-        ...state,
-        isLogin: state.isLogin,
-        selectedChain: action.payload,
       }
     default:
       return state

@@ -18,6 +18,7 @@ import {
   API_URL,
   ROUTER_ADDRESS,
   ADMIN_ADDRESS,
+  CHAIN_NUMBER,
 } from "constants/Address"
 
 import FactoryAbi from "constants/abi/Factory.json"
@@ -479,7 +480,7 @@ const ProjectSetup = () => {
       return
     }
     const response = await fetch(
-      `${API_URL}check/${user.selectedChain}/${inputtedAddress}`
+      `${API_URL}check/${CHAIN_NUMBER}/${inputtedAddress}`
     )
 
     const data = await response.json()

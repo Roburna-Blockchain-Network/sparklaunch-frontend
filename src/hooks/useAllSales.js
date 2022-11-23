@@ -6,17 +6,15 @@ import { FACTORY_ADDRESS } from "constants/Address"
 import { useSelector } from "react-redux"
 
 function useAllSales() {
-  const { selectedChain } = useSelector(state => state.User)
   const { value, error } =
     useCall(
       {
-        contract: new Contract(FACTORY_ADDRESS[selectedChain], FactoryAbi),
+        contract: new Contract(FACTORY_ADDRESS, FactoryAbi),
         method: "getNumberOfSalesDeployed",
         args: [],
       },
       {
         refresh: 10,
-        chainId: selectedChain,
       }
     ) ?? {}
   if (error) {
