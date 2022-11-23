@@ -43,7 +43,6 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   const saleEnd = BN.from(saleInfo.saleEnd).toNumber()
 
   const userBalance = useEtherBalance(account)
-  console.log(account)
 
   useEffect(async () => {
     if (!account) {
@@ -83,8 +82,6 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   }
 
   const handleBuyButton = async () => {
-    console.log(buyVal.toString())
-    console.log(userBalance)
     if (participate.token !== "0") {
       // console.log(userBalance)
       NotificationManager.error("Already Participated !", "Error")
