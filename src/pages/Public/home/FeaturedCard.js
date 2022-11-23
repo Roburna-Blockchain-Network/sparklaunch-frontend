@@ -1,10 +1,43 @@
-import React from "react"
-import PropTypes, { any } from "prop-types"
+import { API_URL, CHAIN_NUMBER } from "constants/Address"
+import React, { useState, useEffect } from "react"
 import { Col, Row } from "react-bootstrap"
-
-const FeaturedCard = props => {
-  const tempCard = <div className="featured-card-animation"></div>
+import { Link } from "react-router-dom"
+import OwlCarousel from "react-owl-carousel"
+const FeaturedCard = () => {
+  const tempCard = (
+    <div
+      class="featured-card"
+      style={{
+        backgroundImage: `url(https://res.cloudinary.com/dk8epvq9b/image/upload/v1664360000/cld-sample-4.jpg)`,
+      }}
+    ></div>
+  )
   const tempList = [tempCard, tempCard, tempCard, tempCard, tempCard]
+  const [featured, setFeatured] = useState([])
+
+  useEffect(async () => {
+    const abortController = new AbortController()
+    try {
+      const response = await fetch(`${API_URL}sale/${CHAIN_NUMBER}/featured`, {
+        signal: abortController.signal,
+      })
+
+      const res = await response.json()
+      if (res.length < 1) {
+        return
+      } else if (res.length < 5) {
+      }
+      setFeatured(res)
+      console.log(res)
+    } catch (error) {
+      console.log(error)
+    }
+
+    return () => {
+      abortController.abort()
+    }
+  }, [])
+
   return (
     <div className="pt-4">
       <p className="text-center display-4 text-primary fw-bolder">
@@ -12,44 +45,58 @@ const FeaturedCard = props => {
       </p>
 
       <div
-        className="bg-white py-1 rounded mx-auto"
+        className="bg-white py-1 rounded mx-auto mb-4"
         style={{ maxWidth: 70 }}
       ></div>
 
-      <Row className="my-4 justify-content-center flex-md-nowrap">
-        {props.featuredSales.length > 0
-          ? props.featuredSales.map((sale, key) => (
-              <Col
-                xs={6}
-                sm={4}
-                md="2"
-                key={key}
-                className="mb-3 flex-md-grow-1"
-              >
-                <Link to={"sale/" + sale._id}>
+      <OwlCarousel
+        className="owl-theme"
+        loop
+        margin={25}
+        nav
+        responsive={{
+          0: {
+            items: 1,
+            nav: true,
+          },
+          600: {
+            items: 3,
+            nav: false,
+          },
+          1000: {
+            items: 5,
+            nav: false,
+            margin: 20,
+          },
+        }}
+      >
+        {featured.length > 0
+          ? featured.map((sale, key) => (
+              <div className="item" key={key}>
+                <Link to={"sale/" + sale.id}>
                   <div
                     className="featured-card"
                     style={{
-                      backgroundImage: `url(${sale.saleDetails.saleImg})`,
+                      backgroundImage: `url(${sale.featuredImage})`,
                     }}
                   ></div>
                   <h3 className="text-center mt-1 d-none d-lg-block">
-                    {sale.saleToken.name}
+                    {sale.tokenName ? sale.tokenName : ""}
                   </h3>
                   <h5 className="text-center mt-1 d-lg-none">
-                    {sale.saleToken.name}
+                    {sale.tokenName ? sale.tokenName : ""}
                   </h5>
                 </Link>
-              </Col>
+              </div>
             ))
-          : tempList.map((item, key) => <Col key={key}>{item}</Col>)}{" "}
-      </Row>
+          : tempList.map((item, key) => (
+              <div className="item" key={key}>
+                {item}
+              </div>
+            ))}
+      </OwlCarousel>
     </div>
   )
-}
-
-FeaturedCard.propTypes = {
-  featuredSales: any,
 }
 
 export default FeaturedCard

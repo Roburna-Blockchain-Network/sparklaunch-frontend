@@ -49,5 +49,15 @@
   line-height: 169.3%;
   width: 100%;
 }
-
+.owl-stage {
+  display: inline;
+  white-space: nowrap;
+}
+.owl-item {
+  display: none;
+  margin-right: 15px !important;
+}
+.owl-item.active {
+  display: block;
+}
 @import "antd/form.scss";

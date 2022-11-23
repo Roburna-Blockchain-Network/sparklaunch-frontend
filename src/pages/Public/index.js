@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react"
 import MetaTags from "react-meta-tags"
-import { Link } from "react-router-dom"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 dayjs.extend(utc)
@@ -17,6 +16,7 @@ import { BigNumber } from "ethers"
 import { useEthers } from "@usedapp/core"
 import { getRoundInfo, getSaleInfo, getTokenInfo } from "utils/factoryHelper"
 import { CHAIN_NUMBER } from "constants/Address"
+
 const currentDate = dayjs.utc().unix()
 
 const Public = props => {
@@ -135,7 +135,7 @@ const Public = props => {
 
         <Container fluid>
           <Hero />
-          <FeaturedCard featuredSales />
+          <FeaturedCard />
 
           <div className="my-4" id="pools">
             {isLoading ? (

@@ -46,7 +46,7 @@ const AdminDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
 
   const isUserAdmin = useIsAdmin(account)
 
-  const handleFeatured = e => {
+  const handleFeatured = async e => {
     // setIsProcessing(true)
     if (isFeatured) {
       if (!isValidUrl(featuredLink)) {
@@ -55,11 +55,32 @@ const AdminDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
         return
       }
       // todo make request
-      NotificationManager.error(
-        "Featured Info successfully updated!",
-        "Success"
-      )
-      // setIsProcessing(false)
+
+      try {
+        const input = JSON.stringify({
+          _id: saleData._id,
+          featured: isFeatured,
+          featuredImage: featuredLink,
+        })
+
+        const requestOptions = {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: input,
+        }
+
+        const response = await fetch(`${API_URL}sale/featured`, requestOptions)
+        const data = await response.json()
+
+        NotificationManager.success(
+          "Featured Info successfully updated!",
+          "Success"
+        )
+        setShowModal(false)
+      } catch (error) {
+        NotificationManager.error("Error on backend !", "Error")
+        console.log(error)
+      }
       return
     } else {
       // todo make request

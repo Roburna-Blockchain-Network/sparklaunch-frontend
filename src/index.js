@@ -15,6 +15,8 @@ import { getDefaultProvider } from "ethers"
 import store from "./store"
 import { RbaChain } from "constants/RbaChain"
 import "react-notifications/lib/notifications.css"
+import "owl.carousel/dist/assets/owl.carousel.css"
+import "owl.carousel/dist/assets/owl.theme.default.css"
 
 const config = {
   readOnlyChainId: [RbaChain.chainId],
