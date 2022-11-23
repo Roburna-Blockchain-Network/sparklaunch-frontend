@@ -44,7 +44,7 @@ const SaleDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
     }
   }
   const sale = saleData
-
+  console.log(saleInfo)
   const formattedRaised = saleInfo ? formatEther(saleInfo?.raisedBNB) : 0
   const formattedSold = saleInfo
     ? formatUnits(saleInfo?.soldToken, tokenInfo.decimals)
@@ -106,7 +106,7 @@ const SaleDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
         <ProgressBar className="mt-1" variant="primary" now={percentSold} />
 
         <RoundInfo saleInfo={saleInfo} roundInfo={roundInfo} />
-        <AuditInfo info={saleInfo} />
+        <AuditInfo audit={saleData.audit} kyc={saleData.kyc} />
       </div>
     </div>
   )

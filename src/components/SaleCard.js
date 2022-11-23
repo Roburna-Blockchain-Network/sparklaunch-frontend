@@ -19,6 +19,7 @@ dayjs.extend(utc)
 import Countdown, { zeroPad } from "react-countdown"
 import { updateSaleTime } from "store/actions"
 import { CHAIN_NATIVE_SYMBOL } from "constants/Address"
+import AuditInfo from "pages/Public/details/AuditInfo"
 
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
 const Completionist = () => <span>Sale is End</span>
@@ -222,20 +223,7 @@ const SaleCard = ({ sale }) => {
                   : 0}
               </Col>
             </Row>
-            <Row className="mt-3 font-size-10">
-              <Col xs={6} className="text-center">
-                <Button className="btn btn-kyc" href="#" id="links">
-                  {" "}
-                  AUDIT
-                </Button>
-              </Col>
-              <Col xs={6} className="text-center">
-                <Button className="btn btn-kyc" href="#" id="links">
-                  {" "}
-                  KYC
-                </Button>
-              </Col>
-            </Row>
+            <AuditInfo kyc={sale?.kyc} audit={sale?.audit} />
           </div>
         </div>
       ) : (

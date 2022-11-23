@@ -114,9 +114,19 @@ const AdminDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
         body: input,
       }
 
-      const response = await fetch(`${API_URL}sale/featured`, requestOptions)
+      const response = await fetch(`${API_URL}sale/kyc`, requestOptions)
       const data = await response.json()
-      let id = await data._id
+
+      NotificationManager.success(
+        "Featured Info successfully updated!",
+        "Success"
+      )
+
+      setTimeout(() => {
+        window.location.reload()
+      }, 6000)
+
+      // setShowModal(false)
     } catch (error) {
       console.log(error)
     }
@@ -146,7 +156,7 @@ const AdminDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
                 setShowModal(true)
               }}
             >
-              Set Audit & KYT
+              Set Audit & KYC
             </Button>
           </div>
         </div>
