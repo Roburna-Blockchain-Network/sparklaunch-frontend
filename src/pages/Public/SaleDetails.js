@@ -230,7 +230,7 @@ const SaleDetails = props => {
                     <div className="w-25 fw-bold">Presale Rate</div>
                     <div className="text-primary">
                       : 1 {CHAIN_NATIVE_SYMBOL} : {tokenPriceOriginal}{" "}
-                      {tokenInfo.symbol}
+                      {tokenInfo?.symbol}
                     </div>
                   </div>
 

@@ -292,14 +292,14 @@ const ProjectSetup = () => {
 
   const handleDeploySale = async data => {
     console.log(data)
-    const factoryContractAddress = FACTORY_ADDRESS[chainId]
+    const factoryContractAddress = FACTORY_ADDRESS
     const contract = new Contract(
       factoryContractAddress,
       FactoryAbi,
       library.getSigner()
     )
-    const routerAddress = ROUTER_ADDRESS[chainId]
-    const adminAddress = ADMIN_ADDRESS[chainId]
+    const routerAddress = ROUTER_ADDRESS
+    const adminAddress = ADMIN_ADDRESS
     // const se
     const START_SALE = data.startdt
     const END_SALE = data.enddt
@@ -360,7 +360,7 @@ const ProjectSetup = () => {
   }
 
   const handleBeforeSubmit = async data => {
-    const factoryContractAddress = FACTORY_ADDRESS[chainId]
+    const factoryContractAddress = FACTORY_ADDRESS
     const contract = new Contract(
       tokenInfo.address,
       ERCAbi,
@@ -509,7 +509,7 @@ const ProjectSetup = () => {
           setUserAllow(allow.data.allowance)
         }
 
-        // console.log(allow)
+        console.log(allow)
       } catch (error) {}
     }
   }, [activeTab])
