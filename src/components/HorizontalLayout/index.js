@@ -7,7 +7,6 @@ import {
   changeLayout,
   changeTopbarTheme,
   changeLayoutWidth,
-  setInitialSales,
 } from "store/actions"
 
 //redux
@@ -17,8 +16,6 @@ import { useSelector, useDispatch } from "react-redux"
 import Navbar from "./Navbar"
 import Header from "./Header"
 import Footer from "./Footer"
-import { fetchAllSales } from "connect/dataProccessing"
-import { getRoundInfo, getSaleInfo, getTokenInfo } from "utils/factoryHelper"
 
 const Layout = props => {
   const dispatch = useDispatch()
