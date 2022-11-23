@@ -30,6 +30,7 @@ import { getRoundInfo, getSaleInfo, getTokenInfo } from "utils/factoryHelper"
 import { formatBigNumber } from "utils/numbers"
 import BuyDetailCard from "components/BuyDetailCard"
 import { BigNumber } from "ethers"
+import AdminDetailCard from "./details/AdminDetailCard"
 dayjs.extend(utc)
 
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
@@ -317,6 +318,12 @@ const SaleDetails = props => {
                 />
 
                 <BuyDetailCard
+                  saleData={saleData}
+                  tokenInfo={tokenInfo}
+                  saleInfo={saleInfo}
+                  roundInfo={roundInfo}
+                />
+                <AdminDetailCard
                   saleData={saleData}
                   tokenInfo={tokenInfo}
                   saleInfo={saleInfo}

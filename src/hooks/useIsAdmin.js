@@ -3,19 +3,18 @@ import AdminAbi from "constants/abi/Admin.json"
 
 import { useCall, useEthers } from "@usedapp/core"
 import { FACTORY_ADDRESS, ADMIN_ADDRESS } from "constants/Address"
-import { useSelector } from "react-redux"
 
-function useIsAdmin() {
+function useIsAdmin(account) {
   const { value, error } =
     useCall({
-      contract: new Contract(saleAddress, AdminAbi),
-      method: "sale",
-      args: [],
+      contract: new Contract(ADMIN_ADDRESS, AdminAbi),
+      method: "isAdmin",
+      args: [account],
     }) ?? {}
   if (error) {
     return false
   }
-  return value
+  return value?.[0]
 }
 
 export default useIsAdmin

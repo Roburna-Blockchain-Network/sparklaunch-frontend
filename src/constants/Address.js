@@ -32,7 +32,7 @@ const CHAIN_NUMBER = 159
 //   159: "0x4e1845Ab1d9D464150777a931Ce8FDaaD1cf8229",
 // }
 
-export const SUPPORTED_CHAIN = [159, 97]
+export const SUPPORTED_CHAIN = [159]
 
 const API_URL = process.env.REACT_APP_BACKEND_URL
 
