@@ -138,25 +138,25 @@ const SaleCard = ({ sale }) => {
             </li>
           </ul>
 
-          {saleInfo.saleStart > currentDate && (
+          {saleInfo?.saleStart > currentDate && (
             <span className="bg-primary text-dark fw-bold px-2 rounded-pill font-size-11 me-2">
               UPCOMING
             </span>
           )}
-          {saleInfo.saleStart < currentDate &&
-          saleInfo.saleEnd > currentDate ? (
+          {saleInfo?.saleStart < currentDate &&
+          saleInfo?.saleEnd > currentDate ? (
             <span className="bg-primary text-dark fw-bold px-2 rounded-pill font-size-11 me-2">
               LIVE
             </span>
           ) : (
             <></>
           )}
-          {saleInfo.saleEnd < currentDate && (
+          {saleInfo?.saleEnd < currentDate && (
             <span className="bg-primary text-dark fw-bold px-2 rounded-pill font-size-11 me-2">
               ENDED
             </span>
           )}
-          {saleInfo.isFinished && (
+          {saleInfo?.isFinished && (
             <span className="bg-primary text-dark fw-bold px-2 rounded-pill font-size-11 me-2">
               CLOSED
             </span>
@@ -197,7 +197,7 @@ const SaleCard = ({ sale }) => {
           <div>
             <div className="mt-3 d-flex justify-content-between font-size-11">
               <Countdown
-                date={dayjs.utc(saleInfo.saleEnd * 1000)}
+                date={dayjs.utc(saleInfo?.saleEnd * 1000)}
                 renderer={renderer}
               ></Countdown>
               <span className="text-primary">{percentSold} %</span>
