@@ -40,6 +40,7 @@ const getSaleInfo = async address => {
     calls.push(tokenContract.tokensAmountForLiquidity())
     calls.push(tokenContract.publicRoundStartDelta())
     calls.push(tokenContract.getCurrentRound())
+    calls.push(tokenContract.saleFinished())
     // calls.push(tokenContract.getNumberOfRegisteredUsers())
     // console.log(calls)
     const [
@@ -54,6 +55,7 @@ const getSaleInfo = async address => {
       tokenLiquidity,
       publicRoundStartDelta,
       getCurrentRound,
+      saleFinished,
       //   numberOfParticipants,
     ] = await ethcallProvider.all(calls)
 
@@ -92,6 +94,7 @@ const getSaleInfo = async address => {
         tokenLiquidity: tokenLiquidity.toString(),
         publicRoundStartDelta: publicRoundStartDelta.toNumber(),
         getCurrentRound: getCurrentRound.toNumber(),
+        isFinished: saleFinished,
         // participants: numberOfParticipants.toNumber(),
       },
     }

@@ -142,14 +142,22 @@ const SaleCard = ({ sale }) => {
               UPCOMING
             </span>
           )}
-          {saleInfo.saleStart < currentDate && (
+          {saleInfo.saleStart < currentDate &&
+          saleInfo.saleEnd > currentDate ? (
             <span className="bg-primary text-dark fw-bold px-2 rounded-pill font-size-11 me-2">
               LIVE
             </span>
+          ) : (
+            <></>
           )}
           {saleInfo.saleEnd < currentDate && (
             <span className="bg-primary text-dark fw-bold px-2 rounded-pill font-size-11 me-2">
               ENDED
+            </span>
+          )}
+          {saleInfo.isFinished && (
+            <span className="bg-primary text-dark fw-bold px-2 rounded-pill font-size-11 me-2">
+              CLOSED
             </span>
           )}
 

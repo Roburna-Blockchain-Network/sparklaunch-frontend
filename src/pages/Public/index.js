@@ -49,7 +49,7 @@ const Public = props => {
     }
 
     if (searchValue === "CLOSED") {
-      return item.round.end < currentDate
+      return item.isFinished
     }
 
     if (searchValue === "LIVE") {
