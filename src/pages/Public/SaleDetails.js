@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { MetaTags } from "react-meta-tags"
 
 import { Col, Container, Form, Modal, Row, Spinner } from "react-bootstrap"
@@ -48,7 +48,7 @@ const SaleDetails = props => {
   const history = useHistory()
   const { sales } = useSelector(state => state.Sales)
   const { id } = useParams()
-
+  const mountedRef = useRef(true)
   const { account } = useEthers()
 
   useEffect(async () => {
@@ -64,29 +64,26 @@ const SaleDetails = props => {
         alert(`sale not found`)
         history.push("/")
       }
-
+      if (!mountedRef.current) return null
       setSaleData(res.data[0])
-
       const token = await getTokenInfo(res.data[0].tokenAddress)
-
-      // console.log(res.data[0].address)
-
+      if (!mountedRef.current) return null
       const sales = await getSaleInfo(res.data[0].address)
-
-      // console.log(sales)
+      if (!mountedRef.current) return null
       const round = await getRoundInfo(res.data[0].address)
+      if (!mountedRef.current) return null
       if (round.success) {
+        if (!mountedRef.current) return null
         setRoundInfo(round.data)
       }
-
-      // console.log(round)
       if (token.success) {
+        if (!mountedRef.current) return null
         setTokenInfo(token.data)
       }
 
       if (sales.success) {
+        if (!mountedRef.current) return null
         const tokenDec = parseUnits("1", tokenInfo?.decimals)
-
         const tokenPrice = tokenDec.div(sales.data.tokenPriceBNB).toString()
         setTokenPriceOriginal(tokenPrice)
         setSaleInfo(sales.data)
@@ -95,10 +92,11 @@ const SaleDetails = props => {
       console.log(error)
     }
 
-    console.log(saleInfo)
+    if (!mountedRef.current) return null
     setReady(true)
 
     return () => {
+      mountedRef.current = false
       abortController.abort()
     }
   }, [])
