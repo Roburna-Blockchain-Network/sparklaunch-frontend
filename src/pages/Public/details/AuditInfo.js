@@ -49,26 +49,34 @@ const AuditInfo = ({ audit, kyc }) => {
   return (
     <>
       <Row className="mt-3 font-size-10">
-        <Col xs={6} className="text-center">
-          <Button
-            className="btn btn-kyc"
-            onClick={() => handleAudit(audit)}
-            id="links"
-          >
-            {" "}
-            AUDIT
-          </Button>
-        </Col>
-        <Col xs={6} className="text-center">
-          <Button
-            className="btn btn-kyc"
-            onClick={() => handleKyc(kyc)}
-            id="links"
-          >
-            {" "}
-            KYC
-          </Button>
-        </Col>
+        {audit && isValidUrl(audit) ? (
+          <Col xs={6} className="text-center">
+            <Button
+              className="btn btn-kyc"
+              onClick={() => handleAudit(audit)}
+              id="links"
+            >
+              {" "}
+              AUDIT
+            </Button>
+          </Col>
+        ) : (
+          <></>
+        )}
+        {kyc && isValidUrl(kyc) ? (
+          <Col xs={6} className="text-center">
+            <Button
+              className="btn btn-kyc"
+              onClick={() => handleKyc(kyc)}
+              id="links"
+            >
+              {" "}
+              KYC
+            </Button>
+          </Col>
+        ) : (
+          <></>
+        )}
       </Row>
     </>
   )
