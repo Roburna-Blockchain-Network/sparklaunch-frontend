@@ -22,22 +22,20 @@ import { Contract } from "@ethersproject/contracts"
 import { NotificationManager } from "react-notifications"
 
 import SaleAbi from "constants/abi/Sale.json"
-import { getUserParticipation } from "utils/factoryHelper"
-import { useSelector } from "react-redux"
-import { BIG_ONE } from "utils/numbers"
+
 import useIsAdmin from "hooks/useIsAdmin"
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
-import { isValidUrl } from "utils/helpers"
 dayjs.extend(utc)
 
 const OwnerCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   const currentDate = dayjs.utc().unix()
-  const { account, chainId, activateBrowserWallet, library } = useEthers()
+  const { account, library } = useEthers()
   const [showModal, setShowModal] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isSaleOwner, setIsSaleOwner] = useState(false)
+  const [isAlreadyEnd, setIsAlreadyEnd] = useState(false)
 
   const isUserAdmin = useIsAdmin(account)
 
@@ -72,6 +70,9 @@ const OwnerCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   }
 
   useEffect(() => {
+    if (saleInfo.isFinished) {
+      setIsAlreadyEnd(true)
+    }
     if (account == saleInfo.saleOwner) {
       setIsSaleOwner(true)
     } else {
@@ -83,9 +84,12 @@ const OwnerCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   const finalize = BigNumber.from(saleInfo.softCapBNB).lte(
     BigNumber.from(saleInfo.raisedBNB)
   )
+
   return (
     <>
-      {isUserAdmin || isSaleOwner ? (
+      {isAlreadyEnd ? (
+        <></>
+      ) : isUserAdmin || isSaleOwner ? (
         <div className="buy-detail-card" id="buy-card">
           <div className="d-flex w-100 flex-wrap mb-0 py-1 border-white border-opacity-50 justify-content-center">
             <div className="fs-5 fw-bold mb-2">SALE OWNER ADMINISTRATION</div>
