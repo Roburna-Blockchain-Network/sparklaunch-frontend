@@ -87,7 +87,7 @@ const OwnerCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
 
   return (
     <>
-      {isAlreadyEnd ? (
+      {isAlreadyEnd || !isSaleTimeEnd ? (
         <></>
       ) : isUserAdmin || isSaleOwner ? (
         <div className="buy-detail-card" id="buy-card">

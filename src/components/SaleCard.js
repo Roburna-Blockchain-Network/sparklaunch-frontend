@@ -37,6 +37,22 @@ const renderer = ({ days, hours, minutes, completed }) => {
     )
   }
 }
+const Completionist2 = () => <span>Sale is start now</span>
+const renderer2 = ({ days, hours, minutes, completed }) => {
+  if (completed) {
+    // Render a completed state
+    return <Completionist2 />
+  } else {
+    // Render a countdown
+    return (
+      <span>
+        Sale start in {zeroPad(days)} days, {zeroPad(hours)} Hours,{" "}
+        {zeroPad(minutes)} Minutes
+      </span>
+    )
+  }
+}
+
 const SaleCard = ({ sale }) => {
   const currentDate = moment().unix()
   let history = useHistory()
@@ -62,6 +78,14 @@ const SaleCard = ({ sale }) => {
   const percentSold = saleInfo?.hardCapBNB
     ? (formattedRaised * 100) / (formatEther(saleInfo?.hardCapBNB) * 1)
     : 0
+
+  const isFinish = saleInfo.saleEnd < currentDate
+  const isStart = saleInfo.saleStart < currentDate
+
+  const timeCountDown = isStart
+    ? dayjs.utc(saleInfo.saleEnd * 1000)
+    : dayjs.utc(saleInfo.saleStart * 1000)
+  const rendererCountDown = isStart ? renderer : renderer2
 
   return (
     <>
@@ -197,10 +221,15 @@ const SaleCard = ({ sale }) => {
 
           <div>
             <div className="mt-3 d-flex justify-content-between font-size-11">
-              <Countdown
-                date={dayjs.utc(saleInfo?.saleEnd * 1000)}
-                renderer={renderer}
-              ></Countdown>
+              {isFinish ? (
+                <>Sale is Finished</>
+              ) : (
+                <Countdown
+                  date={timeCountDown}
+                  renderer={rendererCountDown}
+                ></Countdown>
+              )}
+
               <span className="text-primary">{percentSold} %</span>
             </div>
 

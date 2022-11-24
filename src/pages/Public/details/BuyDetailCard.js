@@ -181,18 +181,6 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
       </div>
       <div className="text-white font-size-11">
         <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50"></div>
-        <div className="text-white font-size-11">
-          <div className="d-flex w-100 flex-wrap justify-content-between mb-0 py-1 border-bottom border-white border-opacity-50">
-            <div className="fw-bold">Your Participation</div>
-            {participate && (
-              <div className="text-white">
-                {formatUnits(participate.token, tokenInfo.decimals)}{" "}
-                {tokenInfo.symbol} / {formatUnits(participate.native, 18)}{" "}
-                {CHAIN_NATIVE_SYMBOL}
-              </div>
-            )}
-          </div>
-        </div>
         <div className="d-flex w-100 flex-wrap justify-content-between mb-0 py-1 border-bottom border-white border-opacity-50">
           <div className="w-25 fw-bold">Status</div>
           <div className="text-white">{saleStatus}</div>

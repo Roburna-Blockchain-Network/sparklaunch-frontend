@@ -23,6 +23,7 @@ import { BigNumber } from "ethers"
 import AdminDetailCard from "./details/AdminDetailCard"
 import TokenInfo from "./details/TokenInfo"
 import OwnerCard from "./details/OwnerCard"
+import ParticipationCard from "./details/ParticipationCard"
 dayjs.extend(utc)
 
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
@@ -248,12 +249,28 @@ const SaleDetails = props => {
                     </div>
                   </div>
 
-                  <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
+                  {/* <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
                     <div className="w-25 fw-bold">Base Allocation</div>
                     <div className="text-primary">
                       : {formatUnits(saleInfo.softCap, tokenInfo.decimals)} -{" "}
                       {formatUnits(saleInfo.hardCap, tokenInfo.decimals)}{" "}
                       {tokenInfo.symbol}
+                    </div>
+                  </div> */}
+
+                  <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
+                    <div className="w-25 fw-bold">Soft Cap</div>
+                    <div className="text-primary">
+                      : {formatUnits(saleInfo.softCapBNB, 18)}{" "}
+                      {CHAIN_NATIVE_SYMBOL}
+                    </div>
+                  </div>
+
+                  <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
+                    <div className="w-25 fw-bold">Hard Cap</div>
+                    <div className="text-primary">
+                      : {formatUnits(saleInfo.hardCapBNB, 18)}{" "}
+                      {CHAIN_NATIVE_SYMBOL}
                     </div>
                   </div>
                 </div>
@@ -274,6 +291,13 @@ const SaleDetails = props => {
                 />
 
                 <BuyDetailCard
+                  saleData={saleData}
+                  tokenInfo={tokenInfo}
+                  saleInfo={saleInfo}
+                  roundInfo={roundInfo}
+                />
+
+                <ParticipationCard
                   saleData={saleData}
                   tokenInfo={tokenInfo}
                   saleInfo={saleInfo}

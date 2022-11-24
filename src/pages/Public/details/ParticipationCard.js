@@ -17,6 +17,7 @@ import {
   ROUTER_ADDRESS,
   ADMIN_ADDRESS,
   CHAIN_NUMBER,
+  CHAIN_NATIVE_SYMBOL,
 } from "constants/Address"
 import { Contract } from "@ethersproject/contracts"
 import { NotificationManager } from "react-notifications"
@@ -30,6 +31,10 @@ const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import { isValidUrl } from "utils/helpers"
+import useIsParticipant from "hooks/useIsParticipant"
+import useParticipationData from "hooks/useParticipationData"
+import useSaleFinished from "hooks/useSaleIsFinished"
+import useSaleIsSuccess from "hooks/useSaleIsSuccess"
 dayjs.extend(utc)
 
 const ParticipationCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
@@ -37,128 +42,87 @@ const ParticipationCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   const { account, chainId, activateBrowserWallet, library } = useEthers()
   const [showModal, setShowModal] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [formTitle, setFormTitle] = useState("Set Featured Sale")
-  const [formContent, setFormContent] = useState(1)
-  const [isFeatured, setIsFeatured] = useState(false)
-  const [featuredLink, setFeaturedLink] = useState("")
-  const [kycLink, setKycLink] = useState("")
-  const [auditLink, setAuditLink] = useState("")
 
-  const isUserAdmin = useIsAdmin(account)
+  const isParticipant = useIsParticipant(saleInfo.address, account)
+  const contribution = useParticipationData(saleInfo.address, account)
+  const isSaleFinish = useSaleFinished(saleInfo.address)
+  const isSaleSuccess = useSaleIsSuccess(saleInfo.address)
 
-  const handleFeatured = async e => {
-    // setIsProcessing(true)
-    if (isFeatured) {
-      if (!isValidUrl(featuredLink)) {
-        NotificationManager.error("Link is not valid !", "Error")
-        // setIsProcessing(false)
-        return
-      }
-      // todo make request
+  // console.log(`isParticipant`, isParticipant)
+  // console.log(`isSaleFinish`, isSaleFinish)
+  // console.log(`contribution`, contribution)
 
-      try {
-        const input = JSON.stringify({
-          _id: saleData._id,
-          featured: isFeatured,
-          featuredImage: featuredLink,
-        })
+  const handleConfirm = async e => {
+    setIsProcessing(true)
 
-        const requestOptions = {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: input,
-        }
-
-        const response = await fetch(`${API_URL}sale/featured`, requestOptions)
-        const data = await response.json()
-
-        NotificationManager.success(
-          "Featured Info successfully updated!",
-          "Success"
-        )
-        setShowModal(false)
-      } catch (error) {
-        NotificationManager.error("Error on backend !", "Error")
-        console.log(error)
-      }
-      return
-    } else {
-      // todo make request
-      NotificationManager.success(
-        "Featured Info successfully updated!",
-        "Success"
-      )
-      // setIsProcessing(false)
-      return
-    }
-  }
-
-  const handleAudit = async e => {
-    // setIsProcessing(true)
-    if (!isValidUrl(kycLink) || !isValidUrl(auditLink)) {
-      NotificationManager.error("Link is not valid !", "Error")
-      // setIsProcessing(false)
-      return
-    }
+    const saleContractAddress = saleData.address
+    const contract = new Contract(
+      saleContractAddress,
+      SaleAbi,
+      library.getSigner()
+    )
 
     try {
-      const input = JSON.stringify({
-        _id: saleData._id,
-        kyc: kycLink,
-        audit: auditLink,
-      })
-
-      const requestOptions = {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: input,
-      }
-
-      const response = await fetch(`${API_URL}sale/kyc`, requestOptions)
-      const data = await response.json()
-
+      const tx = await contract.finishSale()
+      await tx.wait()
       NotificationManager.success(
-        "Featured Info successfully updated!",
-        "Success"
+        `Withdraw ${
+          isSaleSuccess ? tokenInfo.symbol : CHAIN_NATIVE_SYMBOL
+        } is Success  `,
+        "Thanks"
       )
-
-      setTimeout(() => {
-        window.location.reload()
-      }, 6000)
-
-      // setShowModal(false)
     } catch (error) {
-      console.log(error)
+      NotificationManager.error(
+        `${isSaleSuccess ? tokenInfo.symbol : CHAIN_NATIVE_SYMBOL} is Fail`,
+        "Sorry"
+      )
     }
-    // setIsProcessing(false)
+
+    setTimeout(() => {
+      setIsProcessing(false)
+      setShowModal(false)
+    }, 2000)
   }
 
   return (
     <>
-      {isUserAdmin ? (
+      {isParticipant ? (
         <div className="buy-detail-card" id="buy-card">
-          <div className="d-flex w-100 flex-wrap mb-0 py-1 border-white border-opacity-50">
-            <Button
-              className="btn buy-or-connect mb-3"
-              onClick={() => {
-                setFormTitle("Set Featured Sale")
-                setFormContent(1)
-                setShowModal(true)
-              }}
-            >
-              Set Featured Sale
-            </Button>
-            <Button
-              className="btn buy-or-connect  mb-3"
-              onClick={() => {
-                setFormTitle("Set Audit & KYC Info")
-                setFormContent(2)
-                setShowModal(true)
-              }}
-            >
-              Set Audit & KYC
-            </Button>
+          <div className="d-flex w-100 flex-wrap mb-0 py-1 border-white border-opacity-50 justify-content-center">
+            <div className="fs-5 fw-bold mb-2">YOUR CONTRIBUTION</div>
           </div>
+          <div className="text-white font-size-11 mb-3">
+            <div className="d-flex w-100 flex-wrap justify-content-between mb-0 py-1 border-bottom border-white border-opacity-50"></div>
+            <div className="d-flex w-100 flex-wrap justify-content-between mb-0 py-1 border-bottom border-white border-opacity-50">
+              <div className="fw-bold">Bought </div>
+              {contribution && (
+                <div className="text-white">
+                  {formatUnits(contribution[0], tokenInfo.decimals)}{" "}
+                  {tokenInfo.symbol}
+                </div>
+              )}
+            </div>
+            <div className="d-flex w-100 flex-wrap justify-content-between mb-0 py-1 border-bottom border-white border-opacity-50">
+              <div className="fw-bold">Paid </div>
+              {contribution && (
+                <div className="text-white">
+                  {formatUnits(contribution[1], 18)} {CHAIN_NATIVE_SYMBOL}
+                </div>
+              )}
+            </div>
+          </div>
+          {isSaleFinish ? (
+            <Button
+              className="btn buy-or-connect mb-2"
+              onClick={() => {
+                setShowModal(true)
+              }}
+            >
+              WITHDRAW {isSaleSuccess ? tokenInfo.symbol : CHAIN_NATIVE_SYMBOL}
+            </Button>
+          ) : (
+            <></>
+          )}
         </div>
       ) : (
         <></>
@@ -166,134 +130,36 @@ const ParticipationCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
 
       <Modal
         backdrop="static"
-        size="lg"
+        size="sm"
         show={showModal}
         centered
         onHide={() => setShowModal(false)}
       >
         <div className="modal-content">
           <Modal.Header>
-            <span className="text-primary fs-4">Form {formTitle}</span>
-            <button
-              className="btn border-0"
-              data-bs-dismiss="modal"
-              onClick={e => setShowModal(false)}
-            >
-              X
-            </button>
+            <span className="text-primary fs-4">Confirmation</span>
           </Modal.Header>
           <div className="p-4">
-            {/* FORM FEATURED */}
-            {formContent == 1 && (
-              <>
-                <div className="form-group mb-3">
-                  <label>Is Featured</label>
-                  <div className="form-check">
-                    <input
-                      className="form-check-input"
-                      type="radio"
-                      id="saleType1"
-                      onChange={e => setIsFeatured(true)}
-                      checked={isFeatured}
-                    />
-                    <label className="form-check-label" htmlFor="saleType1">
-                      Yes
-                    </label>
-                  </div>
-                  <div className="form-check">
-                    <input
-                      className="form-check-input"
-                      type="radio"
-                      name="saleType"
-                      id="saleType2"
-                      onChange={e => setIsFeatured(false)}
-                      checked={!isFeatured}
-                    />
-                    <label className="form-check-label" htmlFor="saleType2">
-                      No
-                    </label>
-                  </div>
-                </div>
-                {isFeatured && (
-                  <Form.Group className="mb-3" controlId="featuredLink">
-                    <Form.Label>Featured Image Link </Form.Label>
-                    <Form.Control
-                      value={featuredLink}
-                      onChange={e => setFeaturedLink(e.target.value)}
-                      type="text"
-                    />
-                  </Form.Group>
-                )}
-
-                <div className="text-center">
-                  <button
-                    className="btn btn-primary px-3 fw-bolder w-50 text-nowrap"
-                    onClick={handleFeatured}
-                    disabled={isProcessing}
-                  >
-                    {isProcessing ? (
-                      <>
-                        <Spinner
-                          as="span"
-                          animation="border"
-                          size="sm"
-                          role="status"
-                          aria-hidden="true"
-                        />{" "}
-                        Processing...
-                      </>
-                    ) : (
-                      "Submit"
-                    )}
-                  </button>
-                </div>
-              </>
-            )}
-
-            {/* FORM KYC */}
-            {formContent == 2 && (
-              <>
-                <Form.Group className="mb-3" controlId="audit">
-                  <Form.Label>Audit Link </Form.Label>
-                  <Form.Control
-                    value={auditLink}
-                    onChange={e => setAuditLink(e.target.value)}
-                    type="text"
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="kyc">
-                  <Form.Label>KYC Link </Form.Label>
-                  <Form.Control
-                    value={kycLink}
-                    onChange={e => setKycLink(e.target.value)}
-                    type="text"
-                  />
-                </Form.Group>
-
-                <div className="text-center">
-                  <button
-                    className="btn btn-primary px-3 fw-bolder w-50 text-nowrap"
-                    onClick={handleAudit}
-                    disabled={isProcessing}
-                  >
-                    {isProcessing ? (
-                      <>
-                        <Spinner
-                          as="span"
-                          animation="border"
-                          size="sm"
-                          role="status"
-                          aria-hidden="true"
-                        />{" "}
-                        Processing...
-                      </>
-                    ) : (
-                      "Submit"
-                    )}
-                  </button>
-                </div>
-              </>
-            )}
+            <div className="text-center">
+              <div className="mb-3 fs-4">
+                Are you sure want to Withdraw{" "}
+                {isSaleSuccess ? tokenInfo.symbol : CHAIN_NATIVE_SYMBOL}{" "}
+              </div>
+              <button
+                className="btn btn-primary px-3 fw-bolder w-100 text-nowrap mb-3"
+                disabled={isProcessing}
+                onClick={e => handleConfirm(e)}
+              >
+                YES
+              </button>
+              <button
+                className="btn btn-primary px-3 fw-bolder w-100 text-nowrap"
+                disabled={isProcessing}
+                onClick={e => setShowModal(false)}
+              >
+                NO
+              </button>
+            </div>
           </div>
           <Modal.Body></Modal.Body>
         </div>
