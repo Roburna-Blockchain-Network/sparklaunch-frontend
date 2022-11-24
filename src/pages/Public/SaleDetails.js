@@ -6,17 +6,6 @@ import moment from "moment/moment"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 
-import {
-  depositTokens,
-  finishSale,
-  getSaleById,
-  participateInsale,
-  withdraw,
-  withdrawDeposit,
-  withdrawEarnings,
-  withdrawUnused,
-} from "connect/dataProccessing"
-
 import smLogo from "assets/images/logos/smlogo.png"
 // import bscLogo from "assets/images/logos/bsc.png"
 import bscLogo from "assets/images/logos/rba.svg"
@@ -25,13 +14,15 @@ import { useSelector } from "react-redux"
 import { useHistory, useParams } from "react-router-dom"
 import { ChainId, useConfig, useEthers } from "@usedapp/core"
 import { formatEther, formatUnits, parseUnits } from "ethers/lib/utils"
-import SaleDetailCard from "components/SaleDetailCard"
+import SaleDetailCard from "./details/SaleDetailCard"
 import { API_URL, CHAIN_NATIVE_SYMBOL, CHAIN_NUMBER } from "constants/Address"
 import { getRoundInfo, getSaleInfo, getTokenInfo } from "utils/factoryHelper"
 import { formatBigNumber } from "utils/numbers"
-import BuyDetailCard from "components/BuyDetailCard"
+import BuyDetailCard from "./details/BuyDetailCard"
 import { BigNumber } from "ethers"
 import AdminDetailCard from "./details/AdminDetailCard"
+import TokenInfo from "./details/TokenInfo"
+import OwnerCard from "./details/OwnerCard"
 dayjs.extend(utc)
 
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
@@ -46,7 +37,6 @@ const SaleDetails = props => {
   const [roundInfo, setRoundInfo] = useState()
   const [tokenPriceOriginal, setTokenPriceOriginal] = useState()
   const history = useHistory()
-  const { sales } = useSelector(state => state.Sales)
   const { id } = useParams()
   const mountedRef = useRef(true)
   const { account } = useEthers()
@@ -270,41 +260,7 @@ const SaleDetails = props => {
 
                 <div className="row">
                   <Col md={7}>
-                    <div className="text-white font-size-14 mb-4">
-                      <h5 className="text-primary">Token Info</h5>
-                      <div className="d-flex w-100 flex-wrap mb-0 py-1">
-                        <div className="w-25 fw-bold">Name</div>
-                        <div className="text-primary">: {tokenInfo?.name}</div>
-                      </div>
-                      <div className="d-flex w-100 flex-wrap mb-0 py-1">
-                        <div className="w-25 fw-bold">Symbols</div>
-                        <div className="text-primary">
-                          : {tokenInfo?.symbol}
-                        </div>
-                      </div>
-                      <div className="d-flex w-100 flex-wrap mb-0 py-1">
-                        <div className="w-25 fw-bold">Decimals</div>
-                        <div className="text-primary">
-                          : {tokenInfo?.decimals}
-                        </div>
-                      </div>
-                      <div className="d-flex w-100 flex-wrap mb-0 py-1">
-                        <div className="w-25 fw-bold">Supply</div>
-                        <div className="text-primary">
-                          :{" "}
-                          {tokenInfo
-                            ? formatBigNumber(
-                                tokenInfo.totalSupply,
-                                tokenInfo.decimals
-                              )
-                            : 0}
-                        </div>
-                      </div>
-                      <div className="d-flex w-100 flex-wrap mb-0 py-1">
-                        <div className="w-25 fw-bold">Type</div>
-                        <div className="text-primary">: BEP20 / ERC20</div>
-                      </div>
-                    </div>
+                    <TokenInfo info={tokenInfo} />
                   </Col>
                 </div>
               </Col>
@@ -329,69 +285,15 @@ const SaleDetails = props => {
                   saleInfo={saleInfo}
                   roundInfo={roundInfo}
                 />
+                <OwnerCard
+                  saleData={saleData}
+                  tokenInfo={tokenInfo}
+                  saleInfo={saleInfo}
+                  roundInfo={roundInfo}
+                />
               </Col>
             </Row>
           )}
-
-          {/* <Modal
-            backdrop="static"
-            size="sm"
-            show={showParticipateModal}
-            centered
-            onHide={() => setShowParticipateModal(false)}
-          >
-            <div className="modal-content">
-              <Modal.Header>
-                <span className="text-primary fs-4">Buy Tokens</span>
-                <button
-                  className="btn border-0"
-                  data-bs-dismiss="modal"
-                  onClick={() => setShowParticipateModal(false)}
-                >
-                  X
-                </button>
-              </Modal.Header>
-              <Form onSubmit={handleParticipate} className="m-3">
-                <Form.Group className="mb-3" controlId="amount">
-                  <Form.Label>Amount </Form.Label>
-                  <Form.Text className="text-white">
-                    {" "}
-                    (Max: {saleData?.saleParams.maxBuy} BNB)
-                  </Form.Text>
-                  <Form.Control
-                    placeholder="0"
-                    type="number"
-                    step="0.00001"
-                    min="0"
-                  />
-                </Form.Group>
-
-                <div className="text-center">
-                  <button
-                    className="btn btn-primary px-3 fw-bolder w-50 text-nowrap"
-                    type="submit"
-                    disabled={isProcessing}
-                  >
-                    {isProcessing ? (
-                      <>
-                        <Spinner
-                          as="span"
-                          animation="border"
-                          size="sm"
-                          role="status"
-                          aria-hidden="true"
-                        />{" "}
-                        Processing...
-                      </>
-                    ) : (
-                      "Buy"
-                    )}
-                  </button>
-                </div>
-              </Form>
-              <Modal.Body></Modal.Body>
-            </div>
-          </Modal> */}
         </Container>
       </div>
     </React.Fragment>

@@ -25,10 +25,9 @@ const FeaturedCard = () => {
       const res = await response.json()
       if (res.length < 1) {
         return
-      } else if (res.length < 5) {
       }
       setFeatured(res)
-      console.log(res)
+      // console.log(res)
     } catch (error) {
       console.log(error)
     }

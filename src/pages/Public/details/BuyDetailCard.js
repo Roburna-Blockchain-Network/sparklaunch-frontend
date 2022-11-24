@@ -27,6 +27,8 @@ import SaleAbi from "constants/abi/Sale.json"
 import { getUserParticipation } from "utils/factoryHelper"
 import { useSelector } from "react-redux"
 import { BIG_ONE } from "utils/numbers"
+import useIsParticipant from "hooks/useIsParticipant"
+import useParticipationData from "hooks/useParticipationData"
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
 const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   const currentDate = dayjs.utc().unix()
@@ -35,6 +37,8 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   const [canBuy, setCanBuy] = useState(false)
   const [enabled, setEnabled] = useState(false)
   const [participate, setParticipate] = useState()
+  const [isSeller, setIsSeller] = useState(false)
+  const [isBuyer, setIsBuyer] = useState(false)
 
   const minBuy = Number(formatEther(saleInfo.min))
   const maxBuy = Number(formatEther(saleInfo.max))
@@ -44,6 +48,8 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   const saleEnd = BN.from(saleInfo.saleEnd).toNumber()
 
   const userBalance = useEtherBalance(account)
+  const isParticipant = useIsParticipant(saleData?.address, account)
+  const participationData = useParticipationData(saleData?.address, account)
 
   useEffect(async () => {
     if (!account) {
@@ -71,6 +77,12 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   const validBuyVal = val => {
     return val >= minBuy && val <= maxBuy
   }
+
+  useEffect(() => {
+    if (account == saleInfo.saleOwner) {
+      setIsSeller(true)
+    }
+  }, [account])
 
   const handleChangeValue = val => {
     let newVal = buyVal
@@ -135,17 +147,17 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
             Amount In {CHAIN_NATIVE_SYMBOL} (max {maxBuy})
           </Form.Label>
           <Form.Control
-            defaultValue={buyVal}
             value={buyVal}
             type="number"
             placeholder="0"
+            step="0.01"
             max={maxBuy}
             onChange={e => handleChangeValue(Number(e.target.value))}
           />
         </Form.Group>
       </div>
       <div className="my-2">
-        {canBuy ? (
+        {canBuy && account ? (
           <Button
             disabled={enabled}
             className="btn buy-or-connect"
@@ -158,11 +170,12 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
         ) : (
           <Button
             className="btn buy-or-connect"
+            disabled={enabled}
             href="#"
             id="links"
             onClick={!account ? () => activateBrowserWallet() : () => {}}
           >
-            {account ? " SALE IS NOT STARTED / FINISHED" : "CONNECT WALLET"}
+            {account ? saleStatus : "CONNECT WALLET"}
           </Button>
         )}
       </div>

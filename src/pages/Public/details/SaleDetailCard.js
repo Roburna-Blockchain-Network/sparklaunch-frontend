@@ -13,8 +13,8 @@ import { formatEther, parseEther, formatUnits } from "ethers/lib/utils"
 import { BigNumber as BN } from "ethers"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
-import RoundInfo from "pages/Public/details/RoundInfo"
-import AuditInfo from "pages/Public/details/AuditInfo"
+import RoundInfo from "./RoundInfo"
+import AuditInfo from "./AuditInfo"
 import { CHAIN_NATIVE_SYMBOL } from "constants/Address"
 dayjs.extend(utc)
 
@@ -44,7 +44,6 @@ const SaleDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
     }
   }
   const sale = saleData
-  console.log(saleInfo)
   const formattedRaised = saleInfo ? formatEther(saleInfo?.raisedBNB) : 0
   const formattedSold = saleInfo
     ? formatUnits(saleInfo?.soldToken, tokenInfo.decimals)
