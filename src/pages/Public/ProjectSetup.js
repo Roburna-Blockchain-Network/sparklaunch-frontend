@@ -1078,7 +1078,7 @@ const ProjectSetup = () => {
                         checked={!step2.isPublic}
                       />
                       <label className="form-check-label" for="saleType2">
-                        Private
+                        Whitelist
                       </label>
                     </div>
                   </div>

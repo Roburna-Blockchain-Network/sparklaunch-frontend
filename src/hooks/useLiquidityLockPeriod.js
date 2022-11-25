@@ -4,12 +4,12 @@ import SaleAbi from "constants/abi/Sale.json"
 import { useCall, useEthers } from "@usedapp/core"
 import { FACTORY_ADDRESS } from "constants/Address"
 
-function useSaleFinished(saleAddress) {
+function useLiquidityLockPeriod(saleAddress) {
   const { value, error } =
     useCall(
       {
         contract: new Contract(saleAddress, SaleAbi),
-        method: "saleFinished",
+        method: "liquidityLockPeriod",
         args: [],
       },
       {
@@ -17,9 +17,10 @@ function useSaleFinished(saleAddress) {
       }
     ) ?? {}
   if (error) {
+    console.log(error)
     return error
   }
   return value?.[0]
 }
 
-export default useSaleFinished
+export default useLiquidityLockPeriod

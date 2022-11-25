@@ -2,9 +2,22 @@ import React, { useState, useEffect } from "react"
 import { MetaTags } from "react-meta-tags"
 
 import { Col, Container, Form, Row, Spinner } from "react-bootstrap"
-import { Link } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
+import { API_URL, CHAIN_NUMBER } from "constants/Address"
+import useSaleFinished from "hooks/useSaleIsFinished"
+import useSaleIsSuccess from "hooks/useSaleIsSuccess"
+import { NotificationManager } from "react-notifications"
+import useSaleInfo from "hooks/useSaleInfo"
+import { useEthers } from "@usedapp/core"
+import useTokenInfo from "hooks/useTokenInfo"
+import useLiquidityLockPeriod from "hooks/useLiquidityLockPeriod"
+import useLiquidityUnlockTime from "hooks/useLiquidityUnlockTime"
+import usePairAddress from "hooks/usePairAddress"
 
 const TokenLocker = () => {
+  const [saleInfo, setSaleInfo] = useState()
+  const { account, library } = useEthers()
+
   const PairInfo = [
     {
       label: "Quote Pair",
@@ -51,12 +64,45 @@ const TokenLocker = () => {
       value: "2022.08.26 21:07 UTC",
     },
   ]
+  const { address } = useParams()
+
+  useEffect(async () => {
+    const abortController = new AbortController()
+    try {
+      const response = await fetch(
+        `${API_URL}lock/${CHAIN_NUMBER}/${address}`,
+        {
+          signal: abortController.signal,
+        }
+      )
+
+      const res = await response.json()
+      if (res.data.length > 0) {
+        setSaleInfo({ fetchstatus: true, ...res.data[0] })
+      } else {
+        setSaleInfo({ fetchstatus: false })
+      }
+    } catch (error) {}
+
+    return () => {
+      abortController.abort()
+    }
+  }, [address])
+
+  const isSaleSuccess = useSaleIsSuccess(address)
+  const sale = useSaleInfo(address)
+  const token = useTokenInfo(sale?.token)
+  const liquidityLockTime = useLiquidityLockPeriod(address)
+  const liquidityUnlockTime = useLiquidityUnlockTime(address)
+  const pairAddress = usePairAddress(address)
+
+  // const
 
   return (
     <>
       <div className="page-content">
         <MetaTags>
-          <title>Project Setup | SparkLaunch</title>
+          <title>Liquidity Lock Info | Sparklaunch</title>
         </MetaTags>
         <Container fluid>
           <div className="featured-card bg-dark p-4 my-2 rounded-4">

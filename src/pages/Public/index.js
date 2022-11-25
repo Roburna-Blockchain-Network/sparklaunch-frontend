@@ -237,7 +237,7 @@ const Public = props => {
                     href="mailto:contact@ignite-defi.com"
                     className="btn btn-lg bg-primary rounded-4 w-25 fs-1 fw-bold text-black me-3"
                   >
-                    Ask Us
+                    Contact Us
                   </a>
                 </div>
               </>

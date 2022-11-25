@@ -1,8 +1,10 @@
-import { Contract } from "ethers"
+import { Contract, ethers } from "ethers"
 import ERC20Abi from "constants/abi/ERC20.json"
 
 import { useCall, useCalls, useEthers } from "@usedapp/core"
 import { useSelector } from "react-redux"
+
+const ZERO_ADDRESS = ethers.constants.AddressZero
 
 function useTokenInfo(tokenAddress) {
   const partialCall = tokenAddress && {
