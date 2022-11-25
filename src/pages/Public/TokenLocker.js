@@ -35,20 +35,20 @@ const TokenLocker = () => {
       value: "Spark Lock",
     },
     {
-      label: "Base Pair",
-      value: "SXP",
+      label: "Total Amount Locked",
+      value: "189.7542",
     },
     {
-      label: "Symbol",
-      value: "WBNB/SXP",
+      label: "Total Value Locked",
+      value: "$220.041",
     },
     {
-      label: "LP Supply",
-      value: "9,014,470",
+      label: "Owner",
+      value: "0xC8bA821FeD333e1c134324676643e41237583A245a",
     },
     {
-      label: "Dex Listed",
-      value: "Spark",
+      label: "Lock Date",
+      value: "2022.08.26 21:07 UTC",
     },
   ]
 
