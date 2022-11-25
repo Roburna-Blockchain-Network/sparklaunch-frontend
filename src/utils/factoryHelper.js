@@ -41,6 +41,98 @@ const getSaleInfo = async address => {
     calls.push(tokenContract.publicRoundStartDelta())
     calls.push(tokenContract.getCurrentRound())
     calls.push(tokenContract.saleFinished())
+    // console.log(calls)
+    const [
+      sale,
+      saleStart,
+      min,
+      max,
+      lpPercent,
+      defaultDexRouter,
+      listingRate,
+      bnbLiquidity,
+      tokenLiquidity,
+      publicRoundStartDelta,
+      getCurrentRound,
+      saleFinished,
+    ] = await ethcallProvider.all(calls)
+
+    const bnbDecimals = parseUnits("1", "18")
+    const hardCapBNB = sale.hardCap
+      .mul(sale.tokenPriceInBNB)
+      .div(bnbDecimals)
+      .toString()
+    const softCapBNB = sale.softCap
+      .mul(sale.tokenPriceInBNB)
+      .div(bnbDecimals)
+      .toString()
+    return {
+      success: true,
+      data: {
+        address: address,
+        saleStart: saleStart.toNumber(),
+        saleEnd: sale.saleEnd.toNumber(),
+        softCapBNB: softCapBNB,
+        hardCapBNB: hardCapBNB,
+        softCap: sale.softCap.toString(),
+        hardCap: sale.hardCap.toString(),
+        tokenPrice: sale.tokenPriceInBNB.toString(),
+        tokenPriceBNB: sale.tokenPriceInBNB.toString(),
+        raisedBNB: sale.totalBNBRaised.toString(),
+        soldToken: sale.totalTokensSold.toString(),
+        saleOwner: sale.saleOwner,
+        isPublic: sale.isPublic,
+        earningsWithdrawn: sale.earningsWithdrawn,
+        min: min.toString(),
+        max: max.toString(),
+        lpPercent: lpPercent.div("100").toNumber(),
+        defaultDexRouter: defaultDexRouter,
+        listingRate: listingRate.toString(),
+        bnbLiquidity: bnbLiquidity.toString(),
+        tokenLiquidity: tokenLiquidity.toString(),
+        publicRoundStartDelta: publicRoundStartDelta.toNumber(),
+        getCurrentRound: getCurrentRound.toNumber(),
+        isFinished: saleFinished,
+        // participants: numberOfParticipants.toNumber(),
+      },
+    }
+  } catch (error) {
+    return {
+      success: false,
+      data: { address },
+      msg: error,
+    }
+  }
+}
+
+export const getLockInfo = async address => {
+  setMulticallAddress(CHAIN_NUMBER, MULTICALL_ADDRESS)
+  const provider = new ethers.providers.JsonRpcProvider(RPC_ADDRESS)
+  const ethcallProvider = new Provider(provider)
+  await ethcallProvider.init()
+  //   return AdminABI
+  const tokenContract = new Contract(address, SalesABI)
+  //   return tokenContract
+
+  let calls = []
+  try {
+    calls.push(tokenContract.sale())
+    calls.push(tokenContract.saleStartTime())
+    calls.push(tokenContract.minParticipation())
+    calls.push(tokenContract.maxParticipation())
+    calls.push(tokenContract.lpPercentage())
+    calls.push(tokenContract.defaultDexRouter())
+    calls.push(tokenContract.pcsListingRate())
+    calls.push(tokenContract.BNBAmountForLiquidity())
+    calls.push(tokenContract.tokensAmountForLiquidity())
+    calls.push(tokenContract.publicRoundStartDelta())
+    calls.push(tokenContract.getCurrentRound())
+    calls.push(tokenContract.saleFinished())
+    calls.push(tokenContract.isSaleSuccessful())
+    calls.push(tokenContract.defaultPair())
+    calls.push(tokenContract.liquidityUnlockTime())
+    calls.push(tokenContract.liquidityLockPeriod())
+    calls.push(tokenContract.lpWithdrawn())
     // calls.push(tokenContract.getNumberOfRegisteredUsers())
     // console.log(calls)
     const [
@@ -56,6 +148,11 @@ const getSaleInfo = async address => {
       publicRoundStartDelta,
       getCurrentRound,
       saleFinished,
+      isSaleSuccessful,
+      defaultPair,
+      liquidityUnlockTime,
+      liquidityLockPeriod,
+      lpWithdrawn,
       //   numberOfParticipants,
     ] = await ethcallProvider.all(calls)
 
@@ -95,6 +192,13 @@ const getSaleInfo = async address => {
         publicRoundStartDelta: publicRoundStartDelta.toNumber(),
         getCurrentRound: getCurrentRound.toNumber(),
         isFinished: saleFinished,
+        isSuccess: isSaleSuccessful,
+        pair: defaultPair,
+        unlockAt: liquidityUnlockTime.toNumber(),
+        lockPeriod: liquidityLockPeriod.toNumber(),
+        lpWithdrawn: lpWithdrawn,
+        lockDate:
+          liquidityUnlockTime.toNumber() - liquidityLockPeriod.toNumber(),
         // participants: numberOfParticipants.toNumber(),
       },
     }

@@ -35,6 +35,7 @@ const CHAIN_NUMBER = 159
 export const SUPPORTED_CHAIN = [159]
 export const CHAIN_NATIVE_SYMBOL = "RBA"
 export const WRAPPED_SYMBOL = "WRBA"
+export const DEFAULT_DEX = "ARBORSWAP"
 
 const API_URL = process.env.REACT_APP_BACKEND_URL
 
