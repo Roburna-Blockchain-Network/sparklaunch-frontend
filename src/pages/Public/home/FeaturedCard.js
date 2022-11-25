@@ -18,7 +18,7 @@ const FeaturedCard = () => {
   useEffect(async () => {
     const abortController = new AbortController()
     try {
-      const response = await fetch(`${API_URL}sale/${CHAIN_NUMBER}/featured`, {
+      const response = await fetch(`${API_URL}featured/${CHAIN_NUMBER}`, {
         signal: abortController.signal,
       })
 

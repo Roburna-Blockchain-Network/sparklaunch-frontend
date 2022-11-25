@@ -45,10 +45,9 @@ const SaleDetails = props => {
   useEffect(async () => {
     const abortController = new AbortController()
     try {
-      const response = await fetch(
-        `${API_URL}sale/chain/${CHAIN_NUMBER}/id/${id}`,
-        { signal: abortController.signal }
-      )
+      const response = await fetch(`${API_URL}chain/${CHAIN_NUMBER}/id/${id}`, {
+        signal: abortController.signal,
+      })
 
       const res = await response.json()
       if (res.data.length == 0) {

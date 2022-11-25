@@ -4,9 +4,6 @@ import { MetaTags } from "react-meta-tags"
 import { Col, Container, Form, Row, Spinner } from "react-bootstrap"
 import { Link } from "react-router-dom"
 
-//import methods to handle data
-import { getDeploymentFee, deploySale } from "connect/dataProccessing"
-
 const TokenLocker = () => {
   const PairInfo = [
     {

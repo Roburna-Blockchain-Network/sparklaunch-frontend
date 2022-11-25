@@ -69,7 +69,7 @@ const AdminDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
           body: input,
         }
 
-        const response = await fetch(`${API_URL}sale/featured`, requestOptions)
+        const response = await fetch(`${API_URL}featured`, requestOptions)
         const data = await response.json()
 
         NotificationManager.success(
@@ -114,7 +114,7 @@ const AdminDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
         body: input,
       }
 
-      const response = await fetch(`${API_URL}sale/kyc`, requestOptions)
+      const response = await fetch(`${API_URL}kyc`, requestOptions)
       const data = await response.json()
 
       NotificationManager.success(
