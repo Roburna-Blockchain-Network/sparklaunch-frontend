@@ -207,9 +207,9 @@ const SaleDetails = props => {
                       <p>
                         <span className="fw-bold">Hard Cap : </span>
                         {saleInfo
-                          ? formatUnits(saleInfo.hardCapBNB, 18)
+                          ? formatUnits(saleInfo.hardCap, tokenInfo?.decimals)
                           : 0}{" "}
-                        {CHAIN_NATIVE_SYMBOL}
+                        {tokenInfo?.symbol}
                       </p>
                     </Col>
                   </Row>

@@ -63,7 +63,7 @@ const ParticipationCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
     )
 
     try {
-      const tx = await contract.finishSale()
+      const tx = await contract.withdraw()
       await tx.wait()
       NotificationManager.success(
         `Withdraw ${

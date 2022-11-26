@@ -50,7 +50,11 @@ const ProjectSetup = () => {
 
   const [activeTab, setActiveTab] = useState(1)
   const [step1, setStep1] = useState(null)
-
+  const [white1, setWhite1] = useState(null)
+  const [white2, setWhite2] = useState(null)
+  const [white3, setWhite3] = useState(null)
+  const [white4, setWhite4] = useState(null)
+  const [white5, setWhite5] = useState(null)
   const [step2, setStep2] = useState({
     softCap: 0,
     hardCap: 0,
@@ -594,6 +598,27 @@ const ProjectSetup = () => {
       </div>
     )
   }
+
+  // useEffect(() => {
+  //   // console.log(white1)
+  //   let new_key = []
+  //   let new_array = white1
+  //     .trim()
+  //     .replace(/\n/g, "")
+  //     .split(",")
+  //     .map(e => {
+  //       return e.replace(/\n/g, "")
+  //     })
+  //     .map(e => {
+  //       return e.trim()
+  //     })
+  //     .filter(e => {
+  //       return e.length > 1
+  //     })
+  //   new_array.forEach(e => {
+  //     new_key.push("1")
+  //   })
+  // }, [white1])
 
   return (
     <React.Fragment>
@@ -1242,6 +1267,51 @@ const ProjectSetup = () => {
                               }
                             })
                           }}
+                        />
+                      </Form.Group>
+                      <Form.Group className="mb-3" controlId="white1">
+                        <Form.Label>Whitelist Round 1 *</Form.Label>
+                        <Form.Control
+                          as="textarea"
+                          defaultValue={white1}
+                          placeholder="enter address here, separated by comma (,)"
+                          onChange={evt => setWhite1(evt.target.value)}
+                        />
+                      </Form.Group>
+                      <Form.Group className="mb-3" controlId="white2">
+                        <Form.Label>Whitelist Round 2 *</Form.Label>
+                        <Form.Control
+                          as="textarea"
+                          defaultValue={white2}
+                          placeholder="enter address here, separated by comma (,)"
+                          onChange={evt => setWhite2(evt.target.value)}
+                        />
+                      </Form.Group>
+                      <Form.Group className="mb-3" controlId="white2">
+                        <Form.Label>Whitelist Round 3 *</Form.Label>
+                        <Form.Control
+                          as="textarea"
+                          defaultValue={white3}
+                          placeholder="enter address here, separated by comma (,)"
+                          onChange={evt => setWhite3(evt.target.value)}
+                        />
+                      </Form.Group>
+                      <Form.Group className="mb-3" controlId="white2">
+                        <Form.Label>Whitelist Round 4 *</Form.Label>
+                        <Form.Control
+                          as="textarea"
+                          defaultValue={white4}
+                          placeholder="enter address here, separated by comma (,)"
+                          onChange={evt => setWhite4(evt.target.value)}
+                        />
+                      </Form.Group>
+                      <Form.Group className="mb-3" controlId="white5">
+                        <Form.Label>Whitelist Round 5 *</Form.Label>
+                        <Form.Control
+                          as="textarea"
+                          defaultValue={white5}
+                          placeholder="enter address here, separated by comma (,)"
+                          onChange={evt => setWhite5(evt.target.value)}
                         />
                       </Form.Group>
                     </Row>
