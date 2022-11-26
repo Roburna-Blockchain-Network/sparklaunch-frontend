@@ -12,6 +12,7 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import { BigNumber, ethers, utils } from "ethers"
 import useDeploymentFee from "hooks/useDeploymentFee"
+import { NotificationManager } from "react-notifications"
 
 import {
   FACTORY_ADDRESS,
@@ -191,6 +192,7 @@ const ProjectSetup = () => {
       step2.liquidityPercent == 0 ||
       step2.liquidityLock == 0
     ) {
+      NotificationManager.error("Please enter valid data !", "Error", 3000)
       return false
     }
 
@@ -202,53 +204,80 @@ const ProjectSetup = () => {
         step2.round4 == 0 ||
         step2.round5 == 0
       ) {
+        NotificationManager.error(
+          "Please enter valid round info !",
+          "Error",
+          3000
+        )
+        return false
+      } else if (step2.round1 >= step2.round2) {
+        NotificationManager.error("Round 2 must After Round 1 !", "Error", 3000)
+        return false
+      } else if (step2.round2 >= step2.round3) {
+        NotificationManager.error("Round 3 must After Round 2 !", "Error", 3000)
+        return false
+      } else if (step2.round3 >= step2.round4) {
+        NotificationManager.error("Round 4 must After Round 3 !", "Error", 3000)
+        return false
+      } else if (step2.round4 >= step2.round5) {
+        NotificationManager.error("Round 5 must After Round 4 !", "Error", 3000)
+        return false
+      } else if (step2.round5 >= step2.publicTime) {
+        NotificationManager.error(
+          "Round 5 must Before Public Round !",
+          "Error",
+          3000
+        )
         return false
       }
     }
 
     if (step2.minBuy > step2.maxBuy) {
+      NotificationManager.error(
+        "Minimum buy must below Maximum Buy !",
+        "Error",
+        3000
+      )
       return false
     }
 
     if (step2.startTime > step2.endTime) {
+      NotificationManager.error(
+        "Start Sale Time must before End Sale Time !",
+        "Error",
+        3000
+      )
       return false
     }
 
     if (step2.startTime > step2.publicTime) {
+      NotificationManager.error(
+        "Start Time must before Public Sale Time !",
+        "Error",
+        3000
+      )
       return false
     }
 
     if (step2.publicTime > step2.endTime) {
+      NotificationManager.error(
+        "Public Sale Time must before End Sale Time !",
+        "Error",
+        3000
+      )
       return false
-    }
-
-    if (!step2.isPublic) {
-      if (step2.round1 > step2.round2) {
-        return false
-      }
-      if (step2.round2 > step2.round3) {
-        return false
-      }
-      if (step2.round3 > step2.round4) {
-        return false
-      }
-      if (step2.round4 > step2.round5) {
-        return false
-      }
-      if (step2.round5 > step2.publicTime) {
-        return false
-      }
     }
 
     if (BigNumber.from(userAllow).lt(BigNumber.from(requiredToken))) {
       const res = await handleBeforeSubmit(requiredToken)
     }
+
     const userBalance = await handleCheckBalance()
 
     if (!userBalance) {
       return false
     }
-    // console.log(`sukses`)
+
     return true
   }
 
@@ -333,7 +362,6 @@ const ProjectSetup = () => {
       const tx = await contract.deployNormalSale(
         [routerAddress, adminAddress, data.tokenAddress, account],
         [
-          "1000", // TODO : need change
           data.minbuy,
           data.maxbuy,
           data.liquidityPercent,
@@ -371,19 +399,20 @@ const ProjectSetup = () => {
       library.getSigner()
     )
     const amount = parseUnits(requiredToken, BigNumber.from(tokenInfo.decimal))
+
     try {
       const approval = await contract.approve(factoryContractAddress, amount)
 
       await approval.wait()
-
-      return true
     } catch (error) {
       console.log(error)
+      return false
     }
+    setUserAllow(amount)
+    return true
   }
 
   const handleCheckBalance = async data => {
-    const factoryContractAddress = FACTORY_ADDRESS[chainId]
     const contract = new Contract(
       tokenInfo.address,
       ERCAbi,
@@ -400,6 +429,8 @@ const ProjectSetup = () => {
       console.log(error)
     }
   }
+
+  const saveToBackend = async data => {}
 
   const handleSubmitFinal = async event => {
     event.preventDefault()
@@ -745,7 +776,6 @@ const ProjectSetup = () => {
                       defaultValue={step2?.softCap}
                       type="number"
                       placeholder="0"
-                      step="1"
                       min="0"
                       onChange={e =>
                         setStep2(prevState => {
@@ -772,9 +802,6 @@ const ProjectSetup = () => {
                       defaultValue={step2?.hardCap}
                       type="number"
                       placeholder="0"
-                      step="1"
-                      min={step2.softCap}
-                      max={step2.softCap * 2}
                       required
                       onChange={e =>
                         setStep2(prevState => {
@@ -1329,7 +1356,6 @@ const ProjectSetup = () => {
                   <button
                     className="btn btn-primary px-3 fw-bolder"
                     type="submit"
-                    // disabled={!isValidStep2}
                   >
                     Next {">>"}
                   </button>
