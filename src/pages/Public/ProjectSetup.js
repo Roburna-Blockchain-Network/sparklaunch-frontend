@@ -267,14 +267,32 @@ const ProjectSetup = () => {
       )
       return false
     }
+    const amountRequired = parseUnits(
+      requiredToken,
+      BigNumber.from(tokenInfo.decimal)
+    )
+    if (BigNumber.from(userAllow).lt(amountRequired)) {
+      console.log(userAllow)
 
-    if (BigNumber.from(userAllow).lt(BigNumber.from(requiredToken))) {
       const res = await handleBeforeSubmit(requiredToken)
+      if (!res) {
+        NotificationManager.error(
+          "Please Approve Allowance Transaction on Metamask !",
+          "Error",
+          3000
+        )
+        return false
+      }
     }
 
     const userBalance = await handleCheckBalance()
-
+    console.log(`userBalance :`, userBalance)
     if (!userBalance) {
+      NotificationManager.error(
+        `Make sure you have enough  ${tokenInfo.name} to make Launchpad!`,
+        "Error",
+        3000
+      )
       return false
     }
 
@@ -283,16 +301,20 @@ const ProjectSetup = () => {
 
   const handleSubmit2 = async event => {
     const form = event.currentTarget
-
+    setIsLoading(true)
     event.preventDefault()
     event.stopPropagation()
-    console.log(step2)
+    // console.log(step2)
 
     const isValid = await validateStep2()
 
     if (isValid) {
+      setIsLoading(false)
       setActiveTab(activeTab + 1)
     }
+
+    setIsLoading(false)
+
     // console.log(step2data)
   }
 
@@ -331,12 +353,17 @@ const ProjectSetup = () => {
       FactoryAbi,
       library.getSigner()
     )
+
     const routerAddress = ROUTER_ADDRESS
     const adminAddress = ADMIN_ADDRESS
+
+    const TIERS_ROUND = [1]
+    const WL_ROUND = [adminAddress]
+
     // const se
-    const START_SALE = data.startdt
-    const END_SALE = data.enddt
-    const PUBLIC_SALE = data.publicDate
+    const START_SALE = data.start
+    const END_SALE = data.end
+    const PUBLIC_SALE = data.round.public
     // const PUBLIC_DELTA = END_SALE - (PUBLIC_SALE + 10)
     const PUBLIC_DELTA = 10
     let startTimes = []
@@ -362,20 +389,20 @@ const ProjectSetup = () => {
       const tx = await contract.deployNormalSale(
         [routerAddress, adminAddress, data.tokenAddress, account],
         [
-          data.minbuy,
-          data.maxbuy,
-          data.liquidityPercent,
-          data.listingPrice,
-          data.liquidityLock,
-          data.price,
+          data.info.minbuy,
+          data.info.maxbuy,
+          data.info.lpPercent,
+          data.info.dexRate,
+          data.info.liquidityLock,
+          data.info.saleRate,
           END_SALE,
           START_SALE,
           PUBLIC_DELTA,
-          data.hardcap,
-          data.softcap,
+          data.info.hardcap,
+          data.info.softcap,
         ],
-        [adminAddress],
-        [1],
+        WL_ROUND,
+        TIERS_ROUND,
         startTimes,
         isPublic,
         { value: utils.parseEther(deploymentFee) }
@@ -398,7 +425,8 @@ const ProjectSetup = () => {
       ERCAbi,
       library.getSigner()
     )
-    const amount = parseUnits(requiredToken, BigNumber.from(tokenInfo.decimal))
+
+    const amount = ethers.constants.MaxUint256
 
     try {
       const approval = await contract.approve(factoryContractAddress, amount)
@@ -408,7 +436,7 @@ const ProjectSetup = () => {
       console.log(error)
       return false
     }
-    setUserAllow(amount)
+    setUserAllow(amount.toString())
     return true
   }
 
@@ -418,74 +446,100 @@ const ProjectSetup = () => {
       ERCAbi,
       library.getSigner()
     )
-
+    const amountRequired = parseUnits(
+      requiredToken,
+      BigNumber.from(tokenInfo.decimal)
+    )
     try {
       const userbal = await contract.balanceOf(account)
 
-      if (userbal.gt(BigNumber.from(requiredToken))) return true
-
+      if (userbal.gt(amountRequired)) return true
+      console.log(`userbal`, userbal.toString())
+      console.log(`amountRequired`, amountRequired.toString())
       return false
     } catch (error) {
       console.log(error)
     }
   }
 
-  const saveToBackend = async data => {}
+  const saveToBackend = async value => {
+    const input = JSON.stringify(value)
+    try {
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: input,
+      }
+
+      const response = await fetch(`${API_URL}chain`, requestOptions)
+      const data = await response.json()
+      let id = await data._id
+
+      return true
+    } catch (e) {
+      console.log("Err: ", e.message)
+      return false
+    }
+  }
 
   const handleSubmitFinal = async event => {
     event.preventDefault()
     event.stopPropagation()
     setIsLoading(true)
 
-    const DIVISION_BASE = 10000
-
-    const presaleRatePrice = tokenRate(step2.presaleRate, tokenInfo.decimal)
-    const tokenSoftCap = step2.presaleRate * step2.softCap
-    const tokenHardCap = step2.presaleRate * step2.hardCap
-
-    const _minBuy = step2.minBuy * DIVISION_BASE
-    const _maxBuy = step2.maxBuy * DIVISION_BASE
-    // console.log(step2)
     const values = {
       name: step1?.title,
-      price: presaleRatePrice.toString(),
       tokenAddress: tokenInfo.address,
       tokenName: tokenInfo.name,
-      softcap: parseUnits(tokenSoftCap.toString(), tokenInfo.decimal * 1),
-      hardcap: parseUnits(tokenHardCap.toString(), tokenInfo.decimal * 1),
-      maxbuy: parseEther(_maxBuy.toString())
-        .div(BigNumber.from(DIVISION_BASE))
-        .toString(),
-      minbuy: parseEther(_minBuy.toString())
-        .div(BigNumber.from(DIVISION_BASE))
-        .toString(),
-      startdt: step2?.startTime,
-      enddt: step2?.endTime,
-      round1: step2?.round1,
-      round2: step2?.round2,
-      round3: step2?.round3,
-      round4: step2?.round4,
-      round5: step2?.round5,
-      listingPrice: parseUnits(step2.listingRate.toString(), tokenInfo.decimal),
-      liquidityPercent: (step2.liquidityPercent * 100).toString(),
-      liquidityLock: (step2?.liquidityLock * 86400).toString(),
-      publicDate: step2?.publicTime,
-      saleOwner: account,
-      whilelist: step2?.csvlink,
-
-      logo: step3?.logo,
-      website: step3?.website,
-      facebook: step3?.facebook,
-      twitter: step3?.twitter,
-      github: step3?.github,
-      telegram: step3?.telegram,
-      instagram: step3?.instagram,
-      discord: step3?.discord,
-      reddit: step3?.reddit,
-      youtube: step3?.youtube,
+      start: step2?.startTime,
+      end: step2?.endTime,
+      round: {
+        round1: step2?.round1,
+        round2: step2?.round2,
+        round3: step2?.round3,
+        round4: step2?.round4,
+        round5: step2?.round5,
+        start: step2?.startTime,
+        end: step2?.endTime,
+        public: step2?.publicTime,
+      },
+      info: {
+        softcap: parseEther(step2.softCap.toString()).toString(),
+        hardcap: parseEther(step2.hardCap.toString()).toString(),
+        maxbuy: parseEther(step2.maxBuy.toString()).toString(),
+        minbuy: parseEther(step2.minBuy.toString()).toString(),
+        saleRate: parseUnits(
+          step2.presaleRate.toString(),
+          tokenInfo.decimal
+        ).toString(),
+        dexRate: parseUnits(
+          step2.listingRate.toString(),
+          tokenInfo.decimal
+        ).toString(),
+        lpPercent: (step2.liquidityPercent * 100).toString(),
+        liquidityLock: (step2?.liquidityLock * 86400).toString(),
+      },
+      token: {
+        name: tokenInfo.name,
+        decimals: tokenInfo.decimal,
+        symbol: tokenInfo.symbol,
+        totalSupply: tokenInfo.totalSupply,
+      },
+      saleLinks: {
+        logo: step3?.logo,
+        fb: step3?.facebook,
+        git: step3?.github,
+        insta: step3?.instagram,
+        reddit: step3?.reddit,
+        web: step3?.website,
+        twitter: step3?.twitter,
+        telegram: step3?.telegram,
+        discord: step3?.discord,
+        youtube: step3?.youtube,
+      },
       description: description,
     }
-
+    console.log(values)
     try {
       const [id, contractAddress] = await handleDeploySale(values)
 
@@ -494,7 +548,7 @@ const ProjectSetup = () => {
       values.address = contractAddress
       values.chainId = chainId
 
-      const dbId = await saveData(values)
+      const dbId = await saveToBackend(values)
       if (dbId) {
         setIsLoading(false)
         history.push(`/sale/${id}`)
@@ -531,6 +585,7 @@ const ProjectSetup = () => {
       name: data.data.name,
       symbol: data.data.symbol,
       decimal: data.data.decimal,
+      totalSupply: data.data.totalSupply,
     })
     setDisplayInfo(true)
     setIsValidStep1(true)
@@ -1356,8 +1411,22 @@ const ProjectSetup = () => {
                   <button
                     className="btn btn-primary px-3 fw-bolder"
                     type="submit"
+                    disabled={isLoading}
                   >
-                    Next {">>"}
+                    {isLoading ? (
+                      <>
+                        <Spinner
+                          as="span"
+                          animation="border"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                        />{" "}
+                        Processing...
+                      </>
+                    ) : (
+                      "Submit"
+                    )}
                   </button>
                 </div>
               </Form>
