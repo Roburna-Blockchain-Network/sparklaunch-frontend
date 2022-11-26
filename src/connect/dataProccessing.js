@@ -63,6 +63,10 @@ export const saveData = async values => {
       featured: false,
       featuredImage: "",
       visited: 0,
+      token: {
+        name: values.tokenName,
+        decimals: values.tokenName,
+      },
     })
 
     const requestOptions = {
