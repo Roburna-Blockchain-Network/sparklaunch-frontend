@@ -3,7 +3,7 @@ import moment from "moment/moment"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 dayjs.extend(utc)
-import { Button, Col, ProgressBar, Row, Form } from "react-bootstrap"
+import { Button, Col, ProgressBar, Row, Form, Spinner } from "react-bootstrap"
 import { NotificationManager } from "react-notifications"
 
 import { useEtherBalance, useEthers } from "@usedapp/core"
@@ -29,60 +29,52 @@ import { useSelector } from "react-redux"
 import { BIG_ONE } from "utils/numbers"
 import useIsParticipant from "hooks/useIsParticipant"
 import useParticipationData from "hooks/useParticipationData"
+import useGetRound from "hooks/useGetRound"
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
-const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
+
+const BuyDetailCard = ({ sale }) => {
   const currentDate = dayjs.utc().unix()
+
   const { account, chainId, activateBrowserWallet, library } = useEthers()
   const [buyVal, setBuyVal] = useState(0)
   const [canBuy, setCanBuy] = useState(false)
   const [enabled, setEnabled] = useState(false)
+  const [buttonStatus, setButtonStatus] = useState({
+    disabled: true,
+    text: "Please Wait",
+    loading: false,
+    init: true,
+  })
   const [participate, setParticipate] = useState()
-  const [isSeller, setIsSeller] = useState(false)
-  const [isBuyer, setIsBuyer] = useState(false)
 
-  const minBuy = Number(formatEther(saleInfo.min))
-  const maxBuy = Number(formatEther(saleInfo.max))
-  const isPublic = saleInfo.isPublic
+  const minBuy = Number(formatEther(BN.from(sale.info.minbuy)))
+  const maxBuy = Number(formatEther(BN.from(sale.info.maxbuy)))
 
-  const saleStart = BN.from(saleInfo.saleStart).toNumber()
-  const saleEnd = BN.from(saleInfo.saleEnd).toNumber()
+  const isPublic = sale.round.round1 == 0
+  const isPublicRound =
+    sale.round.public < currentDate && sale.round.end > currentDate
 
+  const inProgress =
+    sale.round.start < currentDate && sale.round.end > currentDate
+
+  const getCurrentRound = useGetRound(sale.address)
   const userBalance = useEtherBalance(account)
-  const isParticipant = useIsParticipant(saleData?.address, account)
-  const participationData = useParticipationData(saleData?.address, account)
+  const isParticipant = useIsParticipant(sale.address, account)
 
   useEffect(async () => {
     if (!account) {
       return
     }
     try {
-      const userParticipate = await getUserParticipation(
-        saleData.address,
-        account
-      )
+      const userParticipate = await getUserParticipation(sale.address, account)
       userParticipate.success ? setParticipate(userParticipate.data) : ""
       return
     } catch (error) {}
   }, [account])
 
-  let saleStatus = ""
-  if (saleStart > currentDate) {
-    saleStatus = "Not Started"
-  } else if (saleStart < currentDate && saleEnd > currentDate) {
-    saleStatus = "In Progress"
-  } else if (saleEnd < currentDate) {
-    saleStatus = "Finished"
-  }
-
   const validBuyVal = val => {
     return val >= minBuy && val <= maxBuy
   }
-
-  useEffect(() => {
-    if (account == saleInfo.saleOwner) {
-      setIsSeller(true)
-    }
-  }, [account])
 
   const handleChangeValue = val => {
     let newVal = buyVal
@@ -132,12 +124,12 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   }
 
   useEffect(() => {
-    if (account && saleStatus == "In Progress") {
-      setCanBuy(true)
-      return
+    first
+
+    return () => {
+      second
     }
-    setCanBuy(false)
-  }, [account, saleStatus])
+  }, [isParticipant])
 
   return (
     <div className="buy-detail-card" id="buy-card">
@@ -157,25 +149,33 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
         </Form.Group>
       </div>
       <div className="my-2">
-        {canBuy && account ? (
+        {account ? (
           <Button
-            disabled={enabled}
+            disabled={buttonStatus.disabled}
             className="btn buy-or-connect"
-            href="#"
-            id="links"
             onClick={() => handleBuyButton()}
           >
-            BUY
+            {buttonStatus.loading || buttonStatus.init ? (
+              <>
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />{" "}
+                {buttonStatus.init ? "PLEASE WAIT ...." : "PROCESSING..."}
+              </>
+            ) : (
+              <>{buttonStatus.text.toUpperCase()}</>
+            )}
           </Button>
         ) : (
           <Button
             className="btn buy-or-connect"
-            disabled={enabled}
-            href="#"
-            id="links"
-            onClick={!account ? () => activateBrowserWallet() : () => {}}
+            onClick={() => activateBrowserWallet()}
           >
-            {account ? saleStatus : "CONNECT WALLET"}
+            CONNECT WALLET
           </Button>
         )}
       </div>
@@ -183,7 +183,9 @@ const BuyDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
         <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50"></div>
         <div className="d-flex w-100 flex-wrap justify-content-between mb-0 py-1 border-bottom border-white border-opacity-50">
           <div className="w-25 fw-bold">Status</div>
-          <div className="text-white">{saleStatus}</div>
+          <div className={inProgress ? "text-primary" : "text-danger"}>
+            {inProgress ? "In Progress" : "Finished"}
+          </div>
         </div>
         <div className="d-flex w-100 flex-wrap justify-content-between mb-0 py-1 border-bottom border-white border-opacity-50">
           <div className="w-25 fw-bold">Sale type</div>
