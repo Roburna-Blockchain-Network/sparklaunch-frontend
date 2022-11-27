@@ -50,12 +50,14 @@ const BuyDetailCard = ({ sale }) => {
   const minBuy = Number(formatEther(BN.from(sale.info.minbuy)))
   const maxBuy = Number(formatEther(BN.from(sale.info.maxbuy)))
 
-  const isPublic = sale.round.round1 == 0
+  const isPublic = sale.info.isPublic
   const isPublicRound =
     sale.round.public < currentDate && sale.round.end > currentDate
 
   const inProgress =
     sale.round.start < currentDate && sale.round.end > currentDate
+
+  const isStarted = sale.round.start < currentDate
 
   const getCurrentRound = useGetRound(sale.address)
   const userBalance = useEtherBalance(account)
@@ -184,7 +186,11 @@ const BuyDetailCard = ({ sale }) => {
         <div className="d-flex w-100 flex-wrap justify-content-between mb-0 py-1 border-bottom border-white border-opacity-50">
           <div className="w-25 fw-bold">Status</div>
           <div className={inProgress ? "text-primary" : "text-danger"}>
-            {inProgress ? "In Progress" : "Finished"}
+            {inProgress
+              ? "In Progress"
+              : isStarted
+              ? "Finished"
+              : "Not Started"}
           </div>
         </div>
         <div className="d-flex w-100 flex-wrap justify-content-between mb-0 py-1 border-bottom border-white border-opacity-50">

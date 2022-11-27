@@ -364,26 +364,16 @@ const ProjectSetup = () => {
     const START_SALE = data.start
     const END_SALE = data.end
     const PUBLIC_SALE = data.round.public
-    // const PUBLIC_DELTA = END_SALE - (PUBLIC_SALE + 10)
-    const PUBLIC_DELTA = 10
-    let startTimes = []
-    let isPublic = "false"
+    const PUBLIC_DELTA = END_SALE - PUBLIC_SALE
 
-    if (step2.isPublic) {
-      startTimes.push(START_SALE + 1)
-      startTimes.push(START_SALE + 2)
-      startTimes.push(START_SALE + 3)
-      startTimes.push(START_SALE + 4)
-      startTimes.push(START_SALE + 5)
-      isPublic = "true"
-    } else {
-      // data.round1 = moment(data.enddt).unix()
-      startTimes.push(moment(data.round1).unix())
-      startTimes.push(moment(data.round2).unix())
-      startTimes.push(moment(data.round3).unix())
-      startTimes.push(moment(data.round4).unix())
-      startTimes.push(moment(data.round5).unix())
-    }
+    let startTimes = []
+    let isPublic = data.info.isPublic
+
+    startTimes.push(data.round.round1)
+    startTimes.push(data.round.round2)
+    startTimes.push(data.round.round3)
+    startTimes.push(data.round.round4)
+    startTimes.push(data.round.round5)
     try {
       const saleId = await contract.getNumberOfSalesDeployed()
       const tx = await contract.deployNormalSale(
@@ -495,14 +485,14 @@ const ProjectSetup = () => {
       start: step2?.startTime,
       end: step2?.endTime,
       round: {
-        round1: step2?.round1,
-        round2: step2?.round2,
-        round3: step2?.round3,
-        round4: step2?.round4,
-        round5: step2?.round5,
+        round1: step2.isPublic ? step2?.startTime + 1 : step2?.round1,
+        round2: step2.isPublic ? step2?.startTime + 2 : step2?.round2,
+        round3: step2.isPublic ? step2?.startTime + 3 : step2?.round3,
+        round4: step2.isPublic ? step2?.startTime + 4 : step2?.round4,
+        round5: step2.isPublic ? step2?.startTime + 5 : step2?.round5,
         start: step2?.startTime,
         end: step2?.endTime,
-        public: step2?.publicTime,
+        public: step2.isPublic ? step2?.startTime + 10 : step2?.publicTime,
       },
       info: {
         softcap: parseEther(step2.softCap.toString()).toString(),
@@ -519,6 +509,7 @@ const ProjectSetup = () => {
         ).toString(),
         lpPercent: (step2.liquidityPercent * 100).toString(),
         liquidityLock: (step2?.liquidityLock * 86400).toString(),
+        isPublic: step2.isPublic,
       },
       token: {
         name: tokenInfo.name,
