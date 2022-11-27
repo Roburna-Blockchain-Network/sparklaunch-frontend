@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react"
 import moment from "moment/moment"
 
-import { Button, Col, ProgressBar, Row, Placeholder } from "react-bootstrap"
+import {
+  Button,
+  Col,
+  Card,
+  ProgressBar,
+  Row,
+  Placeholder,
+} from "react-bootstrap"
 
 import discordLogo from "assets/images/icons/discord.png"
 import { Link, useHistory, useParams } from "react-router-dom"
@@ -12,7 +19,7 @@ import {
   parseEther,
   parseUnits,
 } from "ethers/lib/utils"
-import { BigNumber as BN } from "ethers"
+import { BigNumber, BigNumber as BN } from "ethers"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 dayjs.extend(utc)
@@ -20,6 +27,10 @@ import Countdown, { zeroPad } from "react-countdown"
 import { updateSaleTime } from "store/actions"
 import { CHAIN_NATIVE_SYMBOL } from "constants/Address"
 import AuditInfo from "pages/Public/details/AuditInfo"
+import useSaleIsSuccess from "hooks/useSaleIsSuccess"
+import useSaleFinished from "hooks/useSaleIsFinished"
+import useSaleInfo from "hooks/useSaleInfo"
+import { formatBigToNum, formatNumber, NativePrice } from "utils/helpers"
 
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
 const Completionist = () => <span>Sale is End</span>
@@ -53,13 +64,29 @@ const renderer2 = ({ days, hours, minutes, completed }) => {
   }
 }
 
+const RaisedInfo = ({ address }) => {
+  const info = useSaleInfo(address)
+
+  return (
+    <>
+      {info ? (
+        <>
+          {formatBigToNum(info.totalBNBRaised.toString(), 18, 0)}{" "}
+          {CHAIN_NATIVE_SYMBOL}
+        </>
+      ) : (
+        <Placeholder as={Card.Text} animation="glow">
+          <Placeholder xs={6} />
+        </Placeholder>
+      )}
+    </>
+  )
+}
+
 const SaleCard = ({ sale }) => {
   const currentDate = moment().unix()
   let history = useHistory()
-  const dispatch = useDispatch()
-  const users = useSelector(state => state.User)
   const [ready, setReady] = useState(true)
-  const [tokenPriceOriginal, setTokenPriceOriginal] = useState()
 
   const handleClick = e => {
     if (e.target.id === "social" || e.target.id === "links") {
@@ -72,19 +99,15 @@ const SaleCard = ({ sale }) => {
   const saleInfo = sale?.info
   const tokenInfo = sale?.token
 
-  const formattedRaised = saleInfo?.raisedBNB
-    ? formatEther(saleInfo?.raisedBNB)
-    : 0
-  const percentSold = saleInfo?.hardCapBNB
-    ? (formattedRaised * 100) / (formatEther(saleInfo?.hardCapBNB) * 1)
-    : 0
+  const isFinish = sale.round.end < currentDate
+  const isStart = sale.round.start < currentDate
 
-  const isFinish = saleInfo.saleEnd < currentDate
-  const isStart = saleInfo.saleStart < currentDate
+  const isSuccess = useSaleIsSuccess(sale.address)
+  const isClosed = useSaleFinished(sale.address)
 
   const timeCountDown = isStart
-    ? dayjs.utc(saleInfo.saleEnd * 1000)
-    : dayjs.utc(saleInfo.saleStart * 1000)
+    ? dayjs.utc(sale.round.end * 1000)
+    : dayjs.utc(sale.round.start * 1000)
   const rendererCountDown = isStart ? renderer : renderer2
 
   return (
@@ -100,8 +123,8 @@ const SaleCard = ({ sale }) => {
         >
           <div className="d-flex flex-nowrap">
             <div className="flex-grow-1">
-              <h4 className="text-primary mb-0">{tokenInfo?.name}</h4>
-              <h5>{tokenInfo?.symbol ? tokenInfo.symbol : "SPL"}</h5>
+              <h4 className="text-primary mb-0">{sale.name}</h4>
+              <h5>{tokenInfo?.name ? tokenInfo.name : "SPL"}</h5>
             </div>
 
             <div>
@@ -163,25 +186,24 @@ const SaleCard = ({ sale }) => {
             </li>
           </ul>
 
-          {saleInfo?.saleStart > currentDate && (
+          {sale.round.start > currentDate && (
             <span className="bg-primary text-dark fw-bold px-2 rounded-pill font-size-11 me-2">
               UPCOMING
             </span>
           )}
-          {saleInfo?.saleStart < currentDate &&
-          saleInfo?.saleEnd > currentDate ? (
+          {sale.round.start < currentDate && sale.round.end > currentDate ? (
             <span className="bg-primary text-dark fw-bold px-2 rounded-pill font-size-11 me-2">
               LIVE
             </span>
           ) : (
             <></>
           )}
-          {saleInfo?.saleEnd < currentDate && (
+          {sale.round.end < currentDate && (
             <span className="bg-primary text-dark fw-bold px-2 rounded-pill font-size-11 me-2">
               ENDED
             </span>
           )}
-          {saleInfo?.isFinished && (
+          {isClosed && (
             <span className="bg-primary text-dark fw-bold px-2 rounded-pill font-size-11 me-2">
               CLOSED
             </span>
@@ -193,18 +215,30 @@ const SaleCard = ({ sale }) => {
 
           <div className="text-white font-size-11">
             <Row className="mb-2">
+              <Col xs={4}>Soft Cap </Col>
+              <Col xs={8} className="text-primary fs-6 text-end fw-bold">
+                {formatBigToNum(sale.info.softcap, 18, 0)} {CHAIN_NATIVE_SYMBOL}
+              </Col>
+            </Row>
+            <Row className="mb-2">
+              <Col xs={4}>Hard Cap </Col>
+              <Col xs={8} className="text-primary fs-6 text-end fw-bold">
+                {formatBigToNum(sale.info.hardcap, 18, 0)} {CHAIN_NATIVE_SYMBOL}
+              </Col>
+            </Row>
+            <Row className="mb-2">
               <Col xs={4}>Total Raise </Col>
               <Col xs={8} className="text-primary fs-6 text-end fw-bold">
-                {formattedRaised} {CHAIN_NATIVE_SYMBOL}
+                <RaisedInfo address={sale.address} />
               </Col>
             </Row>
 
             <Row className="mb-2">
               <Col xs={4}>Starts</Col>
               <Col xs={8} className="text-primary fs-6 text-end fw-bold">
-                {saleInfo
+                {sale
                   ? dayjs
-                      .utc(saleInfo.saleStart * 1000)
+                      .utc(sale.round.start * 1000)
                       .format(DEFAULT_DATE_FORMAT)
                   : 0}
               </Col>
@@ -213,7 +247,11 @@ const SaleCard = ({ sale }) => {
             <Row className="mb-2">
               <Col xs={4}>Price</Col>
               <Col xs={8} className="text-primary fs-6 text-end fw-bold">
-                {saleInfo ? formatEther(saleInfo?.tokenPrice) : 0}{" "}
+                {saleInfo
+                  ? formatNumber(
+                      NativePrice(saleInfo.saleRate, tokenInfo.decimals)
+                    )
+                  : 0}{" "}
                 {CHAIN_NATIVE_SYMBOL}
               </Col>
             </Row>
@@ -229,11 +267,10 @@ const SaleCard = ({ sale }) => {
                   renderer={rendererCountDown}
                 ></Countdown>
               )}
-
-              <span className="text-primary">{percentSold} %</span>
+              <span className="text-primary"> %</span>
             </div>
 
-            <ProgressBar className="mt-2" variant="primary" now={percentSold} />
+            <ProgressBar className="mt-2" variant="primary" now="15" />
 
             <Row className="mt-3 font-size-10">
               <Col xs={4}>1 {CHAIN_NATIVE_SYMBOL} (approx)</Col>
@@ -242,13 +279,12 @@ const SaleCard = ({ sale }) => {
               </Col>
 
               <Col xs={4} className="text-primary fs-6 fw-bold">
-                {tokenPriceOriginal} {tokenInfo.symbol}
+                {formatBigToNum(sale.info.saleRate, sale.token.decimals, 0)}{" "}
+                {tokenInfo.symbol}
               </Col>
               <Col xs={8} className="text-primary text-end fs-6 fw-bold">
                 {saleInfo
-                  ? dayjs
-                      .utc(saleInfo.saleEnd * 1000)
-                      .format(DEFAULT_DATE_FORMAT)
+                  ? dayjs.utc(sale.round.end * 1000).format(DEFAULT_DATE_FORMAT)
                   : 0}
               </Col>
             </Row>

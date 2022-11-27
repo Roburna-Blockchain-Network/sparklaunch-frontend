@@ -464,6 +464,7 @@ const ProjectSetup = () => {
 
   const saveToBackend = async value => {
     const input = JSON.stringify(value)
+    console.log(input)
     try {
       const requestOptions = {
         method: "POST",

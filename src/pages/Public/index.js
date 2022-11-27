@@ -7,31 +7,21 @@ import { Col, Container, Row } from "react-bootstrap"
 import { fetchAllSales } from "connect/dataProccessing"
 import SaleCard from "components/SaleCard"
 import smLogo from "assets/images/logos/smlogo.png"
-import api from "connect/BaseApi"
 import Hero from "./home/Hero"
 import FeaturedCard from "./home/FeaturedCard"
-import { useDispatch, useSelector } from "react-redux"
-import { setInitialSales, setSaleDeployed } from "store/actions"
 import { BigNumber } from "ethers"
-import { useEthers } from "@usedapp/core"
-import { getRoundInfo, getSaleInfo, getTokenInfo } from "utils/factoryHelper"
 import { CHAIN_NUMBER } from "constants/Address"
 
 const currentDate = dayjs.utc().unix()
 
 const Public = props => {
-  const dispatch = useDispatch()
-  const allSales = useSelector(state => state.Sales)
-
-  const { chainId, account } = useEthers()
-
+  const [allSales, setAllSales] = useState("")
   const [filtered, setFiltered] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedBtn, setSelectedBtn] = useState("ALL")
 
   const contains = (item, searchValue) => {
-    // console.log(currentDate)
     if (
       searchValue === null ||
       searchValue.trim() === "" ||
@@ -95,36 +85,18 @@ const Public = props => {
   }
 
   useEffect(async () => {
-    console.log(`effect run`)
-    console.log(allSales)
     setIsLoading(true)
-    if (!allSales.isInit) {
-      try {
-        const sales = await fetchAllSales(CHAIN_NUMBER)
-        for (const sale of sales) {
-          const [token, round, info] = await Promise.all([
-            getTokenInfo(sale.tokenAddress),
-            getRoundInfo(sale.address),
-            getSaleInfo(sale.address),
-          ])
-
-          if (info.success && token.success && round.success) {
-            sale.info = info?.data
-            sale.token = token?.data
-            sale.round = round?.data
-          } else {
-            setIsLoading(true)
-            return
-          }
-        }
-        dispatch(setInitialSales(sales))
-      } catch (error) {
-        console.log(error)
-        setIsLoading(true)
+    try {
+      const sales = await fetchAllSales(CHAIN_NUMBER)
+      if (sales.length > 0) {
+        setAllSales(sales)
       }
+    } catch (error) {
+      console.log(error)
+      setIsLoading(true)
     }
     setIsLoading(false)
-  }, [dispatch])
+  }, [])
 
   return (
     <React.Fragment>
@@ -215,9 +187,9 @@ const Public = props => {
                 </Row>
 
                 <Row className="g-4 my-4">
-                  {allSales.sales?.length > 0 ? (
-                    allSales.sales
-                      ?.filter(item => {
+                  {allSales ? (
+                    allSales
+                      .filter(item => {
                         return contains(item, filtered)
                       })
                       .map((sale, key) => (

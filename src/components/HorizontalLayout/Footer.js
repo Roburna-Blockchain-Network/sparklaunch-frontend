@@ -58,12 +58,6 @@ const Footer = props => {
                     <i className="bx bxl-telegram fs-3" />
                   </a>
                 </li>
-
-                <li className="ms-2">
-                  <a href="#">
-                    <i className="bx bxl-linkedin fs-3" />
-                  </a>
-                </li>
               </ul>
             </Col>
 
