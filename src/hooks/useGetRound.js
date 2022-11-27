@@ -4,23 +4,23 @@ import SaleAbi from "constants/abi/Sale.json"
 import { useCall, useEthers } from "@usedapp/core"
 import { FACTORY_ADDRESS } from "constants/Address"
 
-function useIsParticipant(saleAddress, account) {
+function useGetRound(saleAddress) {
   const { value, error } =
     useCall(
       {
         contract: new Contract(saleAddress, SaleAbi),
-        method: "isParticipated",
-        args: [account],
+        method: "getCurrentRound",
+        args: [],
       },
       {
-        refresh: 10,
+        refresh: 20,
       }
     ) ?? {}
   if (error) {
-    // console.log(error)
-    return false
+    console.log(error)
+    return error
   }
-  return value?.[0]
+  return value?.[0].toNumber()
 }
 
-export default useIsParticipant
+export default useGetRound

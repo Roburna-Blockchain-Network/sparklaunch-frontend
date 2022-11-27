@@ -32,7 +32,7 @@ import utc from "dayjs/plugin/utc"
 import { isValidUrl } from "utils/helpers"
 dayjs.extend(utc)
 
-const AdminDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
+const AdminDetailCard = ({ sale }) => {
   const currentDate = dayjs.utc().unix()
   const { account, chainId, activateBrowserWallet, library } = useEthers()
   const [showModal, setShowModal] = useState(false)
@@ -103,7 +103,7 @@ const AdminDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
 
     try {
       const input = JSON.stringify({
-        _id: saleData._id,
+        _id: sale._id,
         kyc: kycLink,
         audit: auditLink,
       })

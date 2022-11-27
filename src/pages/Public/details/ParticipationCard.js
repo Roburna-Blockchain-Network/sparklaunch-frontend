@@ -37,20 +37,16 @@ import useSaleFinished from "hooks/useSaleIsFinished"
 import useSaleIsSuccess from "hooks/useSaleIsSuccess"
 dayjs.extend(utc)
 
-const ParticipationCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
+const ParticipationCard = ({ sale }) => {
   const currentDate = dayjs.utc().unix()
   const { account, chainId, activateBrowserWallet, library } = useEthers()
   const [showModal, setShowModal] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
 
-  const isParticipant = useIsParticipant(saleInfo.address, account)
-  const contribution = useParticipationData(saleInfo.address, account)
-  const isSaleFinish = useSaleFinished(saleInfo.address)
-  const isSaleSuccess = useSaleIsSuccess(saleInfo.address)
-
-  // console.log(`isParticipant`, isParticipant)
-  // console.log(`isSaleFinish`, isSaleFinish)
-  // console.log(`contribution`, contribution)
+  const isParticipant = useIsParticipant(sale.address, account)
+  const contribution = useParticipationData(sale.address, account)
+  const isSaleFinish = useSaleFinished(sale.address)
+  const isSaleSuccess = useSaleIsSuccess(sale.address)
 
   const handleConfirm = async e => {
     setIsProcessing(true)
@@ -67,13 +63,13 @@ const ParticipationCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
       await tx.wait()
       NotificationManager.success(
         `Withdraw ${
-          isSaleSuccess ? tokenInfo.symbol : CHAIN_NATIVE_SYMBOL
+          isSaleSuccess ? sale.token.symbol : CHAIN_NATIVE_SYMBOL
         } is Success  `,
         "Thanks"
       )
     } catch (error) {
       NotificationManager.error(
-        `${isSaleSuccess ? tokenInfo.symbol : CHAIN_NATIVE_SYMBOL} is Fail`,
+        `${isSaleSuccess ? sale.token.symbol : CHAIN_NATIVE_SYMBOL} is Fail`,
         "Sorry"
       )
     }
@@ -86,47 +82,43 @@ const ParticipationCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
 
   return (
     <>
-      {isParticipant ? (
-        <div className="buy-detail-card" id="buy-card">
-          <div className="d-flex w-100 flex-wrap mb-0 py-1 border-white border-opacity-50 justify-content-center">
-            <div className="fs-5 fw-bold mb-2">YOUR CONTRIBUTION</div>
-          </div>
-          <div className="text-white font-size-11 mb-3">
-            <div className="d-flex w-100 flex-wrap justify-content-between mb-0 py-1 border-bottom border-white border-opacity-50"></div>
-            <div className="d-flex w-100 flex-wrap justify-content-between mb-0 py-1 border-bottom border-white border-opacity-50">
-              <div className="fw-bold">Bought </div>
-              {contribution && (
-                <div className="text-white">
-                  {formatUnits(contribution[0], tokenInfo.decimals)}{" "}
-                  {tokenInfo.symbol}
-                </div>
-              )}
-            </div>
-            <div className="d-flex w-100 flex-wrap justify-content-between mb-0 py-1 border-bottom border-white border-opacity-50">
-              <div className="fw-bold">Paid </div>
-              {contribution && (
-                <div className="text-white">
-                  {formatUnits(contribution[1], 18)} {CHAIN_NATIVE_SYMBOL}
-                </div>
-              )}
-            </div>
-          </div>
-          {isSaleFinish ? (
-            <Button
-              className="btn buy-or-connect mb-2"
-              onClick={() => {
-                setShowModal(true)
-              }}
-            >
-              WITHDRAW {isSaleSuccess ? tokenInfo.symbol : CHAIN_NATIVE_SYMBOL}
-            </Button>
-          ) : (
-            <></>
-          )}
+      <div className="buy-detail-card" id="buy-card">
+        <div className="d-flex w-100 flex-wrap mb-0 py-1 border-white border-opacity-50 justify-content-center">
+          <div className="fs-5 fw-bold mb-2">YOUR CONTRIBUTION</div>
         </div>
-      ) : (
-        <></>
-      )}
+        <div className="text-white font-size-11 mb-3">
+          <div className="d-flex w-100 flex-wrap justify-content-between mb-0 py-1 border-bottom border-white border-opacity-50"></div>
+          <div className="d-flex w-100 flex-wrap justify-content-between mb-0 py-1 border-bottom border-white border-opacity-50">
+            <div className="fw-bold">Bought </div>
+            {contribution && (
+              <div className="text-white">
+                {formatUnits(contribution[0], sale.token.decimals)}{" "}
+                {sale.token.symbol}
+              </div>
+            )}
+          </div>
+          <div className="d-flex w-100 flex-wrap justify-content-between mb-0 py-1 border-bottom border-white border-opacity-50">
+            <div className="fw-bold">Paid </div>
+            {contribution && (
+              <div className="text-white">
+                {formatUnits(contribution[1], 18)} {CHAIN_NATIVE_SYMBOL}
+              </div>
+            )}
+          </div>
+        </div>
+        {isParticipant && isSaleFinish ? (
+          <Button
+            className="btn buy-or-connect mb-2"
+            onClick={() => {
+              setShowModal(true)
+            }}
+          >
+            WITHDRAW {isSaleSuccess ? sale.token.symbol : CHAIN_NATIVE_SYMBOL}
+          </Button>
+        ) : (
+          <></>
+        )}
+      </div>
 
       <Modal
         backdrop="static"
@@ -143,7 +135,7 @@ const ParticipationCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
             <div className="text-center">
               <div className="mb-3 fs-4">
                 Are you sure want to Withdraw{" "}
-                {isSaleSuccess ? tokenInfo.symbol : CHAIN_NATIVE_SYMBOL}{" "}
+                {isSaleSuccess ? sale.token.symbol : CHAIN_NATIVE_SYMBOL}{" "}
               </div>
               <button
                 className="btn btn-primary px-3 fw-bolder w-100 text-nowrap mb-3"

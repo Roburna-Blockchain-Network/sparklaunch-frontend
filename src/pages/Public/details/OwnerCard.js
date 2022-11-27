@@ -22,20 +22,22 @@ import { Contract } from "@ethersproject/contracts"
 import { NotificationManager } from "react-notifications"
 
 import SaleAbi from "constants/abi/Sale.json"
-
+import useSaleInfo from "hooks/useSaleInfo"
 import useIsAdmin from "hooks/useIsAdmin"
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
+import useSaleFinished from "hooks/useSaleIsFinished"
 dayjs.extend(utc)
 
-const OwnerCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
+const OwnerCard = ({ sale }) => {
   const currentDate = dayjs.utc().unix()
   const { account, library } = useEthers()
   const [showModal, setShowModal] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isSaleOwner, setIsSaleOwner] = useState(false)
   const [isAlreadyEnd, setIsAlreadyEnd] = useState(false)
+  const [finalize, setFinalize] = useState(false)
 
   const isUserAdmin = useIsAdmin(account)
 
@@ -69,32 +71,42 @@ const OwnerCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
     }, 2000)
   }
 
+  const isFinished = useSaleFinished(sale.address)
+  const getInfo = useSaleInfo(sale.address)
+
   useEffect(() => {
-    if (saleInfo.isFinished) {
+    if (isFinished) {
       setIsAlreadyEnd(true)
     }
-    if (account == saleInfo.saleOwner) {
+  }, [isFinished])
+
+  const isSaleTimeEnd = sale.round.end < currentDate
+
+  useEffect(() => {
+    if (typeof getInfo == "undefined") {
+      return
+    }
+    if (account == getInfo.saleOwner) {
       setIsSaleOwner(true)
     } else {
       setIsSaleOwner(false)
     }
-  }, [account, saleInfo])
+    const newFinalize = BigNumber.from(sale.info.softcap).lte(
+      getInfo.totalBNBRaised
+    )
 
-  const isSaleTimeEnd = roundInfo.end < currentDate
-  const finalize = BigNumber.from(saleInfo.softCapBNB).lte(
-    BigNumber.from(saleInfo.raisedBNB)
-  )
+    setFinalize(newFinalize)
+  }, [getInfo, account])
 
   return (
     <>
-      {isAlreadyEnd || !isSaleTimeEnd ? (
-        <></>
-      ) : isUserAdmin || isSaleOwner ? (
+      {isUserAdmin || isSaleOwner ? (
         <div className="buy-detail-card" id="buy-card">
           <div className="d-flex w-100 flex-wrap mb-0 py-1 border-white border-opacity-50 justify-content-center">
             <div className="fs-5 fw-bold mb-2">SALE OWNER ADMINISTRATION</div>
             <Button
-              className="btn buy-or-connect mb-2"
+              disabled={isAlreadyEnd || !isSaleTimeEnd}
+              className="btn btn buy-or-connect mb-2"
               onClick={() => {
                 setShowModal(true)
               }}

@@ -64,29 +64,15 @@ const renderer2 = ({ days, hours, minutes, completed }) => {
   }
 }
 
-const RaisedInfo = ({ address }) => {
-  const info = useSaleInfo(address)
-
-  return (
-    <>
-      {info ? (
-        <>
-          {formatBigToNum(info.totalBNBRaised.toString(), 18, 0)}{" "}
-          {CHAIN_NATIVE_SYMBOL}
-        </>
-      ) : (
-        <Placeholder as={Card.Text} animation="glow">
-          <Placeholder xs={6} />
-        </Placeholder>
-      )}
-    </>
-  )
-}
-
 const SaleCard = ({ sale }) => {
   const currentDate = moment().unix()
   let history = useHistory()
   const [ready, setReady] = useState(true)
+
+  const [raised, setRaised] = useState({
+    amount: "0",
+    percent: "0",
+  })
 
   const handleClick = e => {
     if (e.target.id === "social" || e.target.id === "links") {
@@ -105,10 +91,29 @@ const SaleCard = ({ sale }) => {
   const isSuccess = useSaleIsSuccess(sale.address)
   const isClosed = useSaleFinished(sale.address)
 
+  const getInfo = useSaleInfo(sale.address)
+
   const timeCountDown = isStart
     ? dayjs.utc(sale.round.end * 1000)
     : dayjs.utc(sale.round.start * 1000)
   const rendererCountDown = isStart ? renderer : renderer2
+
+  useEffect(() => {
+    if (typeof getInfo == "undefined") {
+      return
+    }
+    // if (getInfo.totalBNBRaised.toString() == "0") {
+    //   return
+    // }
+    const percents = getInfo.totalBNBRaised.mul(100).div(getInfo.hardCap)
+    const newRaised = formatBigToNum(getInfo.totalBNBRaised.toString(), 18, 0)
+    const newPercent = formatBigToNum(percents.toString(), 18, 0)
+
+    setRaised({
+      amount: newRaised,
+      percent: newPercent,
+    })
+  }, [getInfo])
 
   return (
     <>
@@ -229,7 +234,16 @@ const SaleCard = ({ sale }) => {
             <Row className="mb-2">
               <Col xs={4}>Total Raise </Col>
               <Col xs={8} className="text-primary fs-6 text-end fw-bold">
-                <RaisedInfo address={sale.address} />
+                {getInfo ? (
+                  <>
+                    {formatBigToNum(getInfo.totalBNBRaised.toString(), 18, 0)}{" "}
+                    {CHAIN_NATIVE_SYMBOL}
+                  </>
+                ) : (
+                  <Placeholder as={Card.Text} animation="glow">
+                    <Placeholder xs={6} />
+                  </Placeholder>
+                )}
               </Col>
             </Row>
 
@@ -267,10 +281,14 @@ const SaleCard = ({ sale }) => {
                   renderer={rendererCountDown}
                 ></Countdown>
               )}
-              <span className="text-primary"> %</span>
+              <span className="text-primary">{raised.percent} %</span>
             </div>
 
-            <ProgressBar className="mt-2" variant="primary" now="15" />
+            <ProgressBar
+              className="mt-2"
+              variant="primary"
+              now={raised.percent}
+            />
 
             <Row className="mt-3 font-size-10">
               <Col xs={4}>1 {CHAIN_NATIVE_SYMBOL} (approx)</Col>

@@ -24,6 +24,7 @@ import AdminDetailCard from "./details/AdminDetailCard"
 import TokenInfo from "./details/TokenInfo"
 import OwnerCard from "./details/OwnerCard"
 import ParticipationCard from "./details/ParticipationCard"
+import { formatBigToNum } from "utils/helpers"
 dayjs.extend(utc)
 
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
@@ -31,11 +32,7 @@ const currentDate = dayjs.utc()
 const SaleDetails = props => {
   const [isLoading, setIsLoading] = useState(false)
   const [ready, setReady] = useState(false)
-  const [init, setInit] = useState(true)
-  const [saleData, setSaleData] = useState()
-  const [tokenInfo, setTokenInfo] = useState()
-  const [saleInfo, setSaleInfo] = useState()
-  const [roundInfo, setRoundInfo] = useState()
+  const [sale, setSale] = useState()
   const [tokenPriceOriginal, setTokenPriceOriginal] = useState()
   const history = useHistory()
   const { id } = useParams()
@@ -54,35 +51,10 @@ const SaleDetails = props => {
         alert(`sale not found`)
         history.push("/")
       }
-      if (!mountedRef.current) return null
-      setSaleData(res.data[0])
-      const token = await getTokenInfo(res.data[0].tokenAddress)
-      if (!mountedRef.current) return null
-      const sales = await getSaleInfo(res.data[0].address)
-      if (!mountedRef.current) return null
-      const round = await getRoundInfo(res.data[0].address)
-      if (!mountedRef.current) return null
-      if (round.success) {
-        if (!mountedRef.current) return null
-        setRoundInfo(round.data)
-      }
-      if (token.success) {
-        if (!mountedRef.current) return null
-        setTokenInfo(token.data)
-      }
-
-      if (sales.success) {
-        if (!mountedRef.current) return null
-        const tokenDec = parseUnits("1", tokenInfo?.decimals)
-        const tokenPrice = tokenDec.div(sales.data.tokenPriceBNB).toString()
-        setTokenPriceOriginal(tokenPrice)
-        setSaleInfo(sales.data)
-      }
+      setSale(res.data[0])
     } catch (error) {
       console.log(error)
     }
-
-    if (!mountedRef.current) return null
     setReady(true)
 
     return () => {
@@ -90,6 +62,8 @@ const SaleDetails = props => {
       abortController.abort()
     }
   }, [])
+
+  console.log(sale)
 
   return (
     <React.Fragment>
@@ -114,14 +88,14 @@ const SaleDetails = props => {
                     <div className="avatar-md me-3">
                       <div className="avatar-title bg-primary bg-softer border border-primary rounded-circle overflow-hidden">
                         <img
-                          src={saleData?.saleLinks?.logo}
+                          src={sale.saleLinks.logo}
                           style={{
                             height: "100%",
                             width: "100%",
                             objectFit: "cover",
                             objectPosition: "10% 20%",
                           }}
-                          alt={tokenInfo?.symbol ? tokenInfo?.symbol : "SPL"}
+                          alt={sale.token.symbol ? sale.token.symbol : "SPL"}
                         />
                       </div>
                     </div>
@@ -129,9 +103,9 @@ const SaleDetails = props => {
 
                   <div className="flex-grow-1">
                     <h3 className="text-primary mb-0 me-2 fw-bold">
-                      {saleData?.saleToken?.name}
+                      {sale.name}
                     </h3>
-                    <h5>{saleData?.saleToken?.symbol}</h5>
+                    <h5>{sale.token.symbol}</h5>
                   </div>
 
                   <div>
@@ -152,16 +126,14 @@ const SaleDetails = props => {
                 </div>
 
                 <p className="my-3 text-white font-size-12 line-truncate-2">
-                  {saleData?.description}
+                  {sale.description}
                 </p>
 
                 <ul className="list-unstyled d-flex my-4">
                   <li className="ms-2">
                     <a
                       href={
-                        saleData?.saleLinks.twitter
-                          ? saleData?.saleLinks.twitter
-                          : "#"
+                        sale.saleLinks.twitter ? sale.saleLinks.twitter : "#"
                       }
                     >
                       <i className="bx bxl-twitter fs-3" />
@@ -171,9 +143,7 @@ const SaleDetails = props => {
                   <li className="ms-2">
                     <a
                       href={
-                        saleData?.saleLinks.discord
-                          ? saleData?.saleLinks.discord
-                          : "#"
+                        sale.saleLinks.discord ? sale.saleLinks.discord : "#"
                       }
                     >
                       <img src={discordLogo} alt="discord" />
@@ -183,9 +153,7 @@ const SaleDetails = props => {
                   <li className="ms-2">
                     <a
                       href={
-                        saleData?.saleLinks.telegram
-                          ? saleData?.saleLinks.telegram
-                          : "#"
+                        sale.saleLinks.telegram ? sale.saleLinks.telegram : "#"
                       }
                     >
                       <i className="bx bxl-telegram fs-3" />
@@ -195,21 +163,11 @@ const SaleDetails = props => {
 
                 <div className="text-white font-size-14 mb-4">
                   <h5 className="text-primary">POOL DETAILS</h5>
-
                   <Row>
                     <Col>
                       <p>
                         <span className="fw-bold">Access Type : </span>
-                        {saleInfo?.isPublic ? "Public" : "Private"}
-                      </p>
-                    </Col>
-                    <Col>
-                      <p>
-                        <span className="fw-bold">Hard Cap : </span>
-                        {saleInfo
-                          ? formatUnits(saleInfo.hardCap, tokenInfo?.decimals)
-                          : 0}{" "}
-                        {tokenInfo?.symbol}
+                        {sale.round.round1 == 0 ? "Public" : "Private"}
                       </p>
                     </Col>
                   </Row>
@@ -217,8 +175,13 @@ const SaleDetails = props => {
                   <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
                     <div className="w-25 fw-bold">Presale Rate</div>
                     <div className="text-primary">
-                      : 1 {CHAIN_NATIVE_SYMBOL} : {tokenPriceOriginal}{" "}
-                      {tokenInfo?.symbol}
+                      : 1 {CHAIN_NATIVE_SYMBOL} :{" "}
+                      {formatBigToNum(
+                        sale.info.saleRate,
+                        sale.token.decimals,
+                        0
+                      )}{" "}
+                      {sale.token.symbol}
                     </div>
                   </div>
 
@@ -226,11 +189,12 @@ const SaleDetails = props => {
                     <div className="w-25 fw-bold">Dex Swap Rate</div>
                     <div className="text-primary">
                       : 1 {CHAIN_NATIVE_SYMBOL} :{" "}
-                      {formatUnits(
-                        BigNumber.from(saleInfo.listingRate),
-                        tokenInfo.decimals
-                      ) * 1}{" "}
-                      {tokenInfo.symbol}
+                      {formatBigToNum(
+                        sale.info.dexRate,
+                        sale.token.decimals,
+                        0
+                      )}{" "}
+                      {sale.token.symbol}
                     </div>
                   </div>
 
@@ -239,28 +203,19 @@ const SaleDetails = props => {
                     <div className="text-primary">
                       :{" "}
                       {dayjs
-                        .utc(saleInfo.saleStart * 1000)
+                        .utc(sale.round.start * 1000)
                         .format(DEFAULT_DATE_FORMAT)}{" "}
                       -{" "}
                       {dayjs
-                        .utc(saleInfo.saleEnd * 1000)
+                        .utc(sale.round.end * 1000)
                         .format(DEFAULT_DATE_FORMAT)}
                     </div>
                   </div>
 
-                  {/* <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
-                    <div className="w-25 fw-bold">Base Allocation</div>
-                    <div className="text-primary">
-                      : {formatUnits(saleInfo.softCap, tokenInfo.decimals)} -{" "}
-                      {formatUnits(saleInfo.hardCap, tokenInfo.decimals)}{" "}
-                      {tokenInfo.symbol}
-                    </div>
-                  </div> */}
-
                   <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
                     <div className="w-25 fw-bold">Soft Cap</div>
                     <div className="text-primary">
-                      : {formatUnits(saleInfo.softCapBNB, 18)}{" "}
+                      : {formatBigToNum(sale.info.softcap, 18, 0)}{" "}
                       {CHAIN_NATIVE_SYMBOL}
                     </div>
                   </div>
@@ -268,7 +223,7 @@ const SaleDetails = props => {
                   <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
                     <div className="w-25 fw-bold">Hard Cap</div>
                     <div className="text-primary">
-                      : {formatUnits(saleInfo.hardCapBNB, 18)}{" "}
+                      : {formatBigToNum(sale.info.hardcap, 18, 0)}{" "}
                       {CHAIN_NATIVE_SYMBOL}
                     </div>
                   </div>
@@ -276,44 +231,21 @@ const SaleDetails = props => {
 
                 <div className="row">
                   <Col md={7}>
-                    <TokenInfo info={tokenInfo} />
+                    <TokenInfo info={sale.token} />
                   </Col>
                 </div>
               </Col>
 
               <Col md={4}>
-                <SaleDetailCard
-                  saleData={saleData}
-                  tokenInfo={tokenInfo}
-                  saleInfo={saleInfo}
-                  roundInfo={roundInfo}
-                />
+                <SaleDetailCard sale={sale} />
 
-                <BuyDetailCard
-                  saleData={saleData}
-                  tokenInfo={tokenInfo}
-                  saleInfo={saleInfo}
-                  roundInfo={roundInfo}
-                />
+                <BuyDetailCard sale={sale} />
 
-                <ParticipationCard
-                  saleData={saleData}
-                  tokenInfo={tokenInfo}
-                  saleInfo={saleInfo}
-                  roundInfo={roundInfo}
-                />
-                <AdminDetailCard
-                  saleData={saleData}
-                  tokenInfo={tokenInfo}
-                  saleInfo={saleInfo}
-                  roundInfo={roundInfo}
-                />
-                <OwnerCard
-                  saleData={saleData}
-                  tokenInfo={tokenInfo}
-                  saleInfo={saleInfo}
-                  roundInfo={roundInfo}
-                />
+                <ParticipationCard sale={sale} />
+
+                <AdminDetailCard sale={sale} />
+
+                <OwnerCard sale={sale} />
               </Col>
             </Row>
           )}

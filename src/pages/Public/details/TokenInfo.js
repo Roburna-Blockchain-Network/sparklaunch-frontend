@@ -1,5 +1,5 @@
 import React from "react"
-import { formatBigNumber } from "utils/numbers"
+import { formatBigToNum } from "utils/helpers"
 
 const TokenInfo = ({ info }) => {
   return (
@@ -20,7 +20,7 @@ const TokenInfo = ({ info }) => {
       <div className="d-flex w-100 flex-wrap mb-0 py-1">
         <div className="w-25 fw-bold">Supply</div>
         <div className="text-primary">
-          : {formatBigNumber(info.totalSupply, info.decimals)}
+          : {formatBigToNum(info.totalSupply, info.decimals)}
         </div>
       </div>
       <div className="d-flex w-100 flex-wrap mb-0 py-1">

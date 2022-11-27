@@ -123,13 +123,13 @@ const BuyDetailCard = ({ sale }) => {
     }
   }
 
-  useEffect(() => {
-    first
+  // useEffect(() => {
+  //   first
 
-    return () => {
-      second
-    }
-  }, [isParticipant])
+  //   return () => {
+  //     second
+  //   }
+  // }, [isParticipant])
 
   return (
     <div className="buy-detail-card" id="buy-card">
