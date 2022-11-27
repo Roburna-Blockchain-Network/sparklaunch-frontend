@@ -13,7 +13,7 @@ function useIsParticipant(saleAddress, account) {
         args: [account],
       },
       {
-        refresh: 10,
+        refresh: "everyBlock",
       }
     ) ?? {}
   if (error) {

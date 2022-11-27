@@ -63,17 +63,6 @@ const BuyDetailCard = ({ sale }) => {
   const userBalance = useEtherBalance(account)
   const isParticipant = useIsParticipant(sale.address, account)
 
-  useEffect(async () => {
-    if (!account) {
-      return
-    }
-    try {
-      const userParticipate = await getUserParticipation(sale.address, account)
-      userParticipate.success ? setParticipate(userParticipate.data) : ""
-      return
-    } catch (error) {}
-  }, [account])
-
   const validBuyVal = val => {
     return val >= minBuy && val <= maxBuy
   }
@@ -89,20 +78,20 @@ const BuyDetailCard = ({ sale }) => {
   }
 
   const handleBuyButton = async () => {
-    if (participate.token !== "0") {
-      // console.log(userBalance)
-      NotificationManager.error("Already Participated !", "Error")
-      return
-    }
+    setButtonStatus({
+      loading: true,
+    })
     if (parseEther(buyVal.toString()).gt(userBalance)) {
       NotificationManager.error("You dont have enough money !", "Error")
+      setButtonStatus({
+        loading: false,
+        text: `BUY ${sale.token.name}`,
+      })
       return
     }
 
     if (validBuyVal(buyVal)) {
-      setEnabled(false)
-
-      const saleContractAddress = saleData.address
+      const saleContractAddress = sale.address
       const contract = new Contract(
         saleContractAddress,
         SaleAbi,
@@ -116,23 +105,87 @@ const BuyDetailCard = ({ sale }) => {
         })
         await tx.wait()
         NotificationManager.success("Thanks for participation", "Thanks")
+        setButtonStatus({
+          ...buttonStatus,
+          loading: false,
+          disabled: true,
+          text: `Already Paricipated`,
+        })
+        setTimeout(() => {
+          window.location.reload()
+        }, 3000)
+        return
       } catch (error) {
-        console.log(error)
+        if (error.message.includes("user rejected transaction")) {
+          NotificationManager.info(
+            "Please Approve Metamask to continue buying",
+            "Error",
+            3000
+          )
+        }
+        if (error.message.includes("Already participated")) {
+          NotificationManager.info("Sorry, Already participated", "Error", 3000)
+        }
+        if (error.message.includes("Wrong Round")) {
+          NotificationManager.info(
+            "Sorry, Wrong Round! or You're not in Whitelist!",
+            "Error",
+            3000
+          )
+        }
+        setButtonStatus({
+          ...buttonStatus,
+          loading: false,
+          text: `BUY ${sale.token.name}`,
+        })
       }
-      setEnabled(true)
     } else {
       NotificationManager.error("Buy Value Not Valid", "Error")
+      setButtonStatus({
+        ...buttonStatus,
+        loading: false,
+        text: `BUY ${sale.token.name}`,
+      })
     }
+    setButtonStatus({
+      ...buttonStatus,
+      loading: false,
+    })
   }
 
-  // useEffect(() => {
-  //   first
+  useEffect(() => {
+    if (typeof isParticipant == "undefined") {
+      return
+    }
+    let stateDisabled = isParticipant || !inProgress
+    let textButton = `BUY ${sale.token.name}`
 
-  //   return () => {
-  //     second
-  //   }
-  // }, [isParticipant])
+    if (isParticipant) {
+      textButton = "Already Paticipated"
+      stateDisabled = true
+    }
 
+    if (!inProgress) {
+      textButton = "Sale Is End"
+      stateDisabled = true
+    }
+
+    if (!isStarted) {
+      textButton = "Sale Not Started"
+      stateDisabled = true
+    }
+
+    if (buttonStatus.init) {
+      setButtonStatus({
+        ...buttonStatus,
+        init: false,
+        disabled: stateDisabled,
+        text: textButton,
+      })
+    }
+  }, [isParticipant, isStarted, inProgress])
+  console.log(`isParticipant :`, isParticipant)
+  console.log(`button :`, buttonStatus)
   return (
     <div className="buy-detail-card" id="buy-card">
       <div className="my-2">
@@ -169,7 +222,7 @@ const BuyDetailCard = ({ sale }) => {
                 {buttonStatus.init ? "PLEASE WAIT ...." : "PROCESSING..."}
               </>
             ) : (
-              <>{buttonStatus.text.toUpperCase()}</>
+              <>{buttonStatus?.text?.toUpperCase()}</>
             )}
           </Button>
         ) : (

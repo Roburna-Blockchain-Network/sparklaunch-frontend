@@ -90,7 +90,7 @@ const SaleDetailCard = ({ sale }) => {
 
     const percents = getInfo.totalBNBRaised.mul(100).div(getInfo.hardCap)
     const newRaised = formatBigToNum(getInfo.totalBNBRaised.toString(), 18, 0)
-    const newPercent = formatBigToNum(percents.toString(), 18, 0)
+    const newPercent = formatBigToNum(percents.toString(), 0, 0)
 
     setRaised({
       amount: newRaised,

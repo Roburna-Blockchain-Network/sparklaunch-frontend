@@ -363,8 +363,7 @@ const ProjectSetup = () => {
     // const se
     const START_SALE = data.start
     const END_SALE = data.end
-    const PUBLIC_SALE = data.round.public
-    const PUBLIC_DELTA = END_SALE - PUBLIC_SALE
+    const PUBLIC_DELTA = data.round.public - data.round.round5
 
     let startTimes = []
     let isPublic = data.info.isPublic

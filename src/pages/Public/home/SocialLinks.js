@@ -15,7 +15,6 @@ import {
 } from "react-icons/bs"
 
 const SocialLinks = ({ links }) => {
-  console.log(links)
   return (
     <>
       {isValidUrl(links.web) && (

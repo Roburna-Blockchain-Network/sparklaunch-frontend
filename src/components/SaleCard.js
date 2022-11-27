@@ -103,19 +103,18 @@ const SaleCard = ({ sale }) => {
     if (typeof getInfo == "undefined") {
       return
     }
-    // if (getInfo.totalBNBRaised.toString() == "0") {
-    //   return
-    // }
+
     const percents = getInfo.totalBNBRaised.mul(100).div(getInfo.hardCap)
     const newRaised = formatBigToNum(getInfo.totalBNBRaised.toString(), 18, 0)
-    const newPercent = formatBigToNum(percents.toString(), 18, 0)
+    const newPercent = formatBigToNum(percents.toString(), 0, 0)
 
     setRaised({
+      ...raised,
       amount: newRaised,
       percent: newPercent,
     })
   }, [getInfo])
-
+  console.log(raised)
   return (
     <>
       {ready ? (
@@ -153,44 +152,6 @@ const SaleCard = ({ sale }) => {
 
           <ul className="list-unstyled d-flex mb-4">
             <SocialLinks links={sale.saleLinks} />
-            {/* <li className="ms-2">
-              <a
-                href={
-                  sale.saleLinks.twitter
-                    ? sale.saleLinks.twitter
-                    : "https://twitter.com"
-                }
-                target="_blank"
-              >
-                <i id="social" className="bx bxl-twitter fs-3" />
-              </a>
-            </li>
-
-            <li className="ms-2">
-              <a
-                href={
-                  sale.saleLinks.discord
-                    ? sale.saleLinks.discord
-                    : "https://discord.com"
-                }
-                target="_blank"
-              >
-                <img id="social" src={discordLogo} alt="discord" />
-              </a>
-            </li>
-
-            <li className="ms-2">
-              <a
-                href={
-                  sale.saleLinks.telegram
-                    ? sale.saleLinks.telegram
-                    : "https://telegram.com"
-                }
-                target="_blank"
-              >
-                <i id="social" className="bx bxl-telegram fs-3" />
-              </a>
-            </li> */}
           </ul>
 
           {sale.round.start > currentDate && (
