@@ -17,7 +17,7 @@ function useGetRound(saleAddress) {
       }
     ) ?? {}
   if (error) {
-    console.log(error)
+    // console.log(error)
     return error
   }
   return value?.[0].toNumber()

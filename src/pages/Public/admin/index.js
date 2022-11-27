@@ -244,7 +244,7 @@ const ProjectSetup = () => {
     if (!userBalance) {
       return false
     }
-    console.log(`sukses`)
+    // console.log(`sukses`)
     return true
   }
 
@@ -253,14 +253,14 @@ const ProjectSetup = () => {
 
     event.preventDefault()
     event.stopPropagation()
-    console.log(step2)
+    // console.log(step2)
 
     const isValid = await validateStep2()
 
     if (isValid) {
       setActiveTab(activeTab + 1)
     }
-    // console.log(step2data)
+    //  // console.log(step2data)
   }
 
   const handleSubmit3 = event => {
@@ -291,7 +291,7 @@ const ProjectSetup = () => {
   }
 
   const handleDeploySale = async data => {
-    console.log(data)
+    // console.log(data)
     const factoryContractAddress = FACTORY_ADDRESS[chainId]
     const contract = new Contract(
       factoryContractAddress,
@@ -351,11 +351,11 @@ const ProjectSetup = () => {
       await tx.wait()
 
       const deployedAddress = await contract.saleIdToAddress(saleId.toNumber())
-      console.log(deployedAddress)
+      // console.log(deployedAddress)
 
       return [saleId.toNumber(), deployedAddress]
     } catch (error) {
-      console.log(error)
+      // console.log(error)
     }
   }
 
@@ -374,7 +374,7 @@ const ProjectSetup = () => {
 
       return true
     } catch (error) {
-      console.log(error)
+      // console.log(error)
     }
   }
 
@@ -393,7 +393,7 @@ const ProjectSetup = () => {
 
       return false
     } catch (error) {
-      console.log(error)
+      // console.log(error)
     }
   }
 
@@ -410,7 +410,7 @@ const ProjectSetup = () => {
 
     const _minBuy = step2.minBuy * DIVISION_BASE
     const _maxBuy = step2.maxBuy * DIVISION_BASE
-    // console.log(step2)
+    //  // console.log(step2)
     const values = {
       title: step1?.title,
       price: presaleRatePrice.toString(),
@@ -449,11 +449,11 @@ const ProjectSetup = () => {
       youtube: step3?.youtube,
       description: description,
     }
-    // console.log(values)
+    //  // console.log(values)
     try {
       const [id, contractAddress] = await handleDeploySale(values)
 
-      console.log(id, contractAddress)
+      // console.log(id, contractAddress)
       values.id = id
       values.contractAddress = contractAddress
       values.chainId = chainId
@@ -463,10 +463,10 @@ const ProjectSetup = () => {
         setIsLoading(false)
         history.push(`/sale/${id}`)
       } else {
-        console.log(`backend error`)
+        // console.log(`backend error`)
       }
     } catch (error) {
-      console.log(error)
+      // console.log(error)
     }
   }
 
@@ -476,7 +476,7 @@ const ProjectSetup = () => {
     setIsValidStep1(false)
 
     const validAddress = isAddress(inputtedAddress)
-    console.log(validAddress)
+    // console.log(validAddress)
     if (!validAddress) {
       return
     }
@@ -512,7 +512,7 @@ const ProjectSetup = () => {
           setUserAllow(allow.data.allowance)
         }
 
-        // console.log(allow)
+        //  // console.log(allow)
       } catch (error) {}
     }
   }, [activeTab])

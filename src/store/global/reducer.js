@@ -45,7 +45,7 @@ export const Sales = (
           newSale.push(sale)
         }
       })
-      console.log(newSale)
+      // console.log(newSale)
       return {
         ...state,
         isLoading: false,

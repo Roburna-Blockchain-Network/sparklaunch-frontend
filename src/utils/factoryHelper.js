@@ -41,7 +41,7 @@ const getSaleInfo = async address => {
     calls.push(tokenContract.publicRoundStartDelta())
     calls.push(tokenContract.getCurrentRound())
     calls.push(tokenContract.saleFinished())
-    // console.log(calls)
+    //  // console.log(calls)
     const [
       sale,
       saleStart,
@@ -134,7 +134,7 @@ export const getLockInfo = async address => {
     calls.push(tokenContract.liquidityLockPeriod())
     calls.push(tokenContract.lpWithdrawn())
     // calls.push(tokenContract.getNumberOfRegisteredUsers())
-    // console.log(calls)
+    //  // console.log(calls)
     const [
       sale,
       saleStart,

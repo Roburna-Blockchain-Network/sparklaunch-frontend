@@ -9,7 +9,7 @@ export const setUpdateSale = p => ({
   payload: p,
 })
 export const updateSaleTime = (address, start, end) => ({
-  // console.log(address)
+  //  // console.log(address)
   type: ActionTypes.UPDATE_SALE_TIME,
   payload: { address, start, end },
 })

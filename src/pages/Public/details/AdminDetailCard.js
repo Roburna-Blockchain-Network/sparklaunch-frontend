@@ -79,7 +79,7 @@ const AdminDetailCard = ({ sale }) => {
         setShowModal(false)
       } catch (error) {
         NotificationManager.error("Error on backend !", "Error")
-        console.log(error)
+        // console.log(error)
       }
       return
     } else {
@@ -128,7 +128,7 @@ const AdminDetailCard = ({ sale }) => {
 
       // setShowModal(false)
     } catch (error) {
-      console.log(error)
+      // console.log(error)
     }
     // setIsProcessing(false)
   }

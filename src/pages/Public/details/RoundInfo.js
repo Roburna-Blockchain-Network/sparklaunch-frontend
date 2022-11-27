@@ -19,11 +19,11 @@ const RoundInfo = ({ sale }) => {
     setCurrentRound(getCurrentRound)
   }, [getCurrentRound])
 
-  console.log(currentRound)
+  // console.log(currentRound)
 
   return (
     <>
-      {currentRound ? (
+      {typeof currentRound !== "undefined" ? (
         <>
           <div className="d-flex w-100 flex-wrap mb-0 mt-3 py-1 border-bottom border-white border-opacity-50 text-center">
             <div className="w-100 fw-bold">Round Info</div>
@@ -33,18 +33,22 @@ const RoundInfo = ({ sale }) => {
             <div className="w-50 fw-bold">Round 1</div>
             <div className="text-primary">
               :{" "}
-              {currentRound == 1 && sale.round.round1 > currentDate
+              {currentRound == 1
                 ? "On Going"
-                : "Ended"}
+                : sale.round.round1 > currentDate
+                ? "Not Started"
+                : "Finished"}
             </div>
           </div>
           <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
             <div className="w-50 fw-bold">Round 2</div>
             <div className="text-primary">
               :{" "}
-              {currentRound == 2 && sale.round.round2 > currentDate
+              {currentRound == 2
                 ? "On Going"
-                : "Ended"}
+                : sale.round.round2 > currentDate
+                ? "Not Started"
+                : "Finished"}
             </div>
           </div>
 
@@ -52,9 +56,11 @@ const RoundInfo = ({ sale }) => {
             <div className="w-50 fw-bold">Round 3</div>
             <div className="text-primary">
               :{" "}
-              {currentRound == 3 && sale.round.round3 > currentDate
+              {currentRound == 3
                 ? "On Going"
-                : "Ended"}
+                : sale.round.round3 > currentDate
+                ? "Not Started"
+                : "Finished"}
             </div>
           </div>
 
@@ -62,9 +68,11 @@ const RoundInfo = ({ sale }) => {
             <div className="w-50 fw-bold">Round 4</div>
             <div className="text-primary">
               :{" "}
-              {currentRound == 4 && sale.round.round4 > currentDate
+              {currentRound == 4
                 ? "On Going"
-                : "Ended"}
+                : sale.round.round4 > currentDate
+                ? "Not Started"
+                : "Finished"}
             </div>
           </div>
 
@@ -76,7 +84,9 @@ const RoundInfo = ({ sale }) => {
               sale.round.round5 < currentDate &&
               currentDate < sale.round.public
                 ? "On Going"
-                : "Ended"}
+                : sale.round.round5 > currentDate
+                ? "Not Started"
+                : "Finished"}
             </div>
           </div>
 
@@ -88,7 +98,9 @@ const RoundInfo = ({ sale }) => {
               sale.round.public < currentDate &&
               currentDate < sale.round.end
                 ? "On Going"
-                : "Ended"}
+                : sale.round.public > currentDate
+                ? "Not Started"
+                : "Finished"}
             </div>
           </div>
         </>

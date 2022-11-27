@@ -92,7 +92,7 @@ const Public = props => {
         setAllSales(sales)
       }
     } catch (error) {
-      console.log(error)
+      // console.log(error)
       setIsLoading(true)
     }
     setIsLoading(false)

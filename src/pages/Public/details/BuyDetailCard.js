@@ -184,8 +184,8 @@ const BuyDetailCard = ({ sale }) => {
       })
     }
   }, [isParticipant, isStarted, inProgress])
-  console.log(`isParticipant :`, isParticipant)
-  console.log(`button :`, buttonStatus)
+  // console.log(`isParticipant :`, isParticipant)
+  // console.log(`button :`, buttonStatus)
   return (
     <div className="buy-detail-card" id="buy-card">
       <div className="my-2">

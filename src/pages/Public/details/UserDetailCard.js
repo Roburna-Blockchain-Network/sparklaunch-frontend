@@ -45,7 +45,7 @@ const UserDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   const saleEnd = BN.from(saleInfo.saleEnd).toNumber()
 
   const userBalance = useEtherBalance(account)
-  console.log(account)
+  // console.log(account)
 
   useEffect(async () => {
     if (!account) {
@@ -85,10 +85,10 @@ const UserDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   }
 
   const handleBuyButton = async () => {
-    console.log(buyVal.toString())
-    console.log(userBalance)
+    // console.log(buyVal.toString())
+    // console.log(userBalance)
     if (participate.token !== "0") {
-      // console.log(userBalance)
+      //  // console.log(userBalance)
       NotificationManager.error("Already Participated !", "Error")
       return
     }
@@ -115,7 +115,7 @@ const UserDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
         await tx.wait()
         NotificationManager.success("Thanks for participation", "Thanks")
       } catch (error) {
-        console.log(error)
+        // console.log(error)
       }
       setEnabled(true)
     } else {

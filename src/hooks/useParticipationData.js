@@ -17,7 +17,7 @@ function useParticipationData(saleAddress, account) {
       }
     ) ?? {}
   if (error) {
-    // console.log(error)
+    //  // console.log(error)
     return false
   }
   return value

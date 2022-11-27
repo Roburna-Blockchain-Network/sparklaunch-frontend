@@ -81,7 +81,7 @@ const TokenLocker = () => {
       if (res.data.length > 0) {
         const token = await getTokenInfo(res.data[0].tokenAddress)
         const sale = await getLockInfo(res.data[0].address)
-        console.log(sale)
+        // console.log(sale)
         if (token.success && sale.success) {
           res.data[0].tokenInfo = token.data
           res.data[0].lockInfo = sale.data
@@ -102,7 +102,7 @@ const TokenLocker = () => {
     }
   }, [address])
 
-  console.log(saleInfo)
+  // console.log(saleInfo)
 
   // todo revert is sale success
   return (

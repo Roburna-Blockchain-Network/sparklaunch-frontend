@@ -272,7 +272,7 @@ const ProjectSetup = () => {
       BigNumber.from(tokenInfo.decimal)
     )
     if (BigNumber.from(userAllow).lt(amountRequired)) {
-      console.log(userAllow)
+      // console.log(userAllow)
 
       const res = await handleBeforeSubmit(requiredToken)
       if (!res) {
@@ -286,7 +286,7 @@ const ProjectSetup = () => {
     }
 
     const userBalance = await handleCheckBalance()
-    console.log(`userBalance :`, userBalance)
+    // console.log(`userBalance :`, userBalance)
     if (!userBalance) {
       NotificationManager.error(
         `Make sure you have enough  ${tokenInfo.name} to make Launchpad!`,
@@ -304,7 +304,7 @@ const ProjectSetup = () => {
     setIsLoading(true)
     event.preventDefault()
     event.stopPropagation()
-    // console.log(step2)
+    //  // console.log(step2)
 
     const isValid = await validateStep2()
 
@@ -315,7 +315,7 @@ const ProjectSetup = () => {
 
     setIsLoading(false)
 
-    // console.log(step2data)
+    //  // console.log(step2data)
   }
 
   const handleSubmit3 = event => {
@@ -345,8 +345,51 @@ const ProjectSetup = () => {
     setIsLoading(false)
   }
 
+  const handleWhite = data => {
+    const result = data
+      .split(",")
+      .map(e => {
+        return e.trim().replace(/\n/g, "")
+      })
+      .filter(isAddress)
+    return result
+  }
+
+  const createWhitelist = () => {
+    let wl = []
+    let tier = []
+
+    const w1 = handleWhite(white1)
+    const w2 = handleWhite(white2)
+    const w3 = handleWhite(white3)
+    const w4 = handleWhite(white4)
+    const w5 = handleWhite(white5)
+
+    for (const addr of w1) {
+      wl.push(addr)
+      tier.push("1")
+    }
+    for (const addr of w2) {
+      wl.push(addr)
+      tier.push("2")
+    }
+    for (const addr of w3) {
+      wl.push(addr)
+      tier.push("3")
+    }
+    for (const addr of w4) {
+      wl.push(addr)
+      tier.push("4")
+    }
+    for (const addr of w5) {
+      wl.push(addr)
+      tier.push("5")
+    }
+
+    return [tier, wl]
+  }
+
   const handleDeploySale = async data => {
-    console.log(data)
     const factoryContractAddress = FACTORY_ADDRESS
     const contract = new Contract(
       factoryContractAddress,
@@ -357,10 +400,14 @@ const ProjectSetup = () => {
     const routerAddress = ROUTER_ADDRESS
     const adminAddress = ADMIN_ADDRESS
 
-    const TIERS_ROUND = [1]
-    const WL_ROUND = [adminAddress]
+    let TIERS_ROUND, WL_ROUND
+    if (data.info.isPublic) {
+      TIERS_ROUND = [1]
+      WL_ROUND = [adminAddress]
+    } else {
+      ;[TIERS_ROUND, WL_ROUND] = createWhitelist()
+    }
 
-    // const se
     const START_SALE = data.start
     const END_SALE = data.end
     const PUBLIC_DELTA = data.round.public - data.round.round5
@@ -399,11 +446,11 @@ const ProjectSetup = () => {
       await tx.wait()
 
       const deployedAddress = await contract.saleIdToAddress(saleId.toNumber())
-      console.log(deployedAddress)
+      // console.log(deployedAddress)
 
       return [saleId.toNumber(), deployedAddress]
     } catch (error) {
-      console.log(error)
+      // console.log(error)
     }
   }
 
@@ -422,7 +469,7 @@ const ProjectSetup = () => {
 
       await approval.wait()
     } catch (error) {
-      console.log(error)
+      // console.log(error)
       return false
     }
     setUserAllow(amount.toString())
@@ -443,17 +490,17 @@ const ProjectSetup = () => {
       const userbal = await contract.balanceOf(account)
 
       if (userbal.gt(amountRequired)) return true
-      console.log(`userbal`, userbal.toString())
-      console.log(`amountRequired`, amountRequired.toString())
+      // console.log(`userbal`, userbal.toString())
+      // console.log(`amountRequired`, amountRequired.toString())
       return false
     } catch (error) {
-      console.log(error)
+      // console.log(error)
     }
   }
 
   const saveToBackend = async value => {
     const input = JSON.stringify(value)
-    console.log(input)
+    // console.log(input)
     try {
       const requestOptions = {
         method: "POST",
@@ -467,7 +514,7 @@ const ProjectSetup = () => {
 
       return true
     } catch (e) {
-      console.log("Err: ", e.message)
+      // console.log("Err: ", e.message)
       return false
     }
   }
@@ -530,11 +577,11 @@ const ProjectSetup = () => {
       },
       description: description,
     }
-    console.log(values)
+    // console.log(values)
     try {
       const [id, contractAddress] = await handleDeploySale(values)
 
-      console.log(id, contractAddress)
+      // console.log(id, contractAddress)
       values.id = id
       values.address = contractAddress
       values.chainId = chainId
@@ -544,10 +591,10 @@ const ProjectSetup = () => {
         setIsLoading(false)
         history.push(`/sale/${id}`)
       } else {
-        console.log(`backend error`)
+        // console.log(`backend error`)
       }
     } catch (error) {
-      console.log(error)
+      // console.log(error)
     }
   }
 
@@ -557,7 +604,7 @@ const ProjectSetup = () => {
     setIsValidStep1(false)
 
     const validAddress = isAddress(inputtedAddress)
-    console.log(validAddress)
+    // console.log(validAddress)
     if (!validAddress) {
       return
     }
@@ -590,7 +637,7 @@ const ProjectSetup = () => {
           setUserAllow(allow.data.allowance)
         }
 
-        console.log(allow)
+        // console.log(allow)
       } catch (error) {}
     }
   }, [activeTab])
@@ -677,7 +724,7 @@ const ProjectSetup = () => {
   }
 
   // useEffect(() => {
-  //   // console.log(white1)
+  //   //  // console.log(white1)
   //   let new_key = []
   //   let new_array = white1
   //     .trim()

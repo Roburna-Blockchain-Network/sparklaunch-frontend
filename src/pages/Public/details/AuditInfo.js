@@ -23,7 +23,7 @@ const AuditInfo = ({ audit, kyc }) => {
       )
       return
     }
-    // console.log(audit)
+    //  // console.log(audit)
     window.open(links, "_blank")
   }
 
@@ -42,7 +42,7 @@ const AuditInfo = ({ audit, kyc }) => {
       )
       return
     }
-    // console.log(audit)
+    //  // console.log(audit)
     window.open(links, "_blank")
   }
 

@@ -114,7 +114,7 @@ const SaleCard = ({ sale }) => {
       percent: newPercent,
     })
   }, [getInfo])
-  console.log(raised)
+  // console.log(raised)
   return (
     <>
       {ready ? (

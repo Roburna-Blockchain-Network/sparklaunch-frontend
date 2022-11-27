@@ -176,7 +176,7 @@ const SaleDetailCard = ({ sale }) => {
         </div>
         <ProgressBar className="mt-1" variant="primary" now={raised.percent} />
 
-        {/* <RoundInfo sale={sale} /> */}
+        <RoundInfo sale={sale} />
         <AuditInfo audit={sale.audit} kyc={sale.kyc} />
       </div>
     </div>

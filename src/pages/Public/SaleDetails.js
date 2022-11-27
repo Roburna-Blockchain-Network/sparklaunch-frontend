@@ -54,7 +54,7 @@ const SaleDetails = props => {
       }
       setSale(res.data[0])
     } catch (error) {
-      console.log(error)
+      // console.log(error)
     }
     setReady(true)
 
@@ -64,7 +64,7 @@ const SaleDetails = props => {
     }
   }, [])
 
-  console.log(sale)
+  // console.log(sale)
 
   return (
     <React.Fragment>

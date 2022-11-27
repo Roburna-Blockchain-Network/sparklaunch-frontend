@@ -28,7 +28,7 @@ const Navbar = props => {
   })
 
   function activateParentDropdown(item) {
-    // console.log(item)
+    //  // console.log(item)
     item.classList.add("active")
     const parent = item.parentElement
     if (parent) {
