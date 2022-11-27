@@ -50,7 +50,7 @@ const BuyDetailCard = ({ sale }) => {
   const minBuy = Number(formatEther(BN.from(sale.info.minbuy)))
   const maxBuy = Number(formatEther(BN.from(sale.info.maxbuy)))
 
-  const isPublic = sale.info.isPublic
+  const isPublic = sale.info.isPublic || sale.round.round1 == 0
   const isPublicRound =
     sale.round.public < currentDate && sale.round.end > currentDate
 

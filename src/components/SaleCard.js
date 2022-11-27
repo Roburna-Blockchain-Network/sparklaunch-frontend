@@ -31,6 +31,7 @@ import useSaleIsSuccess from "hooks/useSaleIsSuccess"
 import useSaleFinished from "hooks/useSaleIsFinished"
 import useSaleInfo from "hooks/useSaleInfo"
 import { formatBigToNum, formatNumber, NativePrice } from "utils/helpers"
+import SocialLinks from "pages/Public/home/SocialLinks"
 
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
 const Completionist = () => <span>Sale is End</span>
@@ -151,7 +152,8 @@ const SaleCard = ({ sale }) => {
           </div>
 
           <ul className="list-unstyled d-flex mb-4">
-            <li className="ms-2">
+            <SocialLinks links={sale.saleLinks} />
+            {/* <li className="ms-2">
               <a
                 href={
                   sale.saleLinks.twitter
@@ -188,7 +190,7 @@ const SaleCard = ({ sale }) => {
               >
                 <i id="social" className="bx bxl-telegram fs-3" />
               </a>
-            </li>
+            </li> */}
           </ul>
 
           {sale.round.start > currentDate && (

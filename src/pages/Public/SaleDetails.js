@@ -25,6 +25,7 @@ import TokenInfo from "./details/TokenInfo"
 import OwnerCard from "./details/OwnerCard"
 import ParticipationCard from "./details/ParticipationCard"
 import { formatBigToNum } from "utils/helpers"
+import SocialLinks from "./home/SocialLinks"
 dayjs.extend(utc)
 
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
@@ -130,35 +131,7 @@ const SaleDetails = props => {
                 </p>
 
                 <ul className="list-unstyled d-flex my-4">
-                  <li className="ms-2">
-                    <a
-                      href={
-                        sale.saleLinks.twitter ? sale.saleLinks.twitter : "#"
-                      }
-                    >
-                      <i className="bx bxl-twitter fs-3" />
-                    </a>
-                  </li>
-
-                  <li className="ms-2">
-                    <a
-                      href={
-                        sale.saleLinks.discord ? sale.saleLinks.discord : "#"
-                      }
-                    >
-                      <img src={discordLogo} alt="discord" />
-                    </a>
-                  </li>
-
-                  <li className="ms-2">
-                    <a
-                      href={
-                        sale.saleLinks.telegram ? sale.saleLinks.telegram : "#"
-                      }
-                    >
-                      <i className="bx bxl-telegram fs-3" />
-                    </a>
-                  </li>
+                  <SocialLinks links={sale.saleLinks} />
                 </ul>
 
                 <div className="text-white font-size-14 mb-4">
@@ -167,7 +140,9 @@ const SaleDetails = props => {
                     <Col>
                       <p>
                         <span className="fw-bold">Access Type : </span>
-                        {sale.round.round1 == 0 ? "Public" : "Private"}
+                        {sale.info.isPublic || sale.round.round1 == 0
+                          ? "Public"
+                          : "Private"}
                       </p>
                     </Col>
                   </Row>
@@ -238,13 +213,9 @@ const SaleDetails = props => {
 
               <Col md={4}>
                 <SaleDetailCard sale={sale} />
-
                 <BuyDetailCard sale={sale} />
-
                 <ParticipationCard sale={sale} />
-
                 <AdminDetailCard sale={sale} />
-
                 <OwnerCard sale={sale} />
               </Col>
             </Row>
