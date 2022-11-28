@@ -20,7 +20,7 @@ function useLiquidityLockPeriod(saleAddress) {
     // console.log(error)
     return error
   }
-  return value?.[0]
+  return value?.[0]?.toNumber()
 }
 
 export default useLiquidityLockPeriod

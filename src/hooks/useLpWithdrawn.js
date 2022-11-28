@@ -4,12 +4,12 @@ import SaleAbi from "constants/abi/Sale.json"
 import { useCall, useEthers } from "@usedapp/core"
 import { FACTORY_ADDRESS } from "constants/Address"
 
-function useLiquidityUnlockTime(saleAddress) {
+function useLpWithdrawn(saleAddress) {
   const { value, error } =
     useCall(
       {
         contract: new Contract(saleAddress, SaleAbi),
-        method: "liquidityUnlockTime",
+        method: "lpWithdrawn",
         args: [],
       },
       {
@@ -20,7 +20,7 @@ function useLiquidityUnlockTime(saleAddress) {
     // console.log(error)
     return error
   }
-  return value?.[0]?.toNumber()
+  return value?.[0]
 }
 
-export default useLiquidityUnlockTime
+export default useLpWithdrawn
