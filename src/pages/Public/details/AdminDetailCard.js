@@ -58,7 +58,7 @@ const AdminDetailCard = ({ sale }) => {
 
       try {
         const input = JSON.stringify({
-          _id: saleData._id,
+          _id: sale._id,
           featured: isFeatured,
           featuredImage: featuredLink,
         })

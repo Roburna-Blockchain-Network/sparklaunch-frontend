@@ -44,7 +44,7 @@ const OwnerCard = ({ sale }) => {
   const handleConfirm = async e => {
     setIsProcessing(true)
 
-    const saleContractAddress = saleData.address
+    const saleContractAddress = sale.address
     const contract = new Contract(
       saleContractAddress,
       SaleAbi,
@@ -56,8 +56,13 @@ const OwnerCard = ({ sale }) => {
       await tx.wait()
       NotificationManager.success(
         `${finalize ? "Finalize " : "Cancel "} Sale is Success  `,
-        "Thanks"
+        "Thanks",
+        3000
       )
+      setTimeout(() => {
+        window.location.reload()
+      }, 4000)
+      return
     } catch (error) {
       NotificationManager.error(
         `${finalize ? "Finalize " : "Cancel "} Sale is Fail`,

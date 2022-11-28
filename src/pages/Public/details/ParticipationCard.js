@@ -51,7 +51,7 @@ const ParticipationCard = ({ sale }) => {
   const handleConfirm = async e => {
     setIsProcessing(true)
 
-    const saleContractAddress = saleData.address
+    const saleContractAddress = sale.address
     const contract = new Contract(
       saleContractAddress,
       SaleAbi,
