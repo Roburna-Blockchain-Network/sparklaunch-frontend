@@ -189,13 +189,13 @@ const SaleCard = ({ sale }) => {
             <Row className="mb-2">
               <Col xs={4}>Soft Cap </Col>
               <Col xs={8} className="text-primary fs-6 text-end fw-bold">
-                {formatBigToNum(sale.info.softcap, 18, 0)} {CHAIN_NATIVE_SYMBOL}
+                {formatBigToNum(sale.info.softcap, 18, 2)} {CHAIN_NATIVE_SYMBOL}
               </Col>
             </Row>
             <Row className="mb-2">
               <Col xs={4}>Hard Cap </Col>
               <Col xs={8} className="text-primary fs-6 text-end fw-bold">
-                {formatBigToNum(sale.info.hardcap, 18, 0)} {CHAIN_NATIVE_SYMBOL}
+                {formatBigToNum(sale.info.hardcap, 18, 2)} {CHAIN_NATIVE_SYMBOL}
               </Col>
             </Row>
             <Row className="mb-2">
@@ -203,7 +203,7 @@ const SaleCard = ({ sale }) => {
               <Col xs={8} className="text-primary fs-6 text-end fw-bold">
                 {getInfo ? (
                   <>
-                    {formatBigToNum(getInfo.totalBNBRaised.toString(), 18, 0)}{" "}
+                    {formatBigToNum(getInfo.totalBNBRaised.toString(), 18, 4)}{" "}
                     {CHAIN_NATIVE_SYMBOL}
                   </>
                 ) : (
