@@ -20,7 +20,12 @@ import {
 import { NotificationManager } from "react-notifications"
 import { useEthers } from "@usedapp/core"
 import usePairAddress from "hooks/usePairAddress"
-import { getLockInfo, getSaleInfo, getTokenInfo } from "utils/factoryHelper"
+import {
+  getLockInfo,
+  getLpLockInfo,
+  getSaleInfo,
+  getTokenInfo,
+} from "utils/factoryHelper"
 import Countdown, { zeroPad } from "react-countdown"
 import bscLogo from "assets/images/logos/rba.svg"
 import useSaleIsSuccess from "hooks/useSaleIsSuccess"
@@ -33,6 +38,7 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import duration from "dayjs/plugin/duration"
 import relativeTime from "dayjs/plugin/relativeTime"
+import { formatBigToNum } from "utils/helpers"
 dayjs.extend(utc)
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -70,6 +76,7 @@ const renderer = ({ days, hours, minutes, seconds, completed }) => {
 
 const TokenLocker = () => {
   const [saleInfo, setSaleInfo] = useState()
+  const [lpInfo, setLpInfo] = useState()
   const [lockDate, setLockDate] = useState(NaN)
   const [ready, setReady] = useState(false)
   const { account, library } = useEthers()
@@ -106,6 +113,16 @@ const TokenLocker = () => {
     }
   }, [address])
 
+  useEffect(async () => {
+    try {
+      const response = await getLpLockInfo(address)
+      console.log(response)
+      if (response.success) {
+        setLpInfo(response.data)
+      }
+    } catch (error) {}
+  }, [address])
+
   const getInfo = useSaleInfo(address)
 
   useEffect(() => {
@@ -118,7 +135,7 @@ const TokenLocker = () => {
       setLockDate(liquidityUnlockTime - liquidityLockPeriod)
     }
   }, [liquidityUnlockTime, liquidityLockPeriod])
-  console.log(lockDate)
+
   return (
     <>
       <div className="page-content">
@@ -205,10 +222,8 @@ const TokenLocker = () => {
                 <Row className="list-container">
                   <Col>LP Supply</Col>
                   <Col className="text-end">
-                    {ready ? (
-                      <>
-                        {WRAPPED_SYMBOL} / {saleInfo?.token?.symbol}
-                      </>
+                    {lpInfo ? (
+                      <>{formatBigToNum(lpInfo?.totalSupply, 18, 2)} </>
                     ) : (
                       <Placeholder as={Card.Title} animation="glow">
                         <Placeholder xs={12} />
@@ -246,10 +261,8 @@ const TokenLocker = () => {
                 <Row className="list-container">
                   <Col>Total Amount Locked</Col>
                   <Col className="text-end">
-                    {ready ? (
-                      <Placeholder as={Card.Title} animation="glow">
-                        <Placeholder xs={12} />
-                      </Placeholder>
+                    {lpInfo ? (
+                      <>{formatBigToNum(lpInfo?.totalLock, 18, 2)} </>
                     ) : (
                       <Placeholder as={Card.Title} animation="glow">
                         <Placeholder xs={12} />

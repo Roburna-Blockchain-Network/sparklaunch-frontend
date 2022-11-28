@@ -16,7 +16,7 @@ import SalesABI from "constants/abi/Sales.json"
 
 import { ethers, BigNumber as BN } from "ethers"
 import { Contract, Provider, setMulticallAddress } from "ethers-multicall"
-import { parseUnits } from "ethers/lib/utils"
+import { parseEther, parseUnits } from "ethers/lib/utils"
 
 const getSaleInfo = async address => {
   setMulticallAddress(CHAIN_NUMBER, MULTICALL_ADDRESS)
@@ -94,6 +94,49 @@ const getSaleInfo = async address => {
         getCurrentRound: getCurrentRound.toNumber(),
         isFinished: saleFinished,
         // participants: numberOfParticipants.toNumber(),
+      },
+    }
+  } catch (error) {
+    return {
+      success: false,
+      data: { address },
+      msg: error,
+    }
+  }
+}
+
+export const getLpLockInfo = async address => {
+  setMulticallAddress(CHAIN_NUMBER, MULTICALL_ADDRESS)
+  const provider = new ethers.providers.JsonRpcProvider(RPC_ADDRESS)
+  const ethcallProvider = new Provider(provider)
+  await ethcallProvider.init()
+  //   return AdminABI
+  const tokenContract = new Contract(address, SalesABI)
+  //   return tokenContract
+
+  let calls = []
+  let calls2 = []
+
+  try {
+    calls.push(tokenContract.defaultPair())
+
+    const [pairAddress] = await ethcallProvider.all(calls)
+
+    const pairContract = new Contract(pairAddress, ERC20ABI)
+
+    calls2.push(pairContract.totalSupply())
+    calls2.push(pairContract.balanceOf(address))
+
+    const [supply, balance] = await ethcallProvider.all(calls2)
+
+    const totalSupply = supply.toString()
+    const totalLock = balance.toString()
+
+    return {
+      success: true,
+      data: {
+        totalSupply,
+        totalLock,
       },
     }
   } catch (error) {
