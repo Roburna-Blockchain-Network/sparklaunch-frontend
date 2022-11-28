@@ -28,8 +28,10 @@ const Header = props => {
   const { account, activateBrowserWallet, deactivate, switchNetwork, chainId } =
     useEthers()
 
-  const users = useSelector(state => state.User)
-  // const allSales = useSelector(state => state.Sales)
+  // const users = useSelector(state => state.User)
+
+  const [logged, setLogged] = useState()
+
   const dispatch = useDispatch()
   let options = []
   // options[97] = {
@@ -74,13 +76,27 @@ const Header = props => {
   //   }
   // }
 
-  useEffect(async () => {
+  useEffect(() => {
     if (typeof account == "undefined") {
-      dispatch(setLoginStatus(false))
-    } else {
-      dispatch(setLoginStatus(true))
+      return
     }
-  }, [account, chainId, dispatch])
+    if (account && typeof logged == "undefined") {
+      setLogged(account)
+      return
+    }
+    if (account !== logged) {
+      window.location.reload()
+    }
+    console.log(logged)
+  }, [account, logged])
+
+  // useEffect(async () => {
+  //   if (typeof account == "undefined") {
+  //     dispatch(setLoginStatus(false))
+  //   } else {
+  //     dispatch(setLoginStatus(true))
+  //   }
+  // }, [account, chainId, dispatch])
 
   return (
     <React.Fragment>
