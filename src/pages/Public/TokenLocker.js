@@ -5,6 +5,7 @@ import {
   Col,
   Container,
   Form,
+  Modal,
   Card,
   Row,
   Spinner,
@@ -33,6 +34,8 @@ import useLpWithdrawn from "hooks/useLpWithdrawn"
 import useSaleInfo from "hooks/useSaleInfo"
 import useLiquidityUnlockTime from "hooks/useLiquidityUnlockTime"
 import useLiquidityLockPeriod from "hooks/useLiquidityLockPeriod"
+import { Contract } from "@ethersproject/contracts"
+import SaleAbi from "constants/abi/Sale.json"
 
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
@@ -46,7 +49,7 @@ const currentDate = dayjs.utc().unix()
 
 const Completionist = () => (
   <div className="btn btn-primary px-3 btn-time fw-bolder text-center">
-    You Can unlock Now !
+    LP Token Can Unlock Now !
   </div>
 )
 const renderer = ({ days, hours, minutes, seconds, completed }) => {
@@ -79,6 +82,7 @@ const TokenLocker = () => {
   const [lpInfo, setLpInfo] = useState()
   const [lockDate, setLockDate] = useState(NaN)
   const [ready, setReady] = useState(false)
+  const [showModal2, setShowModal2] = useState(false)
   const { account, library } = useEthers()
   const history = useHistory()
 
@@ -122,6 +126,33 @@ const TokenLocker = () => {
       }
     } catch (error) {}
   }, [address])
+
+  const handleUnlock = async e => {
+    setShowModal2(true)
+
+    const saleContractAddress = saleInfo.address
+    const contract = new Contract(
+      saleContractAddress,
+      SaleAbi,
+      library.getSigner()
+    )
+
+    try {
+      const tx = await contract.withdrawLP()
+      await tx.wait()
+      NotificationManager.success(`Unlock Completed`, "Thanks", 3000)
+      setTimeout(() => {
+        window.location.reload()
+      }, 4000)
+      return
+    } catch (error) {
+      NotificationManager.error(`There error on Unlock LP-Token`, "Sorry")
+    }
+
+    setTimeout(() => {
+      setShowModal2(false)
+    }, 2000)
+  }
 
   const getInfo = useSaleInfo(address)
 
@@ -275,9 +306,7 @@ const TokenLocker = () => {
                   <Col>Total Value Locked</Col>
                   <Col className="text-end">
                     {ready ? (
-                      <Placeholder as={Card.Title} animation="glow">
-                        <Placeholder xs={12} />
-                      </Placeholder>
+                      <>N/A</>
                     ) : (
                       <Placeholder as={Card.Title} animation="glow">
                         <Placeholder xs={12} />
@@ -346,18 +375,42 @@ const TokenLocker = () => {
               </Col>
             </Row>
             <Row>
-              <Col className="text-center">
-                <button
-                  className="btn btn-primary px-3 fw-bolder text-center"
-                  type="submit"
-                >
-                  Unlock
-                </button>
-              </Col>
+              {account && getInfo?.saleOwner == account ? (
+                <Col className="text-center">
+                  <button
+                    className="btn btn-primary px-3 fw-bolder text-center"
+                    type="submit"
+                    onClick={handleUnlock}
+                    disabled={isLpWithdrawn}
+                  >
+                    {isLpWithdrawn ? "Already Unlocked" : "Unlock"}
+                  </button>
+                </Col>
+              ) : null}
             </Row>
           </div>
         </Container>
       </div>
+      <Modal
+        backdrop="static"
+        size="sm"
+        show={showModal2}
+        centered
+        onHide={() => setShowModal2(false)}
+      >
+        <div className="modal-content">
+          <Modal.Header>
+            <span className="text-primary fs-4">Processing...</span>
+          </Modal.Header>
+          <div className="p-4">
+            <div className="text-center">
+              <div className="mb-3 fs-4">Please wait .....</div>
+              <Spinner animation="border" />
+            </div>
+          </div>
+          <Modal.Body></Modal.Body>
+        </div>
+      </Modal>
     </>
   )
 }
