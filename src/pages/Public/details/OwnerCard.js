@@ -162,17 +162,7 @@ const OwnerCard = ({ sale }) => {
                 {finalize ? "FINALIZE SALE" : "CANCEL SALE"}
               </Button>
             )}
-            {isSaleSuccess && getInfo?.earningsWithdrawn === false ? (
-              <Button
-                className="btn btn buy-or-connect mb-3"
-                disabled={isProcessing}
-                onClick={e => {
-                  handleWithdraw()
-                }}
-              >
-                WITHDRAW EARNING
-              </Button>
-            ) : (
+            {isSaleSuccess && getInfo?.earningsWithdrawn === false ? null : (
               <Link to={lockAddress} className="btn btn buy-or-connect mb-3">
                 SHOW LOCK LP PAGE
               </Link>
