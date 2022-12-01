@@ -76,7 +76,8 @@ const OwnerCard = ({ sale }) => {
       return
     } catch (error) {
       NotificationManager.error(
-        `${finalize ? "Finalize " : "Cancel "} Sale is Fail`,
+        `${finalize ? "Finalize " : "Cancel "} Sale is Fail,
+        Reason : ${error?.data?.message}`,
         "Sorry"
       )
     }
