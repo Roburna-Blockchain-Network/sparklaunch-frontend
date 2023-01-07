@@ -110,7 +110,9 @@ const Footer = props => {
                 </Col>
 
                 <Col md={6} className="mb-2" style={{ fontSize: 10 }}>
-                  Privacy Policy
+                  <a href="https://spark-launch.gitbook.io/docs/important-information/privacy-policy">
+                    Privacy Policy
+                  </a>
                 </Col>
 
                 <Col md={6} className="mb-2" style={{ fontSize: 10 }}>
@@ -118,7 +120,9 @@ const Footer = props => {
                 </Col>
 
                 <Col md={6} className="mb-2" style={{ fontSize: 10 }}>
-                  Terms of Use
+                  <a href="https://spark-launch.gitbook.io/docs/important-information/terms-of-service">
+                    Terms of Use
+                  </a>
                 </Col>
               </Row>
             </Col>

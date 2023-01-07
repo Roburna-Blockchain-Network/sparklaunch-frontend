@@ -166,7 +166,7 @@ const BuyDetailCard = ({ sale }) => {
     }
 
     if (!inProgress) {
-      textButton = "Sale Is End"
+      textButton = "Sale Ended"
       stateDisabled = true
     }
 

@@ -180,11 +180,16 @@ const Header = props => {
           </div>
 
           {/* right section */}
-          <div className="d-flex flex-fill  ms-2  justify-content-end">
-            <button className="btn btn-gradient-blue rounded-2 py-0 w-md me-3 d-none d-md-inline">
+          <div className="d-flex flex-fill  ms-2 align-items-center  justify-content-end">
+            {/* <button className="btn btn-gradient-blue rounded-2 py-0 w-md me-3 d-none d-md-inline">
               PYRE GAMES
-            </button>
-
+            </button> */}
+            <a
+              href="#sales"
+              className="border border-2 border-primary text-white text-center me-4 fw-bold py-2 px-3 w-lg rounded-pill d-none d-lg-block"
+            >
+              <span className=" fs-6 ">BUY $IGNT</span>
+            </a>
             <Dropdown className="me-3">
               <Dropdown.Toggle variant="warning" className="py-0 ps-0">
                 <img

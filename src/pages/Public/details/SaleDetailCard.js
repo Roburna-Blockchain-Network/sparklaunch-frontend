@@ -26,11 +26,12 @@ import utc from "dayjs/plugin/utc"
 import RoundInfo from "./RoundInfo"
 import AuditInfo from "./AuditInfo"
 import { CHAIN_NATIVE_SYMBOL } from "constants/Address"
+import TokenImage from "components/TokenImage"
 dayjs.extend(utc)
 
 const currentDate = dayjs.utc().unix()
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
-const Completionist = () => <span>Sale is End</span>
+const Completionist = () => <span>Sale Ended</span>
 const renderer = ({ days, hours, minutes, completed }) => {
   if (completed) {
     // Render a completed state
@@ -109,7 +110,7 @@ const SaleDetailCard = ({ sale }) => {
         <div className="m">
           <div className="avatar-md">
             <div className="avatar-title bg-primary bg-softer rounded-circle overflow-hidden fs-4">
-              <img
+              <TokenImage
                 src={sale.saleLinks.logo}
                 style={{
                   height: "100%",
