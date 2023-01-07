@@ -186,7 +186,7 @@ const Header = props => {
             </button> */}
             <a
               href="#sales"
-              className="border border-2 border-primary text-white text-center me-4 fw-bold py-2 px-3 w-lg rounded-pill"
+              className="border border-2 border-primary text-white text-center me-4 fw-bold py-2 px-3 w-lg rounded-pill d-none d-lg-block"
             >
               <span className=" fs-6 ">BUY $IGNT</span>
             </a>

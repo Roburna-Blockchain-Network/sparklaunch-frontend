@@ -24,6 +24,13 @@ const Hero = () => {
             <span className="fs-5 d-lg-none">LAUNCH TOKEN</span>
           </Link>
         </Col>
+        <Col xs={12} className="text-center d-lg-none">
+          <a
+            href="#sales"
+            className="border border-2 border-primary text-white fw-bold py-3 px-5 w-lg rounded-pill"
+          >            <span className="fs-5 d-lg-none">BUY $IGHT</span>
+          </a>
+        </Col>
 
         
       </Row>

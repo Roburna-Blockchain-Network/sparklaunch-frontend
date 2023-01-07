@@ -204,10 +204,11 @@ const Public = props => {
                   )}
                 </Row>
 
-                <div className="text-end mb-3">
+                <div className="text-center text-lg-end mb-3">
                   <a
                     href="mailto:contact@ignite-defi.com"
-                    className="btn btn-lg bg-primary rounded-4 w-25 fs-1 fw-bold text-black me-3"
+                    className="btn btn-lg bg-primary rounded-4 fs-1 fw-bold text-black me-3"
+                    style={{minWidth: "25%"}}
                   >
                     Contact Us
                   </a>
