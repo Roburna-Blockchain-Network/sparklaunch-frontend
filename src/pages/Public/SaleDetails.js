@@ -26,6 +26,7 @@ import OwnerCard from "./details/OwnerCard"
 import ParticipationCard from "./details/ParticipationCard"
 import { formatBigToNum } from "utils/helpers"
 import SocialLinks from "./home/SocialLinks"
+import TokenImage from "components/TokenImage"
 dayjs.extend(utc)
 
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
@@ -88,7 +89,7 @@ const SaleDetails = props => {
                   <div>
                     <div className="avatar-md me-3">
                       <div className="avatar-title bg-primary bg-softer border border-primary rounded-circle overflow-hidden">
-                        <img
+                        <TokenImage
                           src={sale.saleLinks.logo}
                           style={{
                             height: "100%",
