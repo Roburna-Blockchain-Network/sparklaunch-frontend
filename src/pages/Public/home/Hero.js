@@ -13,7 +13,7 @@ const Hero = () => {
       </Row>
 
       <Row className="pt-5 mb-lg-5 mb-3">
-        <Col xs={12} md={6} className="text-lg-end text-center mb-5 mb-lg-0">
+        <Col xs={12} md={12} className="text-lg-center text-center mb-5 mb-lg-0">
           <Link
             to="/project-setup"
             className="bg-primary text-black fw-bold p-3 rounded-pill"
@@ -21,19 +21,11 @@ const Hero = () => {
             <span className="fs-4 d-none d-lg-inline">
               LAUNCH YOUR PROJECT WITH US
             </span>
-            <span className="fs-5 d-lg-none">LAUNCH YOUR PROJECT WITH US</span>
+            <span className="fs-5 d-lg-none">LAUNCH TOKEN</span>
           </Link>
         </Col>
 
-        <Col md={6} className="text-center">
-          <a
-            href="#sales"
-            className="border border-2 border-primary text-white fw-bold py-3 px-5 w-lg rounded-pill"
-          >
-            <span className="fs-4 d-none d-lg-inline">BUY $IGHT</span>
-            <span className="fs-5 d-lg-none">BUY $IGHT</span>
-          </a>
-        </Col>
+        
       </Row>
     </>
   )
