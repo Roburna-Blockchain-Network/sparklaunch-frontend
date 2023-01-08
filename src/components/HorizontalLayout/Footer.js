@@ -83,15 +83,14 @@ const Footer = props => {
                   >
                     POOLS
                   </a>
-
-                  <Link
-                    to="#"
+                  <a
+                    href="https://spark-launch.gitbook.io/"
+                    target="_blank"
                     className={classnames("nav-link me-3 px-0", {
                       active: window.location.pathname === "/payments",
-                    })}
-                  >
+                    })}>
                     ABOUT
-                  </Link>
+                  </a>
 
                   <Link
                     to="#"
