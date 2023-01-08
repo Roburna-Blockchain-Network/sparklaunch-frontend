@@ -74,27 +74,27 @@ body[data-layout="horizontal"][data-layout-size="boxed"] {
 
 // Scrollable layout
 
-body[data-layout-scrollable="true"] {
-  @media (min-width: 992px) {
+// body[data-layout-scrollable="true"] {
+//   @media (min-width: 992px) {
 
-    #page-topbar,
-    .vertical-menu,
-    .navbar-brand-box {
-      position: absolute;
-    }
-  }
+//     #page-topbar,
+//     .vertical-menu,
+//     .navbar-brand-box {
+//       position: absolute;
+//     }
+//   }
 
-  &[data-layout="horizontal"] {
-    @media (min-width: 992px) {
+//   &[data-layout="horizontal"] {
+//     @media (min-width: 992px) {
 
-      #page-topbar,
-      .topnav {
-        position: absolute;
-      }
+//       #page-topbar,
+//       .topnav {
+//         position: absolute;
+//       }
 
-      .navbar-brand-box {
-        position: relative;
-      }
-    }
-  }
-}
+//       .navbar-brand-box {
+//         position: relative;
+//       }
+//     }
+//   }
+// }

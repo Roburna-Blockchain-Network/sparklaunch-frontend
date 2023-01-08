@@ -65,11 +65,11 @@ const Footer = props => {
               <Navbar className="p-0 navbar-dark footer-nav mb-1">
                 <Nav className="d-flex w-100 px-2">
                   <Link
-                    to="/home"
+                    to="/"
                     className={classnames("nav-link me-3 px-0", {
                       active:
                         window.location.pathname === "/" ||
-                        window.location.pathname === "/home",
+                        window.location.pathname === "/",
                     })}
                   >
                     HOME

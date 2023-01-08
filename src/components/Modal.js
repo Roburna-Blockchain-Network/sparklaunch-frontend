@@ -1,5 +1,5 @@
 import React from 'react'
-import 'assets/scss/modal.scss'
+import 'assets/scss/custom/components/modal.scss'
 export default function Modal() {
     const [show, setShow] = React.useState(true);
 
