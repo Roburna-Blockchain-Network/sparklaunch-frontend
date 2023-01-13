@@ -39,6 +39,7 @@ import { useSelector } from "react-redux"
 import { getTokenAllowance } from "utils/factoryHelper"
 import { BIG_TEN } from "utils/numbers"
 import useServiceFee from "hooks/useServiceFee"
+import Modal from "components/Modal"
 dayjs.extend(utc)
 const ProjectSetup = () => {
   let history = useHistory()
@@ -46,7 +47,6 @@ const ProjectSetup = () => {
 
   const deployFee = useDeploymentFee()
   const servicesFee = useServiceFee()
-
   const user = useSelector(state => state.User)
 
   const [activeTab, setActiveTab] = useState(1)
@@ -638,7 +638,7 @@ const ProjectSetup = () => {
         }
 
         // console.log(allow)
-      } catch (error) {}
+      } catch (error) { }
     }
   }, [activeTab])
 
@@ -668,14 +668,14 @@ const ProjectSetup = () => {
       setRequiredToken(reqHard.add(reqLP).toString())
     }
 
-    return () => {}
+    return () => { }
   }, [step2.hardCap, step2.softCap, step2.listingRate, step2.presaleRate])
 
   const steps = [
     {
       step: 1,
       title: "Before you start",
-      desc: "Input your awesome title, and choose the currency",
+      desc: "Input your title, and choose the currency",
     },
     {
       step: 2,
@@ -750,7 +750,9 @@ const ProjectSetup = () => {
         <MetaTags>
           <title>Project Setup | SparkLaunch</title>
         </MetaTags>
-
+        
+          <Modal />
+        
         <Container fluid>
           <div className="text-end">
             <Link

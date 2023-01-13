@@ -1,0 +1,19 @@
+.scroller{
+    position: fixed;
+    bottom: 10%;
+    left: 90%;
+    z-index: 10000;
+    border-radius: 100%;
+    background-color: #343434;
+    padding: 15px;
+    cursor: pointer;
+
+    .arrow-top{
+        width: 35px;
+        height: 35px;
+    }
+
+    @media screen and (max-width: 768px) {
+        left: 80%;
+    }
+}

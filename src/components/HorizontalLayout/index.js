@@ -16,11 +16,25 @@ import { useSelector, useDispatch } from "react-redux"
 import Navbar from "./Navbar"
 import Header from "./Header"
 import Footer from "./Footer"
+import Scroller from "components/Scroller"
 
 const Layout = props => {
   const dispatch = useDispatch()
-
+  const [showScroller, setShowScroller] = useState(false)
   const [isMenuOpened, setIsMenuOpened] = useState(false)
+
+  function scrollFunction() {
+    if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+      setShowScroller(true)
+    } else {
+      setShowScroller(false)
+    }
+  }
+
+  useEffect(() => {
+    window.onscroll = function () { scrollFunction() };
+  })
+
 
   const { topbarTheme, layoutWidth, isPreloader } = useSelector(state => ({
     topbarTheme: state.Layout.topbarTheme,
@@ -110,6 +124,7 @@ const Layout = props => {
         />
         <Navbar menuOpen={isMenuOpened} />
         <div className="main-content">{props.children}</div>
+        {showScroller && <Scroller />}
         <Footer pathname={props.location.pathname} />
       </div>
     </React.Fragment>

@@ -1,0 +1,45 @@
+.popup{
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1005;
+
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8.17833px);
+
+    .popup-box{
+        background-color: #232323;
+        max-width: 400px;
+        height: 400px;
+        width: 90%;
+        border-radius: 20px;
+        padding: 24px;
+    }
+
+    .popup-title{
+        color: #ff8a8a;
+    }
+
+    .popup-close{
+        cursor: pointer;
+    }
+
+    .popup-body{
+        margin-top: 50px;
+    }
+
+    .popup-content{
+        display: block;
+        color: #fff;
+        font-size: 16px;
+        text-align: justify;
+    }
+
+    @media screen and (max-width: 768px) {
+        .popup-box{
+            max-width: 350px;
+        }
+    }
+}

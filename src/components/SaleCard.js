@@ -32,6 +32,7 @@ import useSaleFinished from "hooks/useSaleIsFinished"
 import useSaleInfo from "hooks/useSaleInfo"
 import { formatBigToNum, formatNumber, NativePrice } from "utils/helpers"
 import SocialLinks from "pages/Public/home/SocialLinks"
+import TokenImage from "./TokenImage"
 
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
 const Completionist = () => <span>Sale is End</span>
@@ -139,7 +140,7 @@ const SaleCard = ({ sale }) => {
             <div>
               <div className="avatar-md">
                 <div className="avatar-title bg-primary bg-softer rounded-circle overflow-hidden fs-4">
-                  <img
+                  <TokenImage
                     src={sale?.saleLinks?.logo}
                     style={{
                       height: "100%",

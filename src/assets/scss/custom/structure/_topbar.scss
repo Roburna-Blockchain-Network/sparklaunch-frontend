@@ -3,7 +3,7 @@
 //
 
 #page-topbar {
-  position: fixed;
+  position: relative;
   top: 0;
   right: 0;
   left: $sidebar-width;
@@ -118,8 +118,8 @@
 }
 
 .page-content {
-  padding: calc(#{$header-height} + #{$grid-gutter-width}) calc(#{$grid-gutter-width} / 2) $footer-height calc(#{$grid-gutter-width} / 2);
-
+  padding: calc(0 + #{$grid-gutter-width}) calc(#{$grid-gutter-width} / 2) $footer-height calc(#{$grid-gutter-width} / 2);
+  margin-top: -110px!important;
   @media (max-width: 1200px) {
     padding: calc(#{$header-height} + #{$grid-gutter-width}) calc(#{$grid-gutter-width} / 2) calc(#{$footer-lg-height} * 2) calc(#{$grid-gutter-width} / 2);
   }

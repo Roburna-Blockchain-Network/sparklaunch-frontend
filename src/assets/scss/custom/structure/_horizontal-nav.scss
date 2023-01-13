@@ -6,8 +6,7 @@
   background: $topnav-bg;
   padding: 0 calc(#{$grid-gutter-width} / 2);
   box-shadow: $box-shadow;
-  margin-top: $header-height;
-  position: fixed;
+  position: absolute;
   left: 0;
   right: 0;
   z-index: 100;

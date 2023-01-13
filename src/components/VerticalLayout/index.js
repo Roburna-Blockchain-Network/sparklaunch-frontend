@@ -18,6 +18,7 @@ import {
 
 //redux
 import { useSelector, useDispatch } from "react-redux"
+import Scroller from "components/Scroller"
 
 const Layout = props => {
   const dispatch = useDispatch()
@@ -127,7 +128,11 @@ const Layout = props => {
           type={leftSideBarType}
           isMobile={isMobile}
         /> */}
-        <div className="main-content">{props.children}</div>
+        <div className="main-content">
+        {props.children}
+        
+        <Scroller />
+        </div>
         {/* <Footer /> */}
       </div>
     </React.Fragment>
