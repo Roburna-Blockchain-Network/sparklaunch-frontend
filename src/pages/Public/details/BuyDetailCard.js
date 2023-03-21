@@ -36,7 +36,7 @@ const BuyDetailCard = ({ sale }) => {
   const currentDate = dayjs.utc().unix()
 
   const { account, chainId, activateBrowserWallet, library } = useEthers()
-  const [buyVal, setBuyVal] = useState(0)
+  const [buyVal, setBuyVal] = useState()
   const [canBuy, setCanBuy] = useState(false)
   const [enabled, setEnabled] = useState(false)
   const [buttonStatus, setButtonStatus] = useState({
@@ -81,7 +81,9 @@ const BuyDetailCard = ({ sale }) => {
     setButtonStatus({
       loading: true,
     })
-    if (parseEther(buyVal.toString()).gt(userBalance)) {
+    console.log(buyVal.toString())
+    console.log(parseEther(buyVal.toString()).lt(userBalance))
+    if (parseEther(buyVal.toString()).lt(userBalance)) {
       NotificationManager.error("You dont have enough money !", "Error")
       setButtonStatus({
         loading: false,
@@ -161,7 +163,7 @@ const BuyDetailCard = ({ sale }) => {
     let textButton = `BUY ${sale.token.name}`
 
     if (isParticipant) {
-      textButton = "Already Paticipated"
+      textButton = "Already Participated"
       stateDisabled = true
     }
 
@@ -196,7 +198,6 @@ const BuyDetailCard = ({ sale }) => {
           <Form.Control
             value={buyVal}
             type="number"
-            placeholder="0"
             step="0.01"
             max={maxBuy}
             onChange={e => handleChangeValue(Number(e.target.value))}

@@ -275,6 +275,7 @@ const ProjectSetup = () => {
       // console.log(userAllow)
 
       const res = await handleBeforeSubmit(requiredToken)
+      console.log(`res :`, res)
       if (!res) {
         NotificationManager.error(
           "Please Approve Allowance Transaction on Metamask !",
@@ -346,6 +347,7 @@ const ProjectSetup = () => {
   }
 
   const handleWhite = data => {
+    if (!data) return []
     const result = data
       .split(",")
       .map(e => {
@@ -400,14 +402,19 @@ const ProjectSetup = () => {
     const routerAddress = ROUTER_ADDRESS
     const adminAddress = ADMIN_ADDRESS
 
-    let TIERS_ROUND, WL_ROUND
+    console.log("We are deploying your sale 1")
+
+    let TIERS_ROUND = []
+    let WL_ROUND = []
     if (data.info.isPublic) {
       TIERS_ROUND = [1]
       WL_ROUND = [adminAddress]
     } else {
-      ;[TIERS_ROUND, WL_ROUND] = createWhitelist()
+      [TIERS_ROUND, WL_ROUND] = createWhitelist()
     }
 
+
+    console.log("We are deploying your sale 2")
     const START_SALE = data.start
     const END_SALE = data.end
     const PUBLIC_DELTA = data.round.public - data.round.round5
@@ -420,6 +427,8 @@ const ProjectSetup = () => {
     startTimes.push(data.round.round3)
     startTimes.push(data.round.round4)
     startTimes.push(data.round.round5)
+
+    console.log("We are deploying your sale 3")
     try {
       const saleId = await contract.getNumberOfSalesDeployed()
       const tx = await contract.deployNormalSale(
@@ -450,7 +459,7 @@ const ProjectSetup = () => {
 
       return [saleId.toNumber(), deployedAddress]
     } catch (error) {
-      // console.log(error)
+      console.log(error)
     }
   }
 
@@ -463,13 +472,14 @@ const ProjectSetup = () => {
     )
 
     const amount = ethers.constants.MaxUint256
+    console.log(`amount`, amount)
 
     try {
       const approval = await contract.approve(factoryContractAddress, amount)
 
       await approval.wait()
     } catch (error) {
-      // console.log(error)
+      console.log(error)
       return false
     }
     setUserAllow(amount.toString())
@@ -488,13 +498,13 @@ const ProjectSetup = () => {
     )
     try {
       const userbal = await contract.balanceOf(account)
-
+      
       if (userbal.gt(amountRequired)) return true
       // console.log(`userbal`, userbal.toString())
       // console.log(`amountRequired`, amountRequired.toString())
       return false
     } catch (error) {
-      // console.log(error)
+      console.log(error)
     }
   }
 
@@ -514,7 +524,7 @@ const ProjectSetup = () => {
 
       return true
     } catch (e) {
-      // console.log("Err: ", e.message)
+      console.log("Err: ", e.message)
       return false
     }
   }
@@ -591,10 +601,10 @@ const ProjectSetup = () => {
         setIsLoading(false)
         history.push(`/sale/${id}`)
       } else {
-        // console.log(`backend error`)
+        console.log(`backend error`)
       }
     } catch (error) {
-      // console.log(error)
+      console.log(error)
     }
   }
 
@@ -638,7 +648,7 @@ const ProjectSetup = () => {
         }
 
         // console.log(allow)
-      } catch (error) { }
+      } catch (error) {}
     }
   }, [activeTab])
 
@@ -668,7 +678,7 @@ const ProjectSetup = () => {
       setRequiredToken(reqHard.add(reqLP).toString())
     }
 
-    return () => { }
+    return () => {}
   }, [step2.hardCap, step2.softCap, step2.listingRate, step2.presaleRate])
 
   const steps = [
@@ -750,9 +760,9 @@ const ProjectSetup = () => {
         <MetaTags>
           <title>Project Setup | SparkLaunch</title>
         </MetaTags>
-        
-          <Modal />
-        
+
+        <Modal />
+
         <Container fluid>
           <div className="text-end">
             <Link
@@ -1054,8 +1064,7 @@ const ProjectSetup = () => {
                       }}
                     />
                     <p className="form-text text-info">
-                      Sale Start Time MUST BEFORE Sale End Time and Public Sale
-                      Time
+                      Sale Start Time MUST BE Sale End Time and Public Sale Time
                     </p>
                   </Form.Group>
 
@@ -1224,7 +1233,7 @@ const ProjectSetup = () => {
                         }
                         checked={!step2.isPublic}
                       />
-                      <label className="form-check-label" for="saleType2">
+                      <label className="form-check-label" htmlFor="saleType2">
                         Whitelist
                       </label>
                     </div>
@@ -1235,7 +1244,9 @@ const ProjectSetup = () => {
                     <p className="mb-3 mt-3 fs-5">Set Sale Rounds</p>
                     <Row>
                       <Form.Text className="text-primary mb-2">
-                        Enter Hrs after sale start that a round should begin
+                        Enter the times and dates you wish each round to start.
+                        Rounds must start and end prior to public round start
+                        time and after sale start time.
                       </Form.Text>
                       <Form.Group
                         className="mb-2"
@@ -1476,7 +1487,7 @@ const ProjectSetup = () => {
               <Form onSubmit={handleSubmit3}>
                 <Row>
                   <Form.Group className="mb-2" as={Col} md={6} controlId="logo">
-                    <Form.Label>Logo URL *</Form.Label>
+                    <Form.Label>Logo URL (80x80) *</Form.Label>
                     <Form.Control
                       defaultValue={step3?.logo}
                       placeholder="Ex. http://..."

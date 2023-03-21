@@ -53,6 +53,7 @@ const SaleDetails = props => {
         alert(`sale not found`)
         history.push("/")
       }
+      console.log(res.data[0])
       setSale(res.data[0])
     } catch (error) {
       // console.log(error)
@@ -71,7 +72,7 @@ const SaleDetails = props => {
     <React.Fragment>
       <div className="page-content">
         <MetaTags>
-          <title>Sale Parcticipation | SparkLaunch</title>
+          <title>Sale Participation | SparkLaunch</title>
         </MetaTags>
 
         <Container fluid>
@@ -206,8 +207,8 @@ const SaleDetails = props => {
                 </div>
 
                 <div className="row">
-                  <Col md={7}>
-                    <TokenInfo info={sale.token} />
+                  <Col md={9}>
+                    <TokenInfo info={sale.token} presaleAddress={sale.address} contractAddress={sale.tokenAddress} />
                   </Col>
                 </div>
               </Col>

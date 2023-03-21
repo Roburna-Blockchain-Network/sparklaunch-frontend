@@ -29,17 +29,21 @@ const RoundInfo = ({ sale }) => {
             <div className="w-100 fw-bold">Round Info</div>
           </div>
 
-          <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
-            <div className="w-50 fw-bold">Round 1</div>
-            <div className="text-primary">
-              :{" "}
-              {currentRound == 1
-                ? "On Going"
-                : sale.round.round1 > currentDate
-                ? "Not Started"
-                : "Finished"}
+          {sale.round.round1 !== sale.start + 1 &&
+            <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
+              <div className="w-50 fw-bold">Round 1</div>
+              <div className="text-primary">
+                :{" "}
+                {currentRound == 1
+                  ? "On Going"
+                  : sale.round.round1 > currentDate
+                    ? "Not Started"
+                    : "Finished"}
+              </div>
             </div>
-          </div>
+          }
+
+          {sale.round.round2 !== sale.start + 2 &&
           <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
             <div className="w-50 fw-bold">Round 2</div>
             <div className="text-primary">
@@ -47,11 +51,12 @@ const RoundInfo = ({ sale }) => {
               {currentRound == 2
                 ? "On Going"
                 : sale.round.round2 > currentDate
-                ? "Not Started"
-                : "Finished"}
+                  ? "Not Started"
+                  : "Finished"}
             </div>
-          </div>
+          </div>}
 
+          {sale.round.round3 !== sale.start + 3 &&
           <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
             <div className="w-50 fw-bold">Round 3</div>
             <div className="text-primary">
@@ -59,11 +64,13 @@ const RoundInfo = ({ sale }) => {
               {currentRound == 3
                 ? "On Going"
                 : sale.round.round3 > currentDate
-                ? "Not Started"
-                : "Finished"}
+                  ? "Not Started"
+                  : "Finished"}
             </div>
-          </div>
+          </div>}
 
+
+          {sale.round.round4 !== sale.start + 4 &&
           <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
             <div className="w-50 fw-bold">Round 4</div>
             <div className="text-primary">
@@ -71,36 +78,37 @@ const RoundInfo = ({ sale }) => {
               {currentRound == 4
                 ? "On Going"
                 : sale.round.round4 > currentDate
-                ? "Not Started"
-                : "Finished"}
+                  ? "Not Started"
+                  : "Finished"}
             </div>
-          </div>
+          </div>}
 
+          {sale.round.round5 !== sale.start + 5 &&
           <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
             <div className="w-50 fw-bold">Round 5</div>
             <div className="text-primary">
               :{" "}
               {currentRound == 5 &&
-              sale.round.round5 < currentDate &&
-              currentDate < sale.round.public
+                sale.round.round5 < currentDate &&
+                currentDate < sale.round.public
                 ? "On Going"
                 : sale.round.round5 > currentDate
-                ? "Not Started"
-                : "Finished"}
+                  ? "Not Started"
+                  : "Finished"}
             </div>
-          </div>
+          </div>}
 
           <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
             <div className="w-50 fw-bold">Public Round</div>
             <div className="text-primary">
               :{" "}
               {currentRound == 5 &&
-              sale.round.public < currentDate &&
-              currentDate < sale.round.end
+                sale.round.public < currentDate &&
+                currentDate < sale.round.end
                 ? "On Going"
                 : sale.round.public > currentDate
-                ? "Not Started"
-                : "Finished"}
+                  ? "Not Started"
+                  : "Finished"}
             </div>
           </div>
         </>

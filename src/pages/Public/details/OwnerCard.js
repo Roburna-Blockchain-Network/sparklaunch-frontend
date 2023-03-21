@@ -160,7 +160,7 @@ const OwnerCard = ({ sale }) => {
                   setShowModal(true)
                 }}
               >
-                {finalize ? "FINALIZE SALE" : "CANCEL SALE"}
+                {finalize ? "FINALIZE SALE" : "WITHDRAW LEFTOVER"}
               </Button>
             )}
             {isSaleSuccess && getInfo?.earningsWithdrawn === false ? null : (

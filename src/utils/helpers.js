@@ -63,6 +63,6 @@ export function formatNumber(x, max = 6) {
   })
 }
 
-export const formatBigToNum = (val, dec, comma = 0) => {
+export const formatBigToNum = (val, dec, comma = 3) => {
   return formatNumber(formatUnits(BigNumber.from(val), dec) * 1, comma)
 }

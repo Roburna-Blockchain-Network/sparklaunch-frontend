@@ -153,18 +153,8 @@
       },
       {
         "internalType": "uint256",
-        "name": "tokenPriceInBNB",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
         "name": "pcsListingRate",
         "type": "uint256"
-      },
-      {
-        "internalType": "uint8",
-        "name": "decimals",
-        "type": "uint8"
       }
     ],
     "name": "calculateMaxTokensForLiquidity",
