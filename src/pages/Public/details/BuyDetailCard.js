@@ -82,8 +82,10 @@ const BuyDetailCard = ({ sale }) => {
       loading: true,
     })
     console.log(buyVal.toString())
+    console.log(userBalance.toString())
+    console.log(buyVal.toString())
     console.log(parseEther(buyVal.toString()).lt(userBalance))
-    if (parseEther(buyVal.toString()).lt(userBalance)) {
+    if (parseEther(buyVal.toString()).gt(userBalance)) {
       NotificationManager.error("You dont have enough money !", "Error")
       setButtonStatus({
         loading: false,

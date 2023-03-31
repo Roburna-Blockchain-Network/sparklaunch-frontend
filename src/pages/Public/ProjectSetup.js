@@ -40,6 +40,7 @@ import { getTokenAllowance } from "utils/factoryHelper"
 import { BIG_TEN } from "utils/numbers"
 import useServiceFee from "hooks/useServiceFee"
 import Modal from "components/Modal"
+import FinalModal from "components/FinalModal"
 dayjs.extend(utc)
 const ProjectSetup = () => {
   let history = useHistory()
@@ -56,6 +57,8 @@ const ProjectSetup = () => {
   const [white3, setWhite3] = useState(null)
   const [white4, setWhite4] = useState(null)
   const [white5, setWhite5] = useState(null)
+  const [show, setShow] = useState(false)
+
   const [step2, setStep2] = useState({
     softCap: 0,
     hardCap: 0,
@@ -300,6 +303,13 @@ const ProjectSetup = () => {
     return true
   }
 
+
+  const handleClose = () => {
+    setShow(false)
+    deployToken()
+  }
+
+
   const handleSubmit2 = async event => {
     const form = event.currentTarget
     setIsLoading(true)
@@ -529,9 +539,14 @@ const ProjectSetup = () => {
     }
   }
 
+
   const handleSubmitFinal = async event => {
     event.preventDefault()
     event.stopPropagation()
+    setShow(true)
+  }
+
+  const deployToken = async event => {
     setIsLoading(true)
 
     const values = {
@@ -760,7 +775,7 @@ const ProjectSetup = () => {
         <MetaTags>
           <title>Project Setup | SparkLaunch</title>
         </MetaTags>
-
+        <FinalModal show={show} handleClose={handleClose} />
         <Modal />
 
         <Container fluid>
