@@ -139,7 +139,7 @@ const ParticipationCard = ({ sale }) => {
               {isProcessing ? (
                 <div className="d-flex justify-content-center">
                   <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
+                    <span className="visually-hidden">Processing...</span>
                   </div>
                 </div>
               ) : (
