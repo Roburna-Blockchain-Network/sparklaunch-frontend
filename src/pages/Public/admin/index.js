@@ -908,8 +908,7 @@ const ProjectSetup = () => {
                       }}
                     />
                     <p className="form-text text-info">
-                      Sale Start Time MUST BEFORE Sale End Time and Public Sale
-                      Time
+                      Sale Start Time MUST BE Sale End Time and Public Sale Time
                     </p>
                   </Form.Group>
 
@@ -1078,7 +1077,7 @@ const ProjectSetup = () => {
                         }
                         checked={!step2.isPublic}
                       />
-                      <label className="form-check-label" for="saleType2">
+                      <label className="form-check-label" htmlFor="saleType2">
                         Private
                       </label>
                     </div>
@@ -1089,7 +1088,9 @@ const ProjectSetup = () => {
                     <p className="mb-3 mt-3 fs-5">Set Sale Rounds</p>
                     <Row>
                       <Form.Text className="text-primary mb-2">
-                        Enter Hrs after sale start that a round should begin
+                        Enter the times and dates you wish each round to start.
+                        Rounds must start and end prior to public round start
+                        time and after sale start time.
                       </Form.Text>
                       <Form.Group
                         className="mb-2"
@@ -1275,7 +1276,7 @@ const ProjectSetup = () => {
                     <Form.Label>Logo URL *</Form.Label>
                     <Form.Control
                       defaultValue={step3?.logo}
-                      placeholder="Ex. http://..."
+                      placeholder="Ex. http://... (200x200)"
                       required
                     />
                   </Form.Group>

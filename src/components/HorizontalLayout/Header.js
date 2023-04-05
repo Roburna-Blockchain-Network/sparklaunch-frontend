@@ -28,59 +28,76 @@ const Header = props => {
   const { account, activateBrowserWallet, deactivate, switchNetwork, chainId } =
     useEthers()
 
-  // const users = useSelector(state => state.User)
+  const users = useSelector(state => state.User)
 
   const [logged, setLogged] = useState()
 
+
   const dispatch = useDispatch()
   let options = []
-  // options[97] = {
-  //   id: 0,
-  //   value: ChainId.BSCTestnet,
-  //   text: "BSC Testnet",
-  //   logo: bscLogo,
-  // }
+  options[97] = {
+    id: 0,
+    value: ChainId.BSCTestnet,
+    text: "BSC Testnet",
+    logo: bscLogo,
+  }
 
-  options[159] = { id: 1, value: 159, text: "Roburna Chain", logo: roburnaLogo }
+  //options[159] = { id: 1, value: 159, text: "Roburna Chain", logo: roburnaLogo }
 
-  const [selected, setSelected] = useState(options[159])
+  const [selected, setSelected] = useState(options[97])
   //  // console.log(users)
 
-  // const handleSwitchNetwork = async e => {
-  //   if (account) {
-  //     if (chainId === e && users.selectedChain === e) {
-  //       return
-  //     } else {
-  //       try {
-  //         await switchNetwork(e)
-  //         setSelected(options[e])
-  //         activateBrowserWallet()
-  //         dispatch(clearAllSales(false))
-  //         dispatch(setSelectedChain(e))
-  //       } catch (error) {
-  //         dispatch(setSelectedChain(chainId))
-  //         setSelected(options[chainId])
-  //         alert(
-  //           `Switch network to ${options[e].text} on your wallet to continue`
-  //         )
-  //       }
-  //       dispatch(setSelectedChain(e))
-  //     }
-  //   } else {
-  //     if (users.selectedChain === e) {
-  //       return
-  //     } else {
-  //       dispatch(setSelectedChain(e))
-  //       setSelected(options[e])
-  //     }
-  //   }
-  // }
+  const handleSwitchNetwork = async e => {
+    console.log(e)
+    if (account) {
+      if (chainId === e && users.selectedChain === e) {
+        return
+      } else {
+        try {
+          await switchNetwork(e)
+          setSelected(options[e])
+          activateBrowserWallet()
+          dispatch(clearAllSales(false))
+        } catch (error) {
+          setSelected(options[chainId])
+          alert(
+            `Switch network to ${options[97].text} on your wallet to continue`
+          )
+        }
+      }
+    } else {
+      if (users.selectedChain === e) {
+        return
+      } else {
+        setSelected(options[e])
+      }
+    }
+  }
+
+
+  const handleConnectWallet = () => {
+    if (account) {
+      deactivate()
+      setLogged()
+    } else {
+      try {
+        activateBrowserWallet()
+        setLogged(account)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }
 
   useEffect(() => {
     if (typeof account == "undefined") {
       return
     }
     if (account && typeof logged == "undefined") {
+      if (chainId !== 97) {
+          switchNetwork(97)
+      }
+
       setLogged(account)
       return
     }
@@ -204,8 +221,8 @@ const Header = props => {
                 {options.map((item, key) => (
                   <Dropdown.Item
                     key={key}
-                    // onClick={() => handleSwitchNetwork(item.value)}
-                    onClick={() => console.log(item.value)}
+                    onClick={() => handleSwitchNetwork(item.value)}
+                    //onClick={() => console.log(item.value)}
                   >
                     <img src={item.logo} height={18} className="me-2" />
                     {item.text}
@@ -225,7 +242,7 @@ const Header = props => {
             ) : (
               <button
                 className="btn btn-sm btn-primary text-white rounded-3 me-3 fw-bold"
-                onClick={() => activateBrowserWallet()}
+                onClick={handleConnectWallet}
               >
                 CONNECT WALLET
               </button>

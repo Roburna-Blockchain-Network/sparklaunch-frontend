@@ -160,7 +160,7 @@ const OwnerCard = ({ sale }) => {
                   setShowModal(true)
                 }}
               >
-                {finalize ? "FINALIZE SALE" : "CANCEL SALE"}
+                {finalize ? "FINALIZE SALE" : "WITHDRAW LEFTOVER"}
               </Button>
             )}
             {isSaleSuccess && getInfo?.earningsWithdrawn === false ? null : (
@@ -191,20 +191,30 @@ const OwnerCard = ({ sale }) => {
                 Are you sure want to {finalize ? "Finalize " : "Cancel "} this
                 sale ?
               </div>
-              <button
-                className="btn btn-primary px-3 fw-bolder w-100 text-nowrap mb-3"
-                disabled={isProcessing}
-                onClick={e => handleConfirm(e)}
-              >
-                YES {finalize ? " FINALIZE SALE" : " CANCEL SALE"}
-              </button>
-              <button
-                className="btn btn-primary px-3 fw-bolder w-100 text-nowrap"
-                disabled={isProcessing}
-                onClick={e => setShowModal(false)}
-              >
-                NO
-              </button>
+
+              {isProcessing ?
+                <div className="d-flex justify-content-center">
+                  <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Processing...</span>
+                  </div>
+                </div>
+                : <React.Fragment>
+                  <button
+                    className="btn btn-primary px-3 fw-bolder w-100 text-nowrap mb-3"
+                    disabled={isProcessing}
+                    onClick={e => handleConfirm(e)}
+                  >
+                    YES {finalize ? " FINALIZE SALE" : " CANCEL SALE"}
+                  </button>
+                  <button
+                    className="btn btn-primary px-3 fw-bolder w-100 text-nowrap"
+                    disabled={isProcessing}
+                    onClick={e => setShowModal(false)}
+                  >
+                    NO
+                  </button>
+                </React.Fragment>
+              }
             </div>
           </div>
           <Modal.Body></Modal.Body>

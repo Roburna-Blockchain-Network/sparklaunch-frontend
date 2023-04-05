@@ -32,7 +32,7 @@ const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
 const UserDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
   const currentDate = dayjs.utc().unix()
   const { account, chainId, activateBrowserWallet, library } = useEthers()
-  const [buyVal, setBuyVal] = useState(0)
+  const [buyVal, setBuyVal] = useState()
   const [canBuy, setCanBuy] = useState(false)
   const [enabled, setEnabled] = useState(false)
   const [participate, setParticipate] = useState()
@@ -142,7 +142,6 @@ const UserDetailCard = ({ saleData, tokenInfo, saleInfo, roundInfo }) => {
             defaultValue={buyVal}
             value={buyVal}
             type="number"
-            placeholder="0"
             max={maxBuy}
             onChange={e => handleChangeValue(Number(e.target.value))}
           />

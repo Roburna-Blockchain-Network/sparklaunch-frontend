@@ -1,9 +1,8 @@
 import React from "react"
 import "assets/scss/custom/components/modal.scss"
-export default function Modal() {
-  const [show, setShow] = React.useState(true)
 
-  const handleClose = () => setShow(false)
+export default function FinalModal({show, handleClose}) {
+  
 
   if (show) {
     return (
@@ -16,11 +15,11 @@ export default function Modal() {
 
             <div className="popup-body">
               <span className="popup-content">
-                Projects with taxes, please ensure that you whitelist the
-                presale contract address in your token contract functions.
-                Failure to do this may result in loss of tokens, funds and
-                difficulty finalising your presale. Spark Launch and its parent
-                group Ignite Defi are not responsible for any errors.
+              Please ensure that all details are correct before confirming as once 
+              presales are confirmed they CAN NOT be amended. Spark Launch and 
+              Ignite Defi take no responsibility for errors made while creating 
+              your presale. By continuing you are agreeing to the Spark Launch 
+              terms and conditions as found on our Gitbook.
               </span>
             </div>
             {/* button to close */}

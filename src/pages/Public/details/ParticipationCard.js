@@ -62,8 +62,7 @@ const ParticipationCard = ({ sale }) => {
       const tx = await contract.withdraw()
       await tx.wait()
       NotificationManager.success(
-        `Withdraw ${
-          isSaleSuccess ? sale.token.symbol : CHAIN_NATIVE_SYMBOL
+        `Withdraw ${isSaleSuccess ? sale.token.symbol : CHAIN_NATIVE_SYMBOL
         } is Success  `,
         "Thanks"
       )
@@ -137,20 +136,31 @@ const ParticipationCard = ({ sale }) => {
                 Are you sure want to Withdraw{" "}
                 {isSaleSuccess ? sale.token.symbol : CHAIN_NATIVE_SYMBOL}{" "}
               </div>
-              <button
-                className="btn btn-primary px-3 fw-bolder w-100 text-nowrap mb-3"
-                disabled={isProcessing}
-                onClick={e => handleConfirm(e)}
-              >
-                YES
-              </button>
-              <button
-                className="btn btn-primary px-3 fw-bolder w-100 text-nowrap"
-                disabled={isProcessing}
-                onClick={e => setShowModal(false)}
-              >
-                NO
-              </button>
+              {isProcessing ? (
+                <div className="d-flex justify-content-center">
+                  <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Processing...</span>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <button
+                    className="btn btn-primary px-3 fw-bolder w-100 text-nowrap mb-3"
+                    disabled={isProcessing}
+                    onClick={e => handleConfirm(e)}
+                  >
+                    YES
+                  </button>
+                  <button
+                    className="btn btn-primary px-3 fw-bolder w-100 text-nowrap"
+                    disabled={isProcessing}
+                    onClick={e => setShowModal(false)}
+                  >
+                    NO
+                  </button>
+                </div>
+              )
+              }
             </div>
           </div>
           <Modal.Body></Modal.Body>

@@ -7,6 +7,7 @@ import { NotificationContainer } from "react-notifications"
 
 import { Provider } from "react-redux"
 import {
+  BSCTestnet,
   DAppProvider,
   // DEFAULT_SUPPORTED_CHAINS,
 } from "@usedapp/core"
@@ -19,12 +20,12 @@ import "owl.carousel/dist/assets/owl.carousel.css"
 import "owl.carousel/dist/assets/owl.theme.default.css"
 
 const config = {
-  readOnlyChainId: [RbaChain.chainId],
+  readOnlyChainId: [BSCTestnet.chainId],
   readOnlyUrls: {
-    [RbaChain.chainId]: "https://preseed-testnet-1.roburna.com/",
-    // [BSCTestnet.chainId]: "https://rpc.ankr.com/bsc_testnet_chapel",
+    //[RbaChain.chainId]: "https://preseed-testnet-1.roburna.com/",
+     [BSCTestnet.chainId]: "https://rpc.ankr.com/bsc_testnet_chapel",
   },
-  networks: [RbaChain],
+  networks: [BSCTestnet],
   noMetamaskDeactivate: true,
 }
 

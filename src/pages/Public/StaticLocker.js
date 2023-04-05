@@ -56,7 +56,7 @@ const StaticLocker = () => {
     <>
       <div className="page-content">
         <MetaTags>
-          <title>Project Setup | SparkLaunch</title>
+          <title>Token Locker | SparkLaunch</title>
         </MetaTags>
         <Container fluid>
           <div className="featured-card bg-dark p-4 my-2 rounded-4">
