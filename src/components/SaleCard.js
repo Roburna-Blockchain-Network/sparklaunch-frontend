@@ -120,6 +120,16 @@ const SaleCard = ({ sale }) => {
       percent: newPercent,
     })
   }, [getInfo])
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      window.location.reload();
+    }, 60000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
   return (
     <>
       {ready ? (
@@ -136,18 +146,16 @@ const SaleCard = ({ sale }) => {
               <h4 className="text-primary mb-0">{sale.name}</h4>
               <h5>{tokenInfo?.name ? tokenInfo.name : "SPL"}</h5>
             </div>
-
             <div>
+              
               <div className="avatar-md">
                 <div className="avatar-title bg-primary bg-softer rounded-circle overflow-hidden fs-4">
                   <TokenImage
                     src={sale?.saleLinks?.logo}
-                    style={{
-                      height: "100%",
-                      width: "100%",
-                      objectFit: "cover",
-                      objectPosition: "10% 20%",
-                    }}
+                    height="100%"
+                    width="100%"
+                    objectFit="contain"
+                    objectPosition="center"
                     alt={tokenInfo?.symbol ? tokenInfo?.symbol : "SPL"}
                   />
                 </div>
@@ -156,6 +164,7 @@ const SaleCard = ({ sale }) => {
           </div>
 
           <ul className="list-unstyled d-flex mb-4">
+
             <SocialLinks links={sale.saleLinks} />
           </ul>
 
@@ -200,7 +209,7 @@ const SaleCard = ({ sale }) => {
               </Col>
             </Row>
             <Row className="mb-2">
-              <Col xs={4}>Total Raise </Col>
+              <Col xs={4}>Total Raised </Col>
               <Col xs={8} className="text-primary fs-6 text-end fw-bold">
                 {getInfo ? (
                   <>

@@ -112,12 +112,10 @@ const SaleDetailCard = ({ sale }) => {
             <div className="avatar-title bg-primary bg-softer rounded-circle overflow-hidden fs-4">
               <TokenImage
                 src={sale.saleLinks.logo}
-                style={{
-                  height: "100%",
-                  width: "100%",
-                  objectFit: "cover",
-                  objectPosition: "10% 20%",
-                }}
+                height="100%"
+                width="100%"
+                objectFit="contain"
+                objectPosition="center"
                 alt={sale.token?.symbol}
               />
             </div>
@@ -132,7 +130,7 @@ const SaleDetailCard = ({ sale }) => {
       <div>
         <div className="d-flex w-100 flex-wrap mt-3 mb-0 py-1 border-bottom border-white border-opacity-50"></div>
         <div className="d-flex w-100 flex-wrap mb-0 py-1 border-bottom border-white border-opacity-50">
-          <div className="w-50 fw-bold">Total Raised</div>
+          <div className="w-50 fw-bold">Total Raised </div>
           <div className="text-primary">
             :{" "}
             {getInfo ? (

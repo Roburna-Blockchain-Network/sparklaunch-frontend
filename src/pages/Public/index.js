@@ -21,6 +21,7 @@ const Public = props => {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedBtn, setSelectedBtn] = useState("ALL")
 
+
   const contains = (item, searchValue) => {
     if (
       searchValue === null ||
@@ -39,7 +40,7 @@ const Public = props => {
     }
 
     if (searchValue === "CLOSED") {
-      return item.isFinished
+      return item.round.end< currentDate
     }
 
     if (searchValue === "LIVE") {
@@ -60,7 +61,6 @@ const Public = props => {
         .toLocaleLowerCase()
         .includes(searchValue.toLocaleLowerCase())
     )
-
     // return true
 
     // const saleDetails = JSON.stringify(Object.values(item.saleDetails))
@@ -97,6 +97,7 @@ const Public = props => {
     }
     setIsLoading(false)
   }, [])
+  console.log(allSales)
 
   return (
     <React.Fragment>

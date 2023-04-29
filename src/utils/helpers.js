@@ -64,5 +64,12 @@ export function formatNumber(x, max = 6) {
 }
 
 export const formatBigToNum = (val, dec, comma = 3) => {
-  return formatNumber(formatUnits(BigNumber.from(val), dec) * 1, comma)
+  // Convert the value to Ether and truncate to 3 decimal places
+  let num = val / 10**18;
+  num = num.toString();
+  let index = num.indexOf('.');
+  if (index != -1 && index + 4 < num.length) {
+    num = num.substring(0, index + 4);
+  }
+  return Number(num);
 }

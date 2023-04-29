@@ -123,6 +123,7 @@ const OwnerCard = ({ sale }) => {
 
   useEffect(() => {
     if (isFinished) {
+      
       setIsAlreadyEnd(true)
     }
   }, [isFinished])
@@ -147,7 +148,7 @@ const OwnerCard = ({ sale }) => {
   }, [getInfo, account])
 
   return (
-    <>
+    <React.Fragment>
       {isUserAdmin || isSaleOwner ? (
         <div className="buy-detail-card" id="buy-card">
           <div className="d-flex w-100 flex-wrap mb-0 py-1 border-white border-opacity-50 justify-content-center">
@@ -240,7 +241,7 @@ const OwnerCard = ({ sale }) => {
           <Modal.Body></Modal.Body>
         </div>
       </Modal>
-    </>
+    </React.Fragment>
   )
 }
 
