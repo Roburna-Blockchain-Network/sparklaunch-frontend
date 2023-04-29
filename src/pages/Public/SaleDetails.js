@@ -66,7 +66,17 @@ const SaleDetails = props => {
     }
   }, [])
 
-  // console.log(sale)
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      window.location.reload();
+    }, 60000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
+
+  // console.log(sale.saleLinks.logo)
 
   return (
     <React.Fragment>
@@ -92,12 +102,10 @@ const SaleDetails = props => {
                       <div className="avatar-title bg-primary bg-softer border border-primary rounded-circle overflow-hidden">
                         <TokenImage
                           src={sale.saleLinks.logo}
-                          style={{
-                            height: "100%",
-                            width: "100%",
-                            objectFit: "cover",
-                            objectPosition: "10% 20%",
-                          }}
+                          height="100%"
+                          width="100%"
+                          objectFit="contain"
+                          objectPosition="center"
                           alt={sale.token.symbol ? sale.token.symbol : "SPL"}
                         />
                       </div>
@@ -115,12 +123,12 @@ const SaleDetails = props => {
                     <div className="avatar-md me-3">
                       <div className="avatar-title bg-dark bg-soft rounded-circle overflow-hidden">
                         <img
-                          src={bscLogo}
+                          src={sale.saleLinks.logo}
                           style={{
-                            height: "100%",
-                            width: "100%",
+                            height: "80px",
+                            width: "80px",
                             objectFit: "cover",
-                            objectPosition: "10% 20%",
+                            objectPosition: "center",
                           }}
                         />
                       </div>

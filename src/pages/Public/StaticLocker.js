@@ -9,46 +9,46 @@ const StaticLocker = () => {
     {
       label: "Quote Pair",
       image: "/images/tokens/bnb.svg",
-      value: "WBNB",
+      value: "---",
     },
     {
       label: "Base Pair",
       image: "/images/tokens/sxp.svg",
-      value: "SXP",
+      value: "---",
     },
     {
       label: "Symbol",
-      value: "WBNB/SXP",
+      value: "---",
     },
     {
       label: "LP Supply",
-      value: 9014470,
+      value: "---",
     },
     {
       label: "Dex Listed",
-      value: "Spark",
+      value: "---",
     },
   ]
   const LockInfo = [
     {
       label: "Title",
-      value: "Spark Lock",
+      value: "---",
     },
     {
       label: "Total Amount Locked",
-      value: "189.7542",
+      value: "---",
     },
     {
       label: "Total Value Locked",
-      value: "$220.041",
+      value: "---",
     },
     {
       label: "Owner",
-      value: "0xC8bA821FeD333e1c134324676643e41237583A245a",
+      value: "---",
     },
     {
       label: "Lock Date",
-      value: "2022.08.26 21:07 UTC",
+      value: "---",
     },
   ]
 
@@ -68,16 +68,16 @@ const StaticLocker = () => {
             <Row>
               <Col className="text-center">
                 <button className="btn btn-primary px-3 btn-time fw-bolder text-center">
-                  111
+                  ---
                 </button>
                 <button className="btn btn-primary px-3 btn-time fw-bolder text-center">
-                  05
+                  ---
                 </button>
                 <button className="btn btn-primary px-3 btn-time fw-bolder text-center">
-                  08
+                  ---
                 </button>
                 <button className="btn btn-primary px-3 btn-time fw-bolder text-center">
-                  05
+                  ---
                 </button>
               </Col>
             </Row>
@@ -115,7 +115,7 @@ const StaticLocker = () => {
                 <Row className="list-container">
                   <Col>Unlock Date</Col>
                   <Col className="text-end">
-                    2023.02.26 20:07 UTC (in 4 months)
+                    ---
                   </Col>
                 </Row>
               </Col>
