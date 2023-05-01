@@ -28,7 +28,7 @@ import {
   getTokenInfo,
 } from "utils/factoryHelper"
 import Countdown, { zeroPad } from "react-countdown"
-import bscLogo from "assets/images/logos/rba.svg"
+import bscLogo from "assets/images/logos/bsc.png"
 import useSaleIsSuccess from "hooks/useSaleIsSuccess"
 import useLpWithdrawn from "hooks/useLpWithdrawn"
 import useSaleInfo from "hooks/useSaleInfo"

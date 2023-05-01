@@ -123,7 +123,7 @@ const SaleDetails = props => {
                     <div className="avatar-md me-3">
                       <div className="avatar-title bg-dark bg-soft rounded-circle overflow-hidden">
                         <img
-                          src={sale.saleLinks.logo}
+                          src={"/images/bnb-chain-logo.png"}
                           style={{
                             height: "80px",
                             width: "80px",
