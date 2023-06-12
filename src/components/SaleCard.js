@@ -19,12 +19,11 @@ import {
   parseEther,
   parseUnits,
 } from "ethers/lib/utils"
-import { BigNumber, BigNumber as BN } from "ethers"
+import { BigNumber } from "ethers"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 dayjs.extend(utc)
 import Countdown, { zeroPad } from "react-countdown"
-import { updateSaleTime } from "store/actions"
 import { CHAIN_NATIVE_SYMBOL } from "constants/Address"
 import AuditInfo from "pages/Public/details/AuditInfo"
 import getUseSaleIsSuccess from "hooks/useSaleIsSuccess"
@@ -246,9 +245,9 @@ const SaleCard = ({ sale }) => {
             <Row className="mb-2">
               <Col xs={4}>Total Raised </Col>
               <Col xs={8} className="text-primary fs-6 text-end fw-bold">
-                {getInfo ? (
+                {BNBRaised? (
                   <>
-                    {formatBigToNum(getInfo.totalBNBRaised.toString(), 18, 4)}{" "}
+                    {formatBigToNum(BNBRaised.toString(), 18, 4)}{" "}
                     {CHAIN_NATIVE_SYMBOL}
                   </>
                 ) : (

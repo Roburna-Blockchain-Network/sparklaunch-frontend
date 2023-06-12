@@ -185,7 +185,7 @@ const SaleDetailCard = ({ sale }) => {
             {totalSold!=null ? (
               <>
                 {formatBigToNum(
-                  getInfo.totalTokensSold.toString(),
+                  totalSold.toString(),
                   sale.token.decimals,
                   0
                 )}{" "}
