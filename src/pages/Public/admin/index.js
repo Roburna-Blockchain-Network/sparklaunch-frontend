@@ -11,7 +11,7 @@ import dayjs from "dayjs"
 
 import utc from "dayjs/plugin/utc"
 import { BigNumber, ethers, utils } from "ethers"
-import useDeploymentFee from "hooks/useDeploymentFee"
+import getUseDeploymentFee from "hooks/useDeploymentFee"
 
 import {
   FACTORY_ADDRESS,
@@ -37,14 +37,14 @@ import { tokenRate } from "utils/helpers"
 import { useSelector } from "react-redux"
 import { getTokenAllowance } from "utils/factoryHelper"
 import { BIG_TEN } from "utils/numbers"
-import useServiceFee from "hooks/useServiceFee"
+import getUseServiceFee from "hooks/useServiceFee"
 dayjs.extend(utc)
 const ProjectSetup = () => {
   let history = useHistory()
   const { account, chainId, library, activateBrowserWallet } = useEthers()
 
-  const deployFee = useDeploymentFee()
-  const servicesFee = useServiceFee()
+  const deployFee = getUseDeploymentFee()
+  const servicesFee = getUseServiceFee()
 
   const user = useSelector(state => state.User)
 

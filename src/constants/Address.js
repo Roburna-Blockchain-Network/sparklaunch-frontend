@@ -12,7 +12,7 @@ import { BSCTestnet } from '@usedapp/core'
 
 
 // BSC Testnet
-const RPC_ADDRESS = "https://rpc.ankr.com/bsc_testnet_chapel"
+const RPC_ADDRESS = "https://data-seed-prebsc-1-s1.binance.org:8545/"
 const FACTORY_ADDRESS = "0xfD48d8347cCe07189Ba7CdAdAbB8A6633a4763ad"
 const ADMIN_ADDRESS = "0x910Ad70E105224f503067DAe10b518F73B07b5cD"
 const ROUTER_ADDRESS = "0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3"

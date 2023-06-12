@@ -13,6 +13,7 @@ function useIsSaleOwner(account) {
       args: [account],
     }) ?? {}
   if (error) {
+    console.log(error)
     return false
   }
   return value?.[0]

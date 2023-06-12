@@ -25,7 +25,7 @@ import SaleAbi from "constants/abi/Sale.json"
 import { getUserParticipation } from "utils/factoryHelper"
 import { useSelector } from "react-redux"
 import { BIG_ONE } from "utils/numbers"
-import useIsAdmin from "hooks/useIsAdmin"
+import getUseIsAdmin from "hooks/useIsAdmin"
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
@@ -44,7 +44,7 @@ const AdminDetailCard = ({ sale }) => {
   const [kycLink, setKycLink] = useState("")
   const [auditLink, setAuditLink] = useState("")
 
-  const isUserAdmin = useIsAdmin(account)
+  const isUserAdmin = null
 
   const handleFeatured = async e => {
     // setIsProcessing(true)

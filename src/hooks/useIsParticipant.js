@@ -1,26 +1,19 @@
-import { Contract } from "ethers"
 import SaleAbi from "constants/abi/Sale.json"
+import Web3 from "web3"
 
-import { useCall, useEthers } from "@usedapp/core"
-import { FACTORY_ADDRESS } from "constants/Address"
-
-function useIsParticipant(saleAddress, account) {
-  const { value, error } =
-    useCall(
-      {
-        contract: new Contract(saleAddress, SaleAbi),
-        method: "isParticipated",
-        args: [account],
-      },
-      {
-        refresh: "everyBlock",
-      }
-    ) ?? {}
-  if (error) {
-    //  // console.log(error)
-    return false
+async function getUseIsParticipant(saleAddress, account) {
+  if (account===undefined) return;
+  try{
+  const web3 = new Web3(window.ethereum);
+  await window.ethereum.enable();
+  const contract = new web3.eth.Contract(SaleAbi, saleAddress);
+  console.log(account)
+  const isParticipant = await contract.methods.isParticipated(account).call();
+  console.log(isParticipant)
+  return isParticipant;
+  } catch (err) {
+    console.log(err);
   }
-  return value?.[0]
 }
 
-export default useIsParticipant
+export default getUseIsParticipant
