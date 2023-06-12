@@ -26,27 +26,81 @@ import SaleAbi from "constants/abi/Sale.json"
 import { getUserParticipation } from "utils/factoryHelper"
 import { useSelector } from "react-redux"
 import { BIG_ONE } from "utils/numbers"
-import useIsAdmin from "hooks/useIsAdmin"
+import getUseIsAdmin from "hooks/useIsAdmin"
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import { isValidUrl } from "utils/helpers"
-import useIsParticipant from "hooks/useIsParticipant"
-import useParticipationData from "hooks/useParticipationData"
-import useSaleFinished from "hooks/useSaleIsFinished"
-import useSaleIsSuccess from "hooks/useSaleIsSuccess"
+import getUseIsParticipant from "hooks/useIsParticipant"
+import getUseParticipationData from "hooks/useParticipationData"
+import getUseSaleFinished from "hooks/useSaleIsFinished"
+import getUseSaleIsSuccess from "hooks/useSaleIsSuccess"
+import Web3 from "web3"
 dayjs.extend(utc)
 
 const ParticipationCard = ({ sale }) => {
   const currentDate = dayjs.utc().unix()
-  const { account, chainId, activateBrowserWallet, library } = useEthers()
+  const {  chainId, activateBrowserWallet, library } = useEthers()
   const [showModal, setShowModal] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [isParticipant, setIsParticipant] = useState(null)
+  const [contribution, setContribution] = useState(null)
+  const [isSaleFinish, setIsSaleFinish] = useState(null)
+  const [isSaleSuccess, setIsSaleSuccess] = useState(null)
+  const [account, setAccount] = useState(null)
 
-  const isParticipant = useIsParticipant(sale.address, account)
-  const contribution = useParticipationData(sale.address, account)
-  const isSaleFinish = useSaleFinished(sale.address)
-  const isSaleSuccess = useSaleIsSuccess(sale.address)
+  async function getIsParticipant(){
+    const isParticipant = await getUseIsParticipant(sale.address, account)
+    setIsParticipant(isParticipant)
+  }
+
+  async function getContribution(){
+    const contribution = await getUseParticipationData(sale.address, account)
+    setContribution(contribution)
+  }
+
+  async function getIsSaleFinish(){
+    const isSaleFinish = await getUseSaleFinished(sale.address)
+    setIsSaleFinish(isSaleFinish)
+  }
+
+  async function getIsSaleSuccess(){
+    const isSaleSuccess = await getUseSaleIsSuccess(sale.address)
+    setIsSaleSuccess(isSaleSuccess)
+  }
+
+  useEffect(() => {
+    async function connectWallet() {
+      if (typeof window.ethereum !== "undefined") {
+        // Instance web3 with the provided information
+        const web3 = new Web3(window.ethereum)
+        try {
+          // Request account access
+          await window.ethereum.enable()
+          // Wallet connected successfully
+          // You can perform further actions here
+          const act = await web3.eth.getAccounts()
+          setAccount(act[0])
+        } catch (e) {
+          // User denied access
+          console.log(e)
+          NotificationManager.error("Please connect your wallet", "Error")
+        }
+      }
+    }
+
+    connectWallet()
+  }, [])
+
+  useEffect(() => {
+    if (account!=null) {
+      getIsParticipant()
+      getContribution()
+      getIsSaleFinish()
+      getIsSaleSuccess()
+    }
+  }, [account])
+
 
   const handleConfirm = async e => {
     setIsProcessing(true)

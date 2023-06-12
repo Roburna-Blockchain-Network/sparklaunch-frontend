@@ -11,7 +11,7 @@ import dayjs from "dayjs"
 
 import utc from "dayjs/plugin/utc"
 import { BigNumber, ethers, utils } from "ethers"
-import useDeploymentFee from "hooks/useDeploymentFee"
+import getUseDeploymentFee from "hooks/useDeploymentFee"
 import { NotificationManager } from "react-notifications"
 
 import {
@@ -38,7 +38,7 @@ import { tokenRate } from "utils/helpers"
 import { useSelector } from "react-redux"
 import { getTokenAllowance } from "utils/factoryHelper"
 import { BIG_TEN } from "utils/numbers"
-import useServiceFee from "hooks/useServiceFee"
+import getUseServiceFee from "hooks/useServiceFee"
 import Modal from "components/Modal"
 import FinalModal from "components/FinalModal"
 dayjs.extend(utc)
@@ -46,8 +46,7 @@ const ProjectSetup = () => {
   let history = useHistory()
   const { account, chainId, library, activateBrowserWallet } = useEthers()
 
-  const deployFee = useDeploymentFee()
-  const servicesFee = useServiceFee()
+  let servicesFee
   const user = useSelector(state => state.User)
 
   const [activeTab, setActiveTab] = useState(1)
@@ -140,10 +139,21 @@ const ProjectSetup = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [isPrivateSale, setIsPrivateSale] = useState(false)
   const [saleType, setSaleType] = useState("public")
+  let deployFee
+
+  async function getFee() {
+    deployFee = await getUseDeploymentFee()
+
+    servicesFee = await getUseServiceFee()
+
+  }
+
+  useEffect(() => {
+    getFee()
+  }, [deployFee, servicesFee])
 
   const handleSubmit1 = async event => {
     const form = event.currentTarget
-
     event.preventDefault()
     event.stopPropagation()
 
@@ -168,32 +178,33 @@ const ProjectSetup = () => {
   }
 
   useEffect(async () => {
-    const feeVal = ethers.utils.formatEther(deployFee)
+    if(!deployFee) return
+    const feeVal = ethers.utils.formatEther(deployFee.toString())
     setDeploymentFee(feeVal)
   }, [deployFee])
 
   useEffect(async () => {
-    const feeVal = ethers.utils.formatUnits(servicesFee, "4")
+    if(!servicesFee) return
+    const feeVal = ethers.utils.formatUnits(servicesFee.toString(), "4")
     setServiceFee(feeVal * 100)
   }, [servicesFee])
-
   const validateStep2 = async () => {
     /**
      * check initial
      */
-
+    console.log(`step2 :`, step2)
     if (
-      step2.softCap == 0 ||
-      step2.hardCap == 0 ||
-      step2.minBuy == 0 ||
-      step2.maxBuy == 0 ||
-      step2.presaleRate == 0 ||
-      step2.listingRate == 0 ||
-      step2.startTime == 0 ||
-      step2.endTime == 0 ||
-      step2.publicTime == 0 ||
-      step2.liquidityPercent == 0 ||
-      step2.liquidityLock == 0
+      step2.softCap === 0 ||
+      step2.hardCap === 0 ||
+      step2.minBuy === 0 ||
+      step2.maxBuy === 0 ||
+      step2.presaleRate === 0 ||
+      step2.listingRate === 0 ||
+      step2.startTime === 0 ||
+      step2.endTime === 0 ||
+      step2.publicTime === 0 ||
+      step2.liquidityPercent === 0 ||
+      step2.liquidityLock === 0
     ) {
       NotificationManager.error("Please enter valid data !", "Error", 3000)
       return false
@@ -201,11 +212,11 @@ const ProjectSetup = () => {
 
     if (!step2.isPublic) {
       if (
-        step2.round1 == 0 ||
-        step2.round2 == 0 ||
-        step2.round3 == 0 ||
-        step2.round4 == 0 ||
-        step2.round5 == 0
+        step2.round1 === 0 ||
+        step2.round2 === 0 ||
+        step2.round3 === 0 ||
+        step2.round4 === 0 ||
+        step2.round5 === 0
       ) {
         NotificationManager.error(
           "Please enter valid round info !",
@@ -303,15 +314,14 @@ const ProjectSetup = () => {
     return true
   }
 
-
   const handleClose = () => {
     setShow(false)
     deployToken()
   }
 
-
   const handleSubmit2 = async event => {
     const form = event.currentTarget
+    console.log(step2)
     setIsLoading(true)
     event.preventDefault()
     event.stopPropagation()
@@ -331,7 +341,7 @@ const ProjectSetup = () => {
 
   const handleSubmit3 = event => {
     const form = event.currentTarget
-
+    console.log(`form :`, form)
     event.preventDefault()
     event.stopPropagation()
 
@@ -400,6 +410,8 @@ const ProjectSetup = () => {
 
     return [tier, wl]
   }
+  // console.log(deploymentFee.toString())
+  // console.log(utils.parseEther(deploymentFee))
 
   const handleDeploySale = async data => {
     const factoryContractAddress = FACTORY_ADDRESS
@@ -420,9 +432,8 @@ const ProjectSetup = () => {
       TIERS_ROUND = [1]
       WL_ROUND = [adminAddress]
     } else {
-      [TIERS_ROUND, WL_ROUND] = createWhitelist()
+      ;[TIERS_ROUND, WL_ROUND] = createWhitelist()
     }
-
 
     console.log("We are deploying your sale 2")
     const START_SALE = data.start
@@ -460,12 +471,12 @@ const ProjectSetup = () => {
         TIERS_ROUND,
         startTimes,
         isPublic,
-        { value: utils.parseEther(deploymentFee) }
+        { value: utils.parseEther(deploymentFee.toString()) }
       )
       await tx.wait()
 
       const deployedAddress = await contract.saleIdToAddress(saleId.toNumber())
-      // console.log(deployedAddress)
+      console.log(deployedAddress)
 
       return [saleId.toNumber(), deployedAddress]
     } catch (error) {
@@ -508,7 +519,7 @@ const ProjectSetup = () => {
     )
     try {
       const userbal = await contract.balanceOf(account)
-      
+
       if (userbal.gt(amountRequired)) return true
       // console.log(`userbal`, userbal.toString())
       // console.log(`amountRequired`, amountRequired.toString())
@@ -538,7 +549,6 @@ const ProjectSetup = () => {
       return false
     }
   }
-
 
   const handleSubmitFinal = async event => {
     event.preventDefault()
@@ -896,7 +906,6 @@ const ProjectSetup = () => {
                       defaultValue={step2?.softCap}
                       type="number"
                       placeholder="0"
-                      min="0"
                       onChange={e =>
                         setStep2(prevState => {
                           return {

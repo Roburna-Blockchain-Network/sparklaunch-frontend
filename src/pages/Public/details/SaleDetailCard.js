@@ -14,11 +14,11 @@ import Countdown, { zeroPad } from "react-countdown"
 import discordLogo from "assets/images/icons/discord.png"
 import { Link, useHistory } from "react-router-dom"
 import { formatEther, parseEther, formatUnits } from "ethers/lib/utils"
-import { BigNumber as BN } from "ethers"
+import { BigNumber  } from "ethers"
 
-import useSaleIsSuccess from "hooks/useSaleIsSuccess"
-import useSaleFinished from "hooks/useSaleIsFinished"
-import useSaleInfo from "hooks/useSaleInfo"
+import getUseSaleIsSuccess from "hooks/useSaleIsSuccess"
+import getUseSaleFinished from "hooks/useSaleIsFinished"
+import getUseSaleInfo from "hooks/useSaleInfo"
 import { formatBigToNum, formatNumber, NativePrice } from "utils/helpers"
 
 import dayjs from "dayjs"
@@ -68,6 +68,10 @@ const SaleDetailCard = ({ sale }) => {
     amount: "0",
     percent: "0",
   })
+  const [getInfo, setGetInfo] = useState()
+  const [BNBRaised, setBNBRaised] = useState(null)
+  const [hardcap, setHardcap] = useState(null)
+  const [totalSold, setTotalSold] = useState(null)
 
   const handleClick = e => {
     if (e.target.id === "social" || e.target.id === "links") {
@@ -79,25 +83,56 @@ const SaleDetailCard = ({ sale }) => {
   const isStart = sale.round.start < currentDate
 
   const timeCountDown = isStart
-    ? dayjs.utc(sale.round.end * 1000)
-    : dayjs.utc(sale.round.start * 1000)
+  ? dayjs.utc(sale.round.end * 1000).format()
+  : dayjs.utc(sale.round.start * 1000).format();
 
   const rendererCountDown = isStart ? renderer : renderer2
-  const getInfo = useSaleInfo(sale.address)
+
+  async function getSaleInfo () {
+    const res = await getUseSaleInfo(sale.address)
+    setGetInfo(res)
+  }
+  async function getBNBRaised() {
+    if (!getInfo) return;
+    const res = await getInfo.totalBNBRaised
+    const temp = BigNumber.from(res.toString())
+    setBNBRaised(temp)
+  }
+  async function getHardcap() {
+    if (!getInfo) return;
+    const res = await getInfo.hardCap
+    const temp = BigNumber.from(res.toString())
+    setHardcap(temp)
+  }
+  async function getTotalSold() {
+    if (!getInfo) return;
+    const res = await getInfo.totalTokensSold
+    const temp = BigNumber.from(res.toString())
+    setTotalSold(temp)
+  }
   useEffect(() => {
-    if (typeof getInfo == "undefined") {
+    getBNBRaised()
+    getHardcap()
+    getTotalSold()
+  }, [getInfo])
+
+  useEffect(() => {
+    getSaleInfo()
+  }, [])
+
+  useEffect(() => {
+    if (BNBRaised===null||hardcap===null) {
       return
     }
-
-    const percents = getInfo.totalBNBRaised.mul(100).div(getInfo.hardCap)
-    const newRaised = formatBigToNum(getInfo.totalBNBRaised.toString(), 18, 0)
-    const newPercent = formatBigToNum(percents.toString(), 0, 0)
-
+    const percents = BNBRaised.mul(100).div(hardcap)
+    const newRaised = formatBigToNum(BNBRaised.toString(), 18, 0)
+    const newPercent = Number(percents.toString(), 0, 0)
     setRaised({
+      ...raised,
       amount: newRaised,
       percent: newPercent,
     })
-  }, [getInfo])
+  }, [BNBRaised,hardcap])
 
   return (
     <div
@@ -133,9 +168,9 @@ const SaleDetailCard = ({ sale }) => {
           <div className="w-50 fw-bold">Total Raised </div>
           <div className="text-primary">
             :{" "}
-            {getInfo ? (
+            {BNBRaised!=null ? (
               <>
-                {formatBigToNum(getInfo.totalBNBRaised.toString(), 18, 0)}{" "}
+                {formatBigToNum(BNBRaised.toString(), 18, 0)}{" "}
                 {CHAIN_NATIVE_SYMBOL}
               </>
             ) : (
@@ -147,7 +182,7 @@ const SaleDetailCard = ({ sale }) => {
           <div className="w-50 fw-bold">Token Sold</div>
           <div className="text-primary">
             :{" "}
-            {getInfo ? (
+            {totalSold!=null ? (
               <>
                 {formatBigToNum(
                   getInfo.totalTokensSold.toString(),

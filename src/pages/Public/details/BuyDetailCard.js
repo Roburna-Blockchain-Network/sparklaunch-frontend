@@ -27,18 +27,23 @@ import SaleAbi from "constants/abi/Sale.json"
 import { getUserParticipation } from "utils/factoryHelper"
 import { useSelector } from "react-redux"
 import { BIG_ONE } from "utils/numbers"
-import useIsParticipant from "hooks/useIsParticipant"
-import useParticipationData from "hooks/useParticipationData"
-import useGetRound from "hooks/useGetRound"
+import getUseIsParticipant from "hooks/useIsParticipant"
+import getUseParticipationData from "hooks/useParticipationData"
+import getUseGetRound from "hooks/useGetRound"
+import Web3 from "web3"
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
 
 const BuyDetailCard = ({ sale }) => {
   const currentDate = dayjs.utc().unix()
 
-  const { account, chainId, activateBrowserWallet, library } = useEthers()
+  const { activateBrowserWallet, library } = useEthers()
   const [buyVal, setBuyVal] = useState()
   const [canBuy, setCanBuy] = useState(false)
   const [enabled, setEnabled] = useState(false)
+  const [balanceBNB, setBalanceBNB] = useState(null)
+  const [getCurrentRound, setCurrentRound] = useState(null)
+  const [isParticipant, setIsParticipant] = useState(null)
+  const [account, setAccount] = useState(null)
   const [buttonStatus, setButtonStatus] = useState({
     disabled: true,
     text: "Please Wait",
@@ -59,9 +64,14 @@ const BuyDetailCard = ({ sale }) => {
 
   const isStarted = sale.round.start < currentDate
 
-  const getCurrentRound = useGetRound(sale.address)
-  const userBalance = useEtherBalance(account)
-  const isParticipant = useIsParticipant(sale.address, account)
+  async function getRoundInfo() {
+    const round = await getUseGetRound(sale.address)
+    setCurrentRound(round)
+  }
+  async function getIsParticipant() {
+    const isParticipant = await getUseIsParticipant(sale.address, account)
+    setIsParticipant(isParticipant)
+  }
 
   const validBuyVal = val => {
     return val >= minBuy && val <= maxBuy
@@ -78,14 +88,16 @@ const BuyDetailCard = ({ sale }) => {
   }
 
   const handleBuyButton = async () => {
+    if (balanceBNB == null) return
     setButtonStatus({
       loading: true,
     })
     console.log(buyVal.toString())
-    console.log(userBalance.toString())
+    console.log(balanceBNB.toString())
     console.log(buyVal.toString())
-    console.log(parseEther(buyVal.toString()).lt(userBalance))
-    if (parseEther(buyVal.toString()).gt(userBalance)) {
+    console.log(parseEther(buyVal.toString()).lt(balanceBNB))
+    if (parseEther(buyVal.toString()).gt(balanceBNB)) {
+      console.log(buyVal.toString(), balanceBNB.toString())
       NotificationManager.error("You dont have enough money !", "Error")
       setButtonStatus({
         loading: false,
@@ -158,6 +170,42 @@ const BuyDetailCard = ({ sale }) => {
   }
 
   useEffect(() => {
+    async function connectWallet() {
+      if (typeof window.ethereum !== "undefined") {
+        // Instance web3 with the provided information
+        const web3 = new Web3(window.ethereum)
+        try {
+          // Request account access
+          await window.ethereum.enable()
+          // Wallet connected successfully
+          // You can perform further actions here
+          const act = await web3.eth.getAccounts()
+          setAccount(act[0])
+          try {
+            web3.eth.getBalance(act[0]).then(res => {
+              setBalanceBNB(res)
+            })
+          } catch (e) {
+            console.log(e)
+          }
+        } catch (e) {
+          // User denied access
+          console.log(e)
+          NotificationManager.error("Please connect your wallet", "Error")
+        }
+      }
+    }
+
+    connectWallet()
+    getRoundInfo()
+  }, [])
+
+  useEffect(() => {
+    if (account === null) return
+    getIsParticipant()
+  }, [account])
+
+  useEffect(() => {
     if (typeof isParticipant == "undefined") {
       return
     }
@@ -207,7 +255,7 @@ const BuyDetailCard = ({ sale }) => {
         </Form.Group>
       </div>
       <div className="my-2">
-        {account ? (
+        {account != null ? (
           <Button
             disabled={buttonStatus.disabled}
             className="btn buy-or-connect"

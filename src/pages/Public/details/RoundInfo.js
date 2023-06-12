@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
-import useGetRound from "hooks/useGetRound"
+import getUseGetRound from "hooks/useGetRound"
 dayjs.extend(utc)
 
 const RoundInfo = ({ sale }) => {
@@ -10,7 +10,7 @@ const RoundInfo = ({ sale }) => {
 
   const [currentRound, setCurrentRound] = useState(0)
 
-  const getCurrentRound = useGetRound(sale.address)
+  const getCurrentRound = getUseGetRound(sale.address)
 
   useEffect(() => {
     if (typeof getCurrentRound == "undefined") {

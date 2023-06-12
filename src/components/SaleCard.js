@@ -27,9 +27,9 @@ import Countdown, { zeroPad } from "react-countdown"
 import { updateSaleTime } from "store/actions"
 import { CHAIN_NATIVE_SYMBOL } from "constants/Address"
 import AuditInfo from "pages/Public/details/AuditInfo"
-import useSaleIsSuccess from "hooks/useSaleIsSuccess"
-import useSaleFinished from "hooks/useSaleIsFinished"
-import useSaleInfo from "hooks/useSaleInfo"
+import getUseSaleIsSuccess from "hooks/useSaleIsSuccess"
+import getUseSaleFinished from "hooks/useSaleIsFinished"
+import getUseSaleInfo from "hooks/useSaleInfo"
 import { formatBigToNum, formatNumber, NativePrice } from "utils/helpers"
 import SocialLinks from "pages/Public/home/SocialLinks"
 import TokenImage from "./TokenImage"
@@ -70,11 +70,14 @@ const SaleCard = ({ sale }) => {
   const currentDate = moment().unix()
   let history = useHistory()
   const [ready, setReady] = useState(true)
-
+  const [getInfo, setGetInfo] = useState()
+  const [BNBRaised, setBNBRaised] = useState(null)
+  const [hardcap, setHardcap] = useState(null)
   const [raised, setRaised] = useState({
     amount: "0",
     percent: "0",
   })
+  const [isClosed, setIsClosed] = useState(false)
 
   const handleClick = e => {
     if (e.target.id === "social" || e.target.id === "links") {
@@ -90,36 +93,68 @@ const SaleCard = ({ sale }) => {
   const isFinish = sale.round.end < currentDate
   const isStart = sale.round.start < currentDate
 
-  const isSuccess = useSaleIsSuccess(sale.address)
-  const isClosed = useSaleFinished(sale.address)
+  const isSuccess = getUseSaleIsSuccess(sale.address)
 
-  const getInfo = useSaleInfo(sale.address)
-
-  const timeCountDown = isStart
-    ? dayjs.utc(sale.round.end * 1000)
-    : dayjs.utc(sale.round.start * 1000)
-  const rendererCountDown = isStart ? renderer : renderer2
+  async function getFinished() {
+    const res = await getUseSaleFinished(sale.address);
+    setIsClosed(res);
+  }
+  
+  async function getSaleInfo() {
+    const res = await getUseSaleInfo(sale.address);
+    setGetInfo(res);
+  }
+  
 
   useEffect(() => {
-    if (typeof getInfo == "undefined") {
+    getFinished()
+    getSaleInfo()
+  }, [])
+
+  const timeCountDown = isStart
+    ? dayjs.utc(sale.round.end * 1000).format()
+    : dayjs.utc(sale.round.start * 1000).format();
+    
+  const rendererCountDown = isStart ? renderer : renderer2
+
+  async function getBNBRaised() {
+    if (!getInfo) return;
+    const res = await getInfo.totalBNBRaised
+    const temp = BigNumber.from(res.toString())
+    setBNBRaised(temp)
+  }
+  async function getHardcap() {
+    if (!getInfo) return;
+    const res = await getInfo.hardCap
+    const temp = BigNumber.from(res.toString())
+    setHardcap(temp)
+  }
+  useEffect(() => {
+    getBNBRaised()
+    getHardcap()
+  }, [getInfo])
+
+  useEffect(() => {
+    if (BNBRaised===null||hardcap===null) {
       return
     }
-
-    const percents = getInfo.totalBNBRaised.mul(100).div(getInfo.hardCap)
-    const newRaised = formatBigToNum(getInfo.totalBNBRaised.toString(), 18, 0)
-    const newPercent = formatBigToNum(percents.toString(), 0, 0)
+    const percents = BNBRaised.mul(100).div(hardcap)
+    const newRaised = formatBigToNum(BNBRaised.toString(), 18, 0)
+    const newPercent = Number(percents.toString(), 0, 0)
     console.log(
       `raised : `,
-      getInfo.totalBNBRaised.toString(),
+      BNBRaised.toString(),
       `hardcap`,
-      getInfo.hardCap.toString()
+      hardcap.toString(),
+      `percent`,
+      percents.toString()
     )
     setRaised({
       ...raised,
       amount: newRaised,
       percent: newPercent,
     })
-  }, [getInfo])
+  }, [BNBRaised,hardcap])
 
   useEffect(() => {
     const intervalId = setInterval(() => {

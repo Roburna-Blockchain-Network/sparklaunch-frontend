@@ -1,26 +1,18 @@
-import { Contract } from "ethers"
+import Web3 from "web3";
 import SaleAbi from "constants/abi/Sale.json"
 
-import { useCall, useEthers } from "@usedapp/core"
-import { FACTORY_ADDRESS } from "constants/Address"
 
-function useSaleIsSuccess(saleAddress) {
-  const { value, error } =
-    useCall(
-      {
-        contract: new Contract(saleAddress, SaleAbi),
-        method: "isSaleSuccessful",
-        args: [],
-      },
-      {
-        refresh: 20,
-      }
-    ) ?? {}
-  if (error) {
-    // console.log(error)
-    return error
+
+async function getUseSaleIsSuccess(saleAddress) {
+  try {
+    const web3 = new Web3(window.ethereum);
+    await window.ethereum.enable();
+    const contract = new web3.eth.Contract(SaleAbi, saleAddress);
+    const success = await contract.methods.isSaleSuccessful().call();
+    return success;
+  } catch (err) {
+    console.log(err);
   }
-  return value?.[0]
 }
 
-export default useSaleIsSuccess
+export default getUseSaleIsSuccess

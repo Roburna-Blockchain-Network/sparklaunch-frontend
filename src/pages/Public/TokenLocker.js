@@ -29,9 +29,9 @@ import {
 } from "utils/factoryHelper"
 import Countdown, { zeroPad } from "react-countdown"
 import bscLogo from "assets/images/logos/bsc.png"
-import useSaleIsSuccess from "hooks/useSaleIsSuccess"
+import getUseSaleIsSuccess from "hooks/useSaleIsSuccess"
 import useLpWithdrawn from "hooks/useLpWithdrawn"
-import useSaleInfo from "hooks/useSaleInfo"
+import getUseSaleInfo from "hooks/useSaleInfo"
 import useLiquidityUnlockTime from "hooks/useLiquidityUnlockTime"
 import useLiquidityLockPeriod from "hooks/useLiquidityLockPeriod"
 import { Contract } from "@ethersproject/contracts"
@@ -87,7 +87,7 @@ const TokenLocker = () => {
   const history = useHistory()
 
   const { address } = useParams()
-  const isSaleSuccess = useSaleIsSuccess(address)
+  const isSaleSuccess = getUseSaleIsSuccess(address)
   const liquidityUnlockTime = useLiquidityUnlockTime(address)
   const liquidityLockPeriod = useLiquidityLockPeriod(address)
   const isLpWithdrawn = useLpWithdrawn(address)
@@ -154,7 +154,7 @@ const TokenLocker = () => {
     }, 2000)
   }
 
-  const getInfo = useSaleInfo(address)
+  const getInfo = getSaleInfo(address)
 
   useEffect(() => {
     if (

@@ -11,14 +11,14 @@ import {
   Spinner,
 } from "react-bootstrap"
 
-import { useEtherBalance, useEthers } from "@usedapp/core"
+import { BNB, useEtherBalance, useEthers } from "@usedapp/core"
 import {
   formatEther,
   formatUnits,
   parseEther,
   parseUnits,
 } from "ethers/lib/utils"
-import { BigNumber, BigNumber as BN } from "ethers"
+import { BigNumber } from "ethers"
 import {
   FACTORY_ADDRESS,
   API_URL,
@@ -30,27 +30,36 @@ import { Contract } from "@ethersproject/contracts"
 import { NotificationManager } from "react-notifications"
 
 import SaleAbi from "constants/abi/Sale.json"
-import useSaleInfo from "hooks/useSaleInfo"
-import useIsAdmin from "hooks/useIsAdmin"
+import getUseSaleInfo from "hooks/useSaleInfo"
+//import getUseIsAdmin from "hooks/useIsAdmin"
 const DEFAULT_DATE_FORMAT = "MMM DD, h:mm A"
+import Web3 from "web3"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
-import useSaleFinished from "hooks/useSaleIsFinished"
-import useSaleIsSuccess from "hooks/useSaleIsSuccess"
+import getUseSaleFinished from "hooks/useSaleIsFinished"
+import getUseSaleIsSuccess from "hooks/useSaleIsSuccess"
 import { Link } from "react-router-dom"
+import { get } from "jquery"
 dayjs.extend(utc)
 
 const OwnerCard = ({ sale }) => {
   const currentDate = dayjs.utc().unix()
-  const { account, library } = useEthers()
+  const {  library } = useEthers()
   const [showModal, setShowModal] = useState(false)
+  const[account,setAccount] = useState(null)
   const [showModal2, setShowModal2] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isSaleOwner, setIsSaleOwner] = useState(false)
   const [isAlreadyEnd, setIsAlreadyEnd] = useState(false)
   const [finalize, setFinalize] = useState(false)
+  const [getInfo, setGetInfo] = useState(null)
+  const [isFinished, setIsFinished] = useState(null)
+  const [earningsWithdrawn, setEarningsWithdrawn] = useState(null)
+  const [BNBRaised, setBNBRaised] = useState(null)
+  const [owner, setOwner] = useState(null)
+  // const [isUserAdmin, setIsUserAdmin] = useState(null)
+  const [isSaleSuccess, setIsSaleSuccess] = useState(null)
 
-  const isUserAdmin = useIsAdmin(account)
 
   const handleConfirm = async e => {
     setIsProcessing(true)
@@ -116,40 +125,105 @@ const OwnerCard = ({ sale }) => {
     }, 2000)
   }
 
-  const isFinished = useSaleFinished(sale.address)
-  const isSaleSuccess = useSaleIsSuccess(sale.address)
-  const getInfo = useSaleInfo(sale.address)
   // console.log(`isSaleSuccess`, isSaleSuccess)
 
+  async function isAdmin () {
+    if (typeof window.ethereum !== "undefined") {
+      // Instance web3 with the provided information
+      const web3 = new Web3(window.ethereum)
+      try {
+        // Request account access
+        await window.ethereum.enable()
+        // Wallet connected successfully
+        // You can perform further actions here
+        const act = await web3.eth.getAccounts()
+        setAccount(act[0])
+      } catch (e) {
+        // User denied access
+        console.log(e)
+        NotificationManager.error("Please connect your wallet", "Error")
+      }
+    }
+
+  }
+  
+  async function getSaleSuccess () {
+    const res = await getUseSaleIsSuccess(sale.address)
+    setIsSaleSuccess(res)
+  }
+
+  async function getSaleInfo () {
+    const res = await getUseSaleInfo(sale.address)
+    setGetInfo(res)
+  }
+  async function getFinished () {
+    const res = await getUseSaleFinished(sale.address)
+    setIsFinished(res)
+  }
+  async function getOwner () {
+    if (!getInfo) return
+    const res = await getInfo.saleOwner
+    setOwner(res)
+  }
+
+  async function getBNBRaised() {
+    if (!getInfo) return;
+    const res = await getInfo.totalBNBRaised
+    const temp = BigNumber.from(res.toString())
+    setBNBRaised(temp)
+  }
+
+  async function getEarningsWithdrawn() {
+    if (!getInfo) return;
+    const res = await getInfo.earningsWithdrawn
+    setEarningsWithdrawn(res)
+  }
+
   useEffect(() => {
+    getFinished()
+    getSaleInfo()
+    isAdmin()
+    getSaleSuccess()
+  }, [])
+
+
+  useEffect(() => {
+    if (isFinished == null) return;
     if (isFinished) {
       
       setIsAlreadyEnd(true)
     }
   }, [isFinished])
 
+  useEffect(() => {
+    if (getInfo == null) return
+    getOwner()
+    getBNBRaised()
+    getEarningsWithdrawn()
+  }, [getInfo])
+
   const isSaleTimeEnd = sale.round.end < currentDate
 
   const lockAddress = `/token-locker/` + sale.address
   useEffect(() => {
-    if (typeof getInfo == "undefined") {
+    if (typeof getInfo == null||BNBRaised == null||owner == null) {
       return
     }
-    if (account == getInfo.saleOwner) {
+    if (account == owner ) {
       setIsSaleOwner(true)
     } else {
       setIsSaleOwner(false)
     }
     const newFinalize = BigNumber.from(sale.info.softcap).lte(
-      getInfo.totalBNBRaised
+      BigNumber.from(BNBRaised.toString())
     )
 
     setFinalize(newFinalize)
-  }, [getInfo, account])
+  }, [getInfo, account, BNBRaised, owner])
 
   return (
     <React.Fragment>
-      {isUserAdmin || isSaleOwner ? (
+      {isSaleOwner ? (
         <div className="buy-detail-card" id="buy-card">
           <div className="d-flex w-100 flex-wrap mb-0 py-1 border-white border-opacity-50 justify-content-center">
             <div className="fs-5 fw-bold mb-2">SALE OWNER ADMINISTRATION</div>
@@ -164,7 +238,7 @@ const OwnerCard = ({ sale }) => {
                 {finalize ? "FINALIZE SALE" : "WITHDRAW LEFTOVER"}
               </Button>
             )}
-            {isSaleSuccess && getInfo?.earningsWithdrawn === false ? null : (
+            {isSaleSuccess && earningsWithdrawn === false ? null : (
               <Link to={lockAddress} className="btn btn buy-or-connect mb-3">
                 SHOW LOCK LP PAGE
               </Link>
