@@ -92,78 +92,89 @@ const SaleCard = ({ sale }) => {
   const isFinish = sale.round.end < currentDate
   const isStart = sale.round.start < currentDate
 
-  const isSuccess = getUseSaleIsSuccess(sale.address)
+  // const isSuccess = getUseSaleIsSuccess(sale.address)
 
   async function getFinished() {
-    const res = await getUseSaleFinished(sale.address);
-    setIsClosed(res);
+    const res = await getUseSaleFinished(sale.address)
+    setIsClosed(res)
   }
-  
+
   async function getSaleInfo() {
-    const res = await getUseSaleInfo(sale.address);
-    setGetInfo(res);
+    const res = await getUseSaleInfo(sale.address)
+    setGetInfo(res)
   }
-  
 
   useEffect(() => {
+    try {
     getFinished()
     getSaleInfo()
+    } catch (e) {
+      console.log(e)
+    }
   }, [])
 
   const timeCountDown = isStart
     ? dayjs.utc(sale.round.end * 1000).format()
-    : dayjs.utc(sale.round.start * 1000).format();
-    
+    : dayjs.utc(sale.round.start * 1000).format()
+
   const rendererCountDown = isStart ? renderer : renderer2
 
   async function getBNBRaised() {
-    if (!getInfo) return;
+    if (!getInfo) return
     const res = await getInfo.totalBNBRaised
     const temp = BigNumber.from(res.toString())
     setBNBRaised(temp)
   }
   async function getHardcap() {
-    if (!getInfo) return;
+    if (!getInfo) return
     const res = await getInfo.hardCap
     const temp = BigNumber.from(res.toString())
     setHardcap(temp)
   }
   useEffect(() => {
+    try{
     getBNBRaised()
     getHardcap()
+    }catch(e){
+      console.log(e)
+    }
   }, [getInfo])
 
   useEffect(() => {
-    if (BNBRaised===null||hardcap===null) {
+    if (BNBRaised === null || hardcap === null) {
       return
     }
-    const percents = BNBRaised.mul(100).div(hardcap)
-    const newRaised = formatBigToNum(BNBRaised.toString(), 18, 0)
-    const newPercent = Number(percents.toString(), 0, 0)
-    console.log(
-      `raised : `,
-      BNBRaised.toString(),
-      `hardcap`,
-      hardcap.toString(),
-      `percent`,
-      percents.toString()
-    )
-    setRaised({
-      ...raised,
-      amount: newRaised,
-      percent: newPercent,
-    })
-  }, [BNBRaised,hardcap])
+    try {
+      const percents = BNBRaised.mul(100).div(hardcap)
+      const newRaised = formatBigToNum(BNBRaised.toString(), 18, 0)
+      const newPercent = Number(percents.toString(), 0, 0)
+      console.log(
+        `raised : `,
+        BNBRaised.toString(),
+        `hardcap`,
+        hardcap.toString(),
+        `percent`,
+        percents.toString()
+      )
+      setRaised({
+        ...raised,
+        amount: newRaised,
+        percent: newPercent,
+      })
+    } catch (e) {
+      console.log(e)
+    }
+  }, [BNBRaised, hardcap])
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      window.location.reload();
-    }, 60000);
+      window.location.reload()
+    }, 60000)
 
     return () => {
-      clearInterval(intervalId);
-    };
-  }, []);
+      clearInterval(intervalId)
+    }
+  }, [])
   return (
     <>
       {ready ? (
@@ -181,7 +192,6 @@ const SaleCard = ({ sale }) => {
               <h5>{tokenInfo?.name ? tokenInfo.name : "SPL"}</h5>
             </div>
             <div>
-              
               <div className="avatar-md">
                 <div className="avatar-title bg-primary bg-softer rounded-circle overflow-hidden fs-4">
                   <TokenImage
@@ -198,7 +208,6 @@ const SaleCard = ({ sale }) => {
           </div>
 
           <ul className="list-unstyled d-flex mb-4">
-
             <SocialLinks links={sale.saleLinks} />
           </ul>
 
@@ -245,7 +254,7 @@ const SaleCard = ({ sale }) => {
             <Row className="mb-2">
               <Col xs={4}>Total Raised </Col>
               <Col xs={8} className="text-primary fs-6 text-end fw-bold">
-                {BNBRaised? (
+                {BNBRaised ? (
                   <>
                     {formatBigToNum(BNBRaised.toString(), 18, 4)}{" "}
                     {CHAIN_NATIVE_SYMBOL}
