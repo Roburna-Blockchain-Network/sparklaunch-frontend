@@ -84,20 +84,20 @@ const Public = props => {
     setFiltered(term)
   }
 
-  useEffect(async () => {
-    setIsLoading(true)
-    try {
-      const sales = await fetchAllSales(CHAIN_NUMBER)
-      if (sales.length > 0) {
-        setAllSales(sales)
-      }
-    } catch (error) {
-      // console.log(error)
-      setIsLoading(true)
-    }
-    setIsLoading(false)
-  }, [])
-  console.log(allSales)
+  // useEffect(async () => {
+  //   setIsLoading(true)
+  //   try {
+  //     const sales = await fetchAllSales(CHAIN_NUMBER)
+  //     if (sales.length > 0) {
+  //       setAllSales(sales)
+  //     }
+  //   } catch (error) {
+  //     // console.log(error)
+  //     setIsLoading(true)
+  //   }
+  //   setIsLoading(false)
+  // }, [])
+  // console.log(allSales)
 
   return (
     <React.Fragment>
@@ -187,8 +187,8 @@ const Public = props => {
                   </Col>
                 </Row>
 
-                <Row className="g-4 my-4">
-                  {allSales && !allSales ? (
+                {/* <Row className="g-4 my-4">
+                  {allSales ? (
                     allSales
                       .filter(item => {
                         return contains(item, filtered)
@@ -203,7 +203,7 @@ const Public = props => {
                       No Sales Found
                     </div>
                   )}
-                </Row>
+                </Row> */}
 
                 <div className="text-center text-lg-end mb-3">
                   <a
