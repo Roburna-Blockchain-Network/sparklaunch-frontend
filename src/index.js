@@ -33,8 +33,7 @@ const app = (
   <DAppProvider config={config}>
     <Provider store={store}>
       <BrowserRouter>
-        <NotificationContainer />
-        <App />
+        Sparklaunch
       </BrowserRouter>
     </Provider>
   </DAppProvider>
@@ -42,3 +41,4 @@ const app = (
 
 ReactDOM.render(app, document.getElementById("root"))
 // serviceWorker.unregister()
+
