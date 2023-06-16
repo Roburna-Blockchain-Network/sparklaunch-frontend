@@ -188,7 +188,7 @@ const Public = props => {
                 </Row>
 
                 <Row className="g-4 my-4">
-                  {allSales ? (
+                  {allSales && !allSales ? (
                     allSales
                       .filter(item => {
                         return contains(item, filtered)
